@@ -6,13 +6,15 @@ This repository holds two things, both published with GitHub Pages:
 |---|---|
 | Landing page | https://cph32789.github.io/newman/ |
 | **Current site** (offline mirror of newmanplasticsurgery.com) | https://cph32789.github.io/newman/original/ |
-| **Redesign concept** (mockup — not the final design) | https://cph32789.github.io/newman/redesign/ |
+| **Redesign Concept 1** (mockup — not the final design) | https://cph32789.github.io/newman/redesign/ |
+| **Redesign Concept 2** (mockup — not the final design) | https://cph32789.github.io/newman/redesign-2/ |
 
 ```
 /index.html           landing page linking to both
 /original/            the mirrored current website (PAGES.md lists every page)
 /redesign/index.html  redesign mockup
-/redesign/images/     every image the redesign uses (self-contained)
+/redesign/images/     every image concept 1 uses (self-contained)
+/redesign-2/          second redesign concept (index.html, gallery.html, images/)
 /.nojekyll            lets GitHub Pages serve underscore folders as-is
 ```
 
@@ -30,7 +32,14 @@ This repository holds two things, both published with GitHub Pages:
 - A handful of theme icon fonts, two video-library files and one link are already 404 on the live site, so they are missing here too (details in PAGES.md).
 - Forms, search, comments and `admin-ajax.php` need WordPress and don't work on static hosting.
 
-## Redesign images
+## Redesign Concept 2
+
+Built from a second, fully-coded mockup supplied by the project owner. Its embedded images were extracted into `redesign-2/images/` and the page otherwise left as designed (procedure explorer, team and profile dialogs, FAQ, mobile dock). Changes made to follow the same rules as concept 1:
+- No before/after photos on the main page; the "Results" section now links to `redesign-2/gallery.html` instead of the live site's galleries.
+- The gallery keeps breast photos locked and unloaded until the viewer confirms they are 18+.
+- Its portraits and model photos are the mockup's own (the model images are marked "illustrative"); the consultation form is a preview and sends nothing.
+
+## Redesign Concept 1 images
 
 The mockup's gradient/SVG placeholders were replaced with real images copied from the mirror into `redesign/images/` (the gradients remain underneath as fallbacks, and the dark overlays were kept so text stays readable):
 
