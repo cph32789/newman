@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	>
+
+<channel>
+	<title>Skin Care | Newman Plastic Surgery</title>
+	<atom:link href="https://newmanplasticsurgery.com/portfolio_category/skin-care/feed" rel="self" type="application/rss+xml" />
+	<link>https://newmanplasticsurgery.com</link>
+	<description>Plastic Surgeon Orlando</description>
+	<lastBuildDate>Tue, 06 Oct 2020 20:17:09 +0000</lastBuildDate>
+	<language>en-US</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.1.17</generator>
+
+<image>
+	<url>https://newmanplasticsurgery.com/wp-content/uploads/2020/06/cropped-NPS-Favicon-1-32x32.png</url>
+	<title>Skin Care | Newman Plastic Surgery</title>
+	<link>https://newmanplasticsurgery.com</link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Youthful in the Sunshine State</title>
+		<link>https://newmanplasticsurgery.com/portfolio-items/youthful-in-the-sunshine-state</link>
+		
+		<dc:creator><![CDATA[NPSwp]]></dc:creator>
+		<pubDate>Sun, 17 Apr 2016 20:46:24 +0000</pubDate>
+				<guid isPermaLink="false">https://new.newmanplasticsurgery.com/?post_type=avada_portfolio&#038;p=2901</guid>
+
+					<description><![CDATA[]]></description>
+										<content:encoded><![CDATA[<p><a href="http://newmanplasticsurgery.com/wp-content/uploads/2016/04/June2015.jpg"><img decoding="async" class="aligncenter size-full wp-image-2879" src="http://newmanplasticsurgery.com/wp-content/uploads/2016/04/June2015.jpg" alt="June2015" width="609" height="816" srcset="https://newmanplasticsurgery.com/wp-content/uploads/2016/04/June2015-224x300.jpg 224w, https://newmanplasticsurgery.com/wp-content/uploads/2016/04/June2015.jpg 609w" sizes="(max-width: 609px) 100vw, 609px" /></a></p>The post <a href="https://newmanplasticsurgery.com/portfolio-items/youthful-in-the-sunshine-state">Youthful in the Sunshine State</a> first appeared on <a href="https://newmanplasticsurgery.com">Newman Plastic Surgery</a>.]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>
