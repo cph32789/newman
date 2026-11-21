@@ -407,5 +407,5 @@ Source: https://newmanplasticsurgery.com (sitemap.xml + link crawl, captured 202
 - `shadow-top.png` / `shadow-bottom.png` are 404 on the live site (relative-path bug in the theme); replaced with 1x1 transparent PNGs in `assets/images/`.
 - Two video-library assets (`screenshot.jpg`, `Halo_by_Sciton...ogv`) and a `radiesse` link are 404 on the live site.
 - Dynamic endpoints (`/wp-admin/admin-ajax.php`, forms, search, comments) cannot work on static hosting; those references still point at the live domain.
-- WordPress shortlink duplicates (`/?p=ID`) and `wp-json`/oEmbed/feed endpoints were deliberately excluded.
+- WordPress shortlink duplicates (`/?p=ID`) and their `rel=shortlink` tags, plus `wp-json`/oEmbed/feed endpoints, were deliberately excluded.
 - External embeds (YouTube, Google Maps, social widgets) are left as links to their original sites.
