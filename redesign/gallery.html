@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Before &amp; After Gallery — Newman Plastic Surgery (Redesign Concept)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ivory:#F6F2EC; --sand:#E9E1D6; --stone:#C9BBA8; --bronze:#9C7A55;
+  --ink:#1C1A18; --charcoal:#2B2825; --muted:#6E665D; --line:rgba(28,26,24,.12);
+  --serif:'Cormorant Garamond',Georgia,serif; --sans:'Inter',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--ivory);color:var(--ink);font-family:var(--sans);font-weight:300;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1280px;margin:0 auto;padding:0 32px}
+.eyebrow{font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--bronze);font-weight:500}
+h1,h2,h3{font-family:var(--serif);font-weight:300;letter-spacing:-.01em;line-height:1.05}
+em{font-style:italic;color:var(--bronze)}
+.btn{display:inline-flex;align-items:center;gap:12px;padding:16px 30px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;font-weight:500;transition:.35s}
+.btn-dark{background:var(--ink);color:var(--ivory)}
+.btn-dark:hover{background:var(--bronze)}
+.btn-line{border:1px solid currentColor}
+.btn-line:hover{background:var(--ink);color:var(--ivory)}
+.arrow{width:22px;height:1px;background:currentColor;position:relative}
+.arrow:after{content:"";position:absolute;right:0;top:-3px;width:7px;height:7px;border-top:1px solid currentColor;border-right:1px solid currentColor;transform:rotate(45deg)}
+
+/* concept banner */
+.concept{background:var(--ink);color:var(--stone);text-align:center;font-size:11px;letter-spacing:.2em;text-transform:uppercase;padding:8px}
+
+/* nav */
+nav{position:sticky;top:0;z-index:50;background:rgba(246,242,236,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:84px}
+.logo{display:flex;flex-direction:column;line-height:1}
+.logo b{font-family:var(--serif);font-weight:400;font-size:26px;letter-spacing:.18em}
+.logo span{font-size:9px;letter-spacing:.42em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+.links{display:flex;gap:38px;font-size:12px;letter-spacing:.16em;text-transform:uppercase}
+.links a{position:relative;padding:6px 0}
+.links a:after{content:"";position:absolute;left:0;bottom:0;width:0;height:1px;background:var(--bronze);transition:.3s}
+.links a:hover:after{width:100%}
+.nav-r{display:flex;align-items:center;gap:24px;font-size:13px}
+.nav-r .btn{padding:13px 22px}
+.burger{display:none;width:26px;height:12px;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink)}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1.05fr 1fr;min-height:calc(100vh - 118px);border-bottom:1px solid var(--line)}
+.hero-copy{padding:80px 64px 64px 0;display:flex;flex-direction:column;justify-content:space-between}
+.hero h1{font-size:clamp(52px,7.2vw,112px);margin:28px 0 32px}
+.hero p.lead{font-size:18px;max-width:440px;color:var(--muted)}
+.hero-cta{display:flex;gap:16px;flex-wrap:wrap;margin-top:40px}
+.hero-meta{display:flex;gap:48px;margin-top:64px;padding-top:28px;border-top:1px solid var(--line)}
+.hero-meta div{font-size:12px;color:var(--muted);letter-spacing:.04em}
+.hero-meta strong{display:block;font-family:var(--serif);font-weight:400;font-size:22px;color:var(--ink);letter-spacing:0;margin-bottom:2px}
+.hero-img{position:relative;overflow:hidden;margin-right:-32px;
+  background:
+   radial-gradient(ellipse 60% 70% at 58% 42%,#EAD9C6 0%,transparent 60%),
+   radial-gradient(ellipse 40% 50% at 30% 80%,#B89A7A 0%,transparent 70%),
+   linear-gradient(160deg,#D8C6B1 0%,#A88A69 55%,#5E4A37 100%)}
+.silhouette{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center}
+.silhouette svg{width:78%;height:auto;opacity:.92}
+.photo-tag{position:absolute;left:28px;bottom:28px;background:rgba(246,242,236,.92);padding:18px 22px;max-width:260px}
+.photo-tag .eyebrow{font-size:9px}
+.photo-tag p{font-family:var(--serif);font-size:20px;line-height:1.2;margin-top:8px}
+.placeholder-note{position:absolute;top:24px;right:28px;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.75)}
+
+/* trust */
+.trust{border-bottom:1px solid var(--line)}
+.trust .wrap{display:flex;justify-content:space-between;align-items:center;padding:30px 32px;gap:24px;flex-wrap:wrap}
+.trust span{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--muted)}
+.trust b{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--charcoal);letter-spacing:.02em}
+
+/* philosophy */
+.philo{padding:150px 0;text-align:center}
+.philo h2{font-size:clamp(40px,5vw,76px);max-width:980px;margin:28px auto}
+.philo p{max-width:560px;margin:0 auto;color:var(--muted);font-size:17px}
+
+/* procedures */
+.procs{padding:0 0 150px}
+.sec-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:56px;gap:32px}
+.sec-head h2{font-size:clamp(40px,4.4vw,64px);margin-top:16px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.card{position:relative;aspect-ratio:3/4.3;overflow:hidden;color:var(--ivory);display:flex;flex-direction:column;justify-content:flex-end;padding:30px;cursor:pointer}
+.card .bg{position:absolute;inset:0;transition:transform 1.2s cubic-bezier(.2,.7,.2,1)}
+.card:hover .bg{transform:scale(1.06)}
+.card:before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,transparent 40%,rgba(20,16,12,.7))}
+.card>*:not(.bg){position:relative;z-index:2}
+.card .num{position:absolute;top:26px;left:30px;font-family:var(--serif);font-size:15px;opacity:.8}
+.card h3{font-size:42px;margin-bottom:12px}
+.card ul{list-style:none;font-size:13px;opacity:.86;line-height:1.9}
+.card .more{margin-top:20px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;display:flex;align-items:center;gap:12px}
+.b1{background:radial-gradient(circle at 50% 35%,#E8D5C0,transparent 55%),linear-gradient(170deg,#C9AE90,#6D5440)}
+.b2{background:radial-gradient(circle at 40% 45%,#DCC4AA,transparent 55%),linear-gradient(170deg,#B69676,#4E3D2F)}
+.b3{background:radial-gradient(circle at 60% 50%,#D2BCA2,transparent 55%),linear-gradient(170deg,#A98C6F,#3F322A)}
+.b4{background:radial-gradient(circle at 50% 40%,#F0E4D6,transparent 55%),linear-gradient(170deg,#CDBCA8,#7A6655)}
+
+/* surgeon */
+.surgeon{background:var(--charcoal);color:var(--ivory);padding:140px 0}
+.surgeon .wrap{display:grid;grid-template-columns:.9fr 1.1fr;gap:96px;align-items:center}
+.portrait{aspect-ratio:4/5;background:radial-gradient(ellipse at 50% 30%,#6A5A4B,transparent 65%),linear-gradient(180deg,#4A3F36,#221E1A);position:relative;display:flex;align-items:flex-end;justify-content:center}
+.portrait svg{width:70%}
+.portrait .frame{position:absolute;inset:18px;border:1px solid rgba(201,187,168,.3)}
+.surgeon h2{font-size:clamp(44px,4.8vw,72px);margin:20px 0 28px}
+.surgeon p{color:#C8BFB3;font-size:17px;max-width:520px;margin-bottom:20px}
+.sig{font-family:var(--serif);font-style:italic;font-size:34px;color:var(--stone);margin:36px 0}
+.creds{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(201,187,168,.2);margin-top:44px;max-width:560px}
+.creds div{background:var(--charcoal);padding:22px 0;font-size:13px;color:#C8BFB3}
+.creds div:nth-child(odd){padding-right:20px}
+.creds div:nth-child(even){padding-left:20px}
+.creds strong{display:block;font-family:var(--serif);font-weight:400;color:var(--ivory);font-size:20px}
+.surgeon .btn-line{color:var(--ivory);margin-top:40px}
+.surgeon .btn-line:hover{background:var(--ivory);color:var(--ink)}
+
+/* aesthetics / med spa */
+.spa{padding:150px 0}
+.spa-grid{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid var(--line)}
+.spa-item{padding:44px 36px 44px 0;border-bottom:1px solid var(--line)}
+.spa-item:not(:nth-child(3n)){border-right:1px solid var(--line);}
+.spa-item:not(:nth-child(3n+1)){padding-left:36px}
+.spa-item .eyebrow{color:var(--muted)}
+.spa-item h3{font-size:32px;margin:14px 0 12px}
+.spa-item p{color:var(--muted);font-size:15px}
+
+/* gallery */
+.gallery{background:var(--sand);padding:140px 0}
+.ba{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.ba-item{background:var(--ivory)}
+.ba-pair{display:grid;grid-template-columns:1fr 1fr;gap:2px;aspect-ratio:1.5}
+.ba-pair div{position:relative;background:linear-gradient(160deg,#D7C6B3,#A88D73)}
+.ba-pair div:last-child{background:linear-gradient(160deg,#E3D4C3,#B79D82)}
+.ba-pair span{position:absolute;left:12px;bottom:10px;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--ivory)}
+.ba-cap{padding:20px 22px;display:flex;justify-content:space-between;font-size:13px}
+.ba-cap b{font-family:var(--serif);font-weight:400;font-size:20px}
+.privacy{margin-top:40px;font-size:14px;color:var(--muted);text-align:center}
+
+/* journey */
+.journey{padding:150px 0}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:40px;margin-top:64px;counter-reset:s}
+.step{border-top:1px solid var(--ink);padding-top:28px}
+.step:before{counter-increment:s;content:"0" counter(s);font-family:var(--serif);font-size:56px;color:var(--stone);display:block;line-height:1;margin-bottom:22px}
+.step h3{font-size:28px;margin-bottom:10px}
+.step p{color:var(--muted);font-size:15px}
+
+/* quote */
+.quote{padding:120px 0;text-align:center;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.quote blockquote{font-family:var(--serif);font-size:clamp(30px,3.6vw,52px);font-weight:300;line-height:1.2;max-width:1000px;margin:24px auto 0}
+
+/* consult */
+.consult{display:grid;grid-template-columns:1fr 1fr;min-height:640px}
+.consult-l{background:linear-gradient(160deg,#8C6E52,#3A2E25);color:var(--ivory);padding:110px 80px;display:flex;flex-direction:column;justify-content:space-between}
+.consult-l h2{font-size:clamp(44px,4.6vw,70px);margin:22px 0}
+.consult-l p{color:#E2D6C8;max-width:420px}
+.contact-list{margin-top:48px;font-size:15px;line-height:2.1}
+.contact-list b{font-family:var(--serif);font-weight:400;font-size:24px}
+.consult-r{background:var(--ivory);padding:110px 80px}
+form{display:grid;grid-template-columns:1fr 1fr;gap:34px 28px;margin-top:32px}
+.f{display:flex;flex-direction:column;gap:8px}
+.f.full{grid-column:1/-1}
+label{font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--muted)}
+input,select,textarea{font:inherit;font-size:16px;background:transparent;border:0;border-bottom:1px solid var(--line);padding:10px 0;color:var(--ink);outline:none;border-radius:0}
+input:focus,select:focus,textarea:focus{border-color:var(--bronze)}
+textarea{resize:none;height:80px}
+form .btn{grid-column:1/-1;justify-content:center;border:0;cursor:pointer}
+.fine{grid-column:1/-1;font-size:12px;color:var(--muted)}
+
+/* footer */
+footer{background:var(--ink);color:#A79D90;padding:90px 0 40px;font-size:14px}
+.foot{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:48px;padding-bottom:64px;border-bottom:1px solid rgba(255,255,255,.08)}
+footer .logo b{color:var(--ivory)}
+footer h4{font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--stone);font-weight:500;margin-bottom:20px}
+footer li{list-style:none;line-height:2.1}
+footer li a:hover{color:var(--ivory)}
+.foot-b{display:flex;justify-content:space-between;padding-top:30px;font-size:12px;flex-wrap:wrap;gap:12px}
+
+/* fade-in */
+.r{opacity:0;transform:translateY(24px);transition:opacity 1s,transform 1s cubic-bezier(.2,.7,.2,1)}
+.r.in{opacity:1;transform:none}
+
+/* real imagery (photos layered over the original gradients) */
+.hero-img{background:url(images/hero-practice-exterior.jpg) center/cover no-repeat,#5E4A37}
+.hero-img:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(20,16,12,.45))}
+.photo-tag{z-index:2}
+.b1{background:url(images/procedure-face.jpg) center/cover no-repeat,#6D5440}
+.b2{background:url(images/procedure-breast.jpg) center/cover no-repeat,#4E3D2F}
+.b3{background:url(images/procedure-body.jpg) center/cover no-repeat,#3F322A}
+.b4{background:url(images/procedure-aesthetics.jpg) center/cover no-repeat,#7A6655}
+.card:before{background:linear-gradient(180deg,transparent 25%,rgba(20,16,12,.82))}
+.portrait{background:url(images/dr-newman-portrait.png) center/88% auto no-repeat,radial-gradient(ellipse at 50% 30%,#6A5A4B,transparent 65%),linear-gradient(180deg,#4A3F36,#221E1A)}
+.ba-pair span{text-shadow:0 1px 6px rgba(0,0,0,.6);z-index:1}
+.logo-img{display:block;height:44px;width:auto}
+
+@media(max-width:1000px){
+  .links,.nav-r .phone{display:none}.burger{display:block}
+  .hero{grid-template-columns:1fr}
+  .hero-copy{padding:56px 0}
+  .hero-img{min-height:520px;margin:0 -32px}
+  .grid4{grid-template-columns:1fr 1fr}
+  .surgeon .wrap,.consult{grid-template-columns:1fr;gap:56px}
+  .spa-grid,.ba{grid-template-columns:1fr}
+  .spa-item{padding:36px 0!important;border-right:0!important}
+  .steps{grid-template-columns:1fr 1fr}
+  .foot{grid-template-columns:1fr 1fr}
+  .consult-l,.consult-r{padding:72px 32px}
+  .sec-head{flex-direction:column;align-items:flex-start}
+}
+@media(max-width:600px){
+  .wrap{padding:0 22px}
+  .nav-r .btn{display:none}
+  .hero-img{margin:0 -22px}
+  .hero-meta{gap:28px;flex-wrap:wrap}
+  .grid4,.steps{grid-template-columns:1fr}
+  .philo,.procs,.spa,.journey{padding:96px 0}
+  .procs{padding-top:0}
+  form{grid-template-columns:1fr}
+  .foot{grid-template-columns:1fr}
+  .consult-l,.consult-r{padding:64px 22px}
+}
+
+.ba-pair{aspect-ratio:1.8}
+.ba-pair div{background-size:cover;background-position:center}
+.ba-pair div[aria-label*='profile']{background-position:70% center}
+.ba-pair{position:relative}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:36px}
+.filters button{font:inherit;font-size:12px;letter-spacing:.2em;text-transform:uppercase;font-weight:500;padding:14px 24px;background:transparent;border:1px solid var(--ink);color:var(--ink);cursor:pointer;min-height:44px}
+.filters button[aria-pressed="true"]{background:var(--ink);color:var(--ivory)}
+.page-head{padding:90px 0 56px}.page-head h1{font-size:clamp(44px,6vw,84px);margin-top:16px}
+.lock{position:absolute;inset:0;z-index:3;border:0;cursor:pointer;color:var(--ivory);font:inherit;background:linear-gradient(160deg,#6D5440,#2B2825);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:20px;text-align:center}
+.lock b{font-family:var(--serif);font-weight:400;font-size:24px}.lock span{font-size:11px;letter-spacing:.22em;text-transform:uppercase;opacity:.85}
+.g-item[hidden]{display:none}
+.gate{position:fixed;inset:0;z-index:100;background:rgba(20,16,12,.78);display:none;align-items:center;justify-content:center;padding:20px}
+.gate.open{display:flex}
+.gate-box{background:var(--ivory);max-width:480px;width:100%;padding:44px 36px;text-align:center}
+.gate-box h2{font-size:38px;margin:14px 0 14px}.gate-box p{color:var(--muted);font-size:15px;margin-bottom:28px}
+.gate-box .row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.gate-box .btn{cursor:pointer;border:1px solid var(--ink);font-family:inherit}
+.gate-no{margin-top:18px;font-size:14px;color:var(--bronze);min-height:22px}
+@media(max-width:1000px){.ba{grid-template-columns:1fr 1fr}}@media(max-width:600px){.ba{grid-template-columns:1fr}.gate-box{padding:36px 22px}}
+</style>
+</head>
+<body>
+<div class="concept">Redesign concept · Mockup only · Imagery borrowed from the current site</div>
+<nav>
+  <div class="wrap">
+    <a href="index.html" class="logo" aria-label="Newman Plastic Surgery — home"><img class="logo-img" src="images/logo-newman-plastic-surgery.png" alt="Newman Plastic Surgery — Charles E. Newman Jr., MD · Dzi-Long Newman, MPAS, PA-C"></a>
+    <div class="links">
+      <a href="index.html#procedures">Surgery</a>
+      <a href="index.html#aesthetics">Aesthetics</a>
+      <a href="gallery.html" aria-current="page">Gallery</a>
+      <a href="index.html#surgeon">Dr. Newman</a>
+      <a href="index.html#journey">Your Visit</a>
+    </div>
+    <div class="nav-r">
+      <a class="phone" href="tel:4074819505">407.481.9505</a>
+      <a href="index.html#consult" class="btn btn-dark">Book Consultation</a>
+      <div class="burger"></div>
+    </div>
+  </div>
+</nav>
+<main class="gallery" style="padding-top:0">
+<div class="wrap">
+  <div class="page-head"><div class="eyebrow">Real Patients</div><h1>Before &amp; <em>After</em></h1>
+  <p class="privacy" style="text-align:left;margin-top:24px;max-width:560px">Results vary. Additional results are available privately during your consultation to protect patient confidentiality.</p></div>
+  <div class="filters" role="group" aria-label="Filter by procedure type">
+    <button type="button" data-filter="all" aria-pressed="true">All</button>
+    <button type="button" data-filter="face" aria-pressed="false">Face</button>
+    <button type="button" data-filter="breast" aria-pressed="false">Breast (18+)</button>
+    <button type="button" data-filter="body" aria-pressed="false">Body</button>
+  </div>
+  <div class="ba" style="padding-bottom:140px">
+      <div class="ba-item g-item" data-cat="face"><div class="ba-pair"><div role="img" aria-label="Before — Facelift patient, profile view" style="background-image:url(images/ba-facelift-before.jpg)"><span>Before</span></div><div role="img" aria-label="After — Facelift patient, profile view" style="background-image:url(images/ba-facelift-after.jpg)"><span>After</span></div></div><div class="ba-cap"><b>Facelift — profile</b><span>Face</span></div></div>
+      <div class="ba-item g-item" data-cat="face"><div class="ba-pair"><div role="img" aria-label="Before — Facelift patient, front view" style="background-image:url(images/ba-facelift2-before.jpg)"><span>Before</span></div><div role="img" aria-label="After — Facelift patient, front view" style="background-image:url(images/ba-facelift2-after.jpg)"><span>After</span></div></div><div class="ba-cap"><b>Facelift — front</b><span>Face</span></div></div>
+      <div class="ba-item g-item" data-cat="body"><div class="ba-pair"><div role="img" aria-label="Before — Abdominoplasty patient, three-quarter view" style="background-image:url(images/ba-tummytuck-before.jpg)"><span>Before</span></div><div role="img" aria-label="After — Abdominoplasty patient, three-quarter view" style="background-image:url(images/ba-tummytuck-after.jpg)"><span>After</span></div></div><div class="ba-cap"><b>Abdominoplasty</b><span>Body</span></div></div>
+      <div class="ba-item g-item is-locked" data-cat="breast"><div class="ba-pair"><div role="img" aria-label="Before — Breast augmentation patient, front view" data-bg="images/ba-breast-before.jpg"><span>Before</span></div><div role="img" aria-label="After — Breast augmentation patient, front view" data-bg="images/ba-breast-after.jpg"><span>After</span></div><button class="lock" type="button" data-verify><b>Photos for viewers 18+</b><span>Confirm your age to view</span></button></div><div class="ba-cap"><b>Breast Augmentation</b><span>Breast</span></div></div>
+      <div class="ba-item g-item is-locked" data-cat="breast"><div class="ba-pair"><div role="img" aria-label="Before — Breast augmentation patient, second case" data-bg="images/ba-breast2-before.jpg"><span>Before</span></div><div role="img" aria-label="After — Breast augmentation patient, second case" data-bg="images/ba-breast2-after.jpg"><span>After</span></div><button class="lock" type="button" data-verify><b>Photos for viewers 18+</b><span>Confirm your age to view</span></button></div><div class="ba-cap"><b>Breast Augmentation II</b><span>Breast</span></div></div>
+  </div>
+</div>
+</main>
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div><a class="logo" href="index.html"><b>NEWMAN</b><span style="color:#7C7368">Plastic Surgery · Orlando</span></a>
+        <p style="margin-top:28px;max-width:300px">Committed to the highest standards in plastic surgery and aesthetics.</p></div>
+      <div><h4>Surgery</h4><ul><li><a href="#">Face</a></li><li><a href="#">Breast</a></li><li><a href="#">Body</a></li><li><a href="#">Reconstruction</a></li></ul></div>
+      <div><h4>Aesthetics</h4><ul><li><a href="#">Injectables</a></li><li><a href="#">Laser</a></li><li><a href="#">miraDry</a></li><li><a href="#">Skincare</a></li></ul></div>
+      <div><h4>Practice</h4><ul><li><a href="#">Dr. Newman</a></li><li><a href="#">Our Team</a></li><li><a href="#">Financing</a></li><li><a href="#">Offers & Events</a></li></ul></div>
+    </div>
+    <div class="foot-b"><span>© Newman Plastic Surgery · 444 N. Mills Ave, Orlando</span><span>Instagram · Facebook · YouTube</span></div>
+  </div>
+</footer>
+
+<div class="gate" id="gate" role="dialog" aria-modal="true" aria-labelledby="gate-t" aria-describedby="gate-d">
+  <div class="gate-box">
+    <div class="eyebrow">Age Verification</div>
+    <h2 id="gate-t">Are you 18 or older?</h2>
+    <p id="gate-d">These photos show breast surgery results and are intended for adults only. Please confirm you are at least 18 years of age to continue.</p>
+    <div class="row">
+      <button class="btn btn-dark" type="button" id="gate-yes">Yes, I am 18 or older</button>
+      <button class="btn btn-line" type="button" id="gate-no">No</button>
+    </div>
+    <div class="gate-no" id="gate-msg" role="status"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var KEY='npsAge18',verified=false,lastFocus=null;
+  try{verified=sessionStorage.getItem(KEY)==='1'}catch(e){}
+  var gate=document.getElementById('gate'),msg=document.getElementById('gate-msg'),yes=document.getElementById('gate-yes'),no=document.getElementById('gate-no');
+  var items=[].slice.call(document.querySelectorAll('.g-item')),btns=[].slice.call(document.querySelectorAll('.filters button'));
+  function reveal(){
+    items.forEach(function(it){
+      it.classList.remove('is-locked');
+      var l=it.querySelector('.lock'); if(l) l.remove();
+      [].forEach.call(it.querySelectorAll('[data-bg]'),function(d){d.style.backgroundImage='url('+d.getAttribute('data-bg')+')';d.removeAttribute('data-bg')});
+    });
+  }
+  function openGate(){lastFocus=document.activeElement;msg.textContent='';gate.classList.add('open');yes.focus()}
+  function closeGate(){gate.classList.remove('open');if(lastFocus&&lastFocus.focus)lastFocus.focus()}
+  function applyFilter(f){
+    btns.forEach(function(b){b.setAttribute('aria-pressed',b.dataset.filter===f?'true':'false')});
+    items.forEach(function(it){it.hidden=!(f==='all'||it.dataset.cat===f)});
+  }
+  var pending=null;
+  yes.addEventListener('click',function(){verified=true;try{sessionStorage.setItem(KEY,'1')}catch(e){}reveal();closeGate();if(pending){applyFilter(pending);pending=null}});
+  no.addEventListener('click',function(){pending=null;msg.textContent='Sorry — you must be 18 or older to view these photos.';setTimeout(closeGate,1800)});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&gate.classList.contains('open')){pending=null;closeGate()}});
+  document.addEventListener('click',function(e){var v=e.target.closest('[data-verify]');if(v&&!verified)openGate()});
+  btns.forEach(function(b){b.addEventListener('click',function(){
+    var f=b.dataset.filter;
+    if(f==='breast'&&!verified){pending='breast';openGate();return}
+    applyFilter(f);
+  })});
+  if(verified)reveal();
+  var q=(location.hash||'').replace('#','');if(['face','body'].indexOf(q)>-1)applyFilter(q);
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12});
+  document.querySelectorAll('.r').forEach(function(el){io.observe(el)});
+})();
+</script>
+</body>
+</html>

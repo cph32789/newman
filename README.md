@@ -39,7 +39,7 @@ The mockup's gradient/SVG placeholders were replaced with real images copied fro
 | Hero | Practice exterior photo, 444 N. Mills Ave |
 | Surgeon portrait | Dr. Newman's photo from "Meet Dr. Newman" |
 | Procedure cards | The Face / Breast / Body / Non-Surgical category images from the current site |
-| Before & After | Real facelift, breast augmentation and tummy tuck pairs from the gallery |
+| Before & After | Real facelift, breast augmentation and tummy tuck pairs — on `redesign/gallery.html` only (none on the main page). Breast photos stay unloaded until the viewer confirms they are 18+ |
 | Logo (nav) | Actual NPS logo PNG |
 
 Each image has alt text (`aria-label` for CSS backgrounds).
