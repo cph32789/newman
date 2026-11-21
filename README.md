@@ -8,6 +8,7 @@ This repository holds two things, both published with GitHub Pages:
 | **Current site** (offline mirror of newmanplasticsurgery.com) | https://cph32789.github.io/newman/original/ |
 | **Redesign Concept 1** (mockup — not the final design) | https://cph32789.github.io/newman/redesign/ |
 | **Redesign Concept 2** (mockup — not the final design) | https://cph32789.github.io/newman/redesign-2/ |
+| **Redesign Concept 3** (mockup — not the final design) | https://cph32789.github.io/newman/redesign-3/ |
 
 ```
 /index.html           landing page linking to both
@@ -15,6 +16,7 @@ This repository holds two things, both published with GitHub Pages:
 /redesign/index.html  redesign mockup
 /redesign/images/     every image concept 1 uses (self-contained)
 /redesign-2/          second redesign concept (index.html, gallery.html, images/)
+/redesign-3/          third redesign concept (index.html, gallery.html, images/)
 /.nojekyll            lets GitHub Pages serve underscore folders as-is
 ```
 
@@ -38,6 +40,13 @@ Built from a second, fully-coded mockup supplied by the project owner. Its embed
 - No before/after photos on the main page; the "Results" section now links to `redesign-2/gallery.html` instead of the live site's galleries.
 - The gallery keeps breast photos locked and unloaded until the viewer confirms they are 18+.
 - Its portraits and model photos are the mockup's own (the model images are marked "illustrative"); the consultation form is a preview and sends nothing.
+
+## Redesign Concept 3
+
+Built from a third fully-coded mockup ("Option Two") supplied by the project owner: bold teal/lime direction with a procedure explorer, team/profile dialogs and a mobile dock. Images were extracted from the file into `redesign-3/images/`. As with concept 2:
+- The main page has no before/after photos; its "Real possibilities" section links to `redesign-3/gallery.html` rather than the live site.
+- The gallery locks breast photos (not even downloaded) until the viewer confirms they are 18+.
+- Model photos are the mockup's own and are labelled illustrative; the consultation form is a preview and sends nothing.
 
 ## Redesign Concept 1 images
 
