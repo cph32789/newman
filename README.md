@@ -6,6 +6,7 @@ This repository holds two things, both published with GitHub Pages:
 |---|---|
 | Landing page | https://cph32789.github.io/newman/ |
 | **Current site** (offline mirror of newmanplasticsurgery.com) | https://cph32789.github.io/newman/original/ |
+| **Redesign v1** (the rebuild, home page first) | https://cph32789.github.io/newman/redesign-v1/ |
 | **Redesign Concept 1** (mockup — not the final design) | https://cph32789.github.io/newman/redesign/ |
 | **Redesign Concept 2** (mockup — not the final design) | https://cph32789.github.io/newman/redesign-2/ |
 | **Redesign Concept 3** (mockup — not the final design) | https://cph32789.github.io/newman/redesign-3/ |
@@ -17,6 +18,8 @@ This repository holds two things, both published with GitHub Pages:
 /redesign/images/     every image concept 1 uses (self-contained)
 /redesign-2/          second redesign concept (index.html, gallery.html, images/)
 /redesign-3/          third redesign concept (index.html, gallery.html, images/)
+/redesign-v1/         Redesign v1: the real rebuild, one page at a time (home page first)
+/docs/                PROJECT-GOALS.md and DESIGN-SYSTEM.md
 /.nojekyll            lets GitHub Pages serve underscore folders as-is
 ```
 
@@ -33,6 +36,14 @@ This repository holds two things, both published with GitHub Pages:
 ### Known gaps in the mirror
 - A handful of theme icon fonts, two video-library files and one link are already 404 on the live site, so they are missing here too (details in PAGES.md).
 - Forms, search, comments and `admin-ajax.php` need WordPress and don't work on static hosting.
+
+## Redesign v1 (the rebuild)
+
+The first page of the real rebuild: the **home page**, built to the project goals in [`docs/PROJECT-GOALS.md`](docs/PROJECT-GOALS.md) and the design system in [`docs/DESIGN-SYSTEM.md`](docs/DESIGN-SYSTEM.md). Look and feel from Concept 3 (warmed up), mobile experience from Concept 2.
+
+Includes: precise procedure **search** ("nose job", "breast augmentation", goals, typos), a **Discover** feed with **My list** (saved ideas go into the consultation request), **social linking** (shareable per-procedure links, related posts), a phone **tab bar** and slide-up sheets, and an **image model** that never stretches or squishes images and stores per-image fit settings.
+
+Sample content (feed cards, social posts, procedure text) is draft until approved. Results, biography and financing links show a "next build" note until those pages are built.
 
 ## Redesign Concept 2
 
