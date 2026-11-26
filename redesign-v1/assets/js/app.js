@@ -5,7 +5,8 @@
    ===================================================================== */
 (function () {
   'use strict';
-  var NPS = window.NPS, SITE = NPS.site, P = NPS.procedures;
+  var NPS = window.NPS, SITE = NPS.site, P = NPS.procedures, BASE = window.NPS_BASE || '';
+  var HOME = !!document.getElementById('feed');   // home-only features (feed, social, reviews)
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
   var byId = {}; P.forEach(function (p) { byId[p.id] = p; });
@@ -166,13 +167,14 @@
 
   /* ---------- Share ---------- */
   function shareUrl(hash) { return location.origin + location.pathname + (hash || ''); }
-  function share(title, hash) {
-    var url = shareUrl(hash);
+  function share(title, hash, full) {
+    var url = full || shareUrl(hash);
     if (navigator.share) { navigator.share({ title: title, url: url }).catch(function () {}); return; }
     if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(url).then(function () { toast('Link copied'); }, function () { toast(url); }); } else { toast(url); }
   }
 
-  /* ---------- Detail sheet (a preview of a procedure page) ---------- */
+  function pageUrl(id) { return BASE + 'procedures/' + id + '/'; }
+  /* ---------- Detail sheet (a quick preview of a procedure page) ---------- */
   function openDetail(id) {
     var p = byId[id]; if (!p) return;
     var soc = NPS.social.filter(function (s) { return s.ref === id; });
@@ -186,14 +188,15 @@
       '<p class="dblurb">' + esc(p.blurb) + '</p>' +
       '<p class="dtext">' + esc(p.detail) + '</p>' +
       (aka.length ? '<p class="note" style="margin-top:14px">Also known as: ' + aka.map(esc).join(', ') + '</p>' : '') +
-      '<div class="dacts"><button class="btn btn--ink" data-toconsult="' + id + '">Request a consultation</button>' +
+      '<a class="btn btn--champagne" href="' + pageUrl(id) + '" style="margin-top:22px;width:100%">View the full page ' + ic('arrow') + '</a>' +
+      '<div class="dacts" style="margin-top:12px"><button class="btn btn--ink" data-toconsult="' + id + '">Request a consultation</button>' +
       '<button class="btn btn--line" data-save="' + id + '" aria-pressed="' + isSaved(id) + '" aria-label="Save">' + ic('heart') + '<span class="sv">Save</span></button>' +
       '<button class="btn btn--line" data-share="' + id + '" aria-label="Share">' + ic('share') + '</button></div>' +
       (p.cat === 'Breast' ? '<p class="age-note">Before-and-after photos of breast procedures are shown only to visitors who confirm they are 18 or older.</p>' : '') +
-      '<div class="dsec"><h3>Results</h3><button class="link" data-soon="The results gallery is part of the next build.">See results for ' + esc(p.title.replace(/\s*\(.*\)/, '').toLowerCase()) + ' ' + ic('arrow') + '</button></div>' +
+      '<div class="dsec"><h3>Results</h3><a class="link" href="' + pageUrl(id) + '#results">See results for ' + esc(p.title.replace(/\s*\(.*\)/, '').toLowerCase()) + ' ' + ic('arrow') + '</a></div>' +
       (soc.length ? '<div class="dsec"><h3>From our social feeds</h3><div class="dsoc">' + soc.map(function (s) { var pl = SITE.social[s.platform]; return '<a href="' + pl.url + '" target="_blank" rel="noopener">' + NPS.imgTag('soc.' + s.id, { image: s.img, fx: 50, fy: 40 }, { alt: '' }) + '<span><b>' + pl.label + '</b>' + esc(s.caption) + '</span></a>'; }).join('') + '</div></div>' : '') +
       (rel.length ? '<div class="dsec"><h3>Related</h3><div class="pills">' + rel.map(function (r) { return '<button class="chip" data-detail="' + r.id + '">' + esc(r.title.replace(/\s*\(.*\)/, '')) + '</button>'; }).join('') + '</div></div>' : '') +
-      '<div class="dsec"><h3>Share</h3><p class="note">Every procedure has its own link, so you can send it to a friend or tag it in a post: <b style="word-break:break-all">' + esc(location.host + location.pathname + '#procedure/' + id) + '</b></p></div>';
+      '<div class="dsec"><h3>Share</h3><p class="note">Every procedure has its own link, so you can send it to a friend or tag it in a post: <b style="word-break:break-all">' + esc(new URL(pageUrl(id), location.href).href.replace(/^https?:\/\//, '')) + '</b></p></div>';
     var d = openSheet('detail'); var sc = $('#dbody'); sc.scrollTop = 0;
     history.replaceState(null, '', '#procedure/' + id);
     refreshSaved();
@@ -228,6 +231,7 @@
     return '';
   }
   function renderFeed(append) {
+    if (!HOME) return;
     var items = feedItems(), box = $('#feed');
     if (!append) { box.innerHTML = ''; fShown = 0; }
     var n = fShown ? STEP : FIRST, slice = items.slice(fShown, fShown + n);
@@ -239,6 +243,7 @@
   }
   /* Keep rows complete: if the last row would be short, widen the last card so the grid always ends square. */
   function balanceFeed() {
+    if (!HOME) return;
     var box = $('#feed'), cards = $$('.fc', box);
     cards.forEach(function (c) { c.classList.remove('is-wide', 'is-wide2'); });
     var cols = getComputedStyle(box).gridTemplateColumns.split(' ').length, n = cards.length;
@@ -250,16 +255,17 @@
   }
   var balT; window.addEventListener('resize', function () { clearTimeout(balT); balT = setTimeout(balanceFeed, 120); });
   function renderChips() {
+    if (!HOME) return;
     $('#feedChips').innerHTML = FILTERS.map(function (f) { return '<button class="chip" data-ffilter="' + f[0] + '" aria-pressed="' + (f[0] === fFilter) + '">' + f[1] + '</button>'; }).join('');
   }
 
   /* ---------- Social ---------- */
   function renderSocial() {
     var keys = ['instagram', 'facebook', 'youtube', 'pinterest'];
-    $('#socialBtns').innerHTML = keys.map(function (k) { var s = SITE.social[k]; return '<a class="sbtn" href="' + s.url + '" target="_blank" rel="noopener">' + ic(PLAT[k]) + s.label + '</a>'; }).join('');
+    if ($('#socialBtns')) $('#socialBtns').innerHTML = keys.map(function (k) { var s = SITE.social[k]; return '<a class="sbtn" href="' + s.url + '" target="_blank" rel="noopener">' + ic(PLAT[k]) + s.label + '</a>'; }).join('');
     var dots = keys.map(function (k) { var s = SITE.social[k]; return '<a href="' + s.url + '" target="_blank" rel="noopener" aria-label="' + s.label + '">' + ic(PLAT[k]) + '</a>'; }).join('');
     $('#footSocials').innerHTML = dots; $('#menuSocials').innerHTML = dots;
-    $('#posts').innerHTML = NPS.social.map(function (s) {
+    if ($('#posts')) $('#posts').innerHTML = NPS.social.map(function (s) {
       var pl = SITE.social[s.platform], rp = byId[s.ref];
       return '<article class="post"><a class="ph frame" href="' + pl.url + '" target="_blank" rel="noopener" aria-label="Open on ' + pl.label + '">' + NPS.imgTag('post.' + s.id, { image: s.img, fx: 50, fy: 40 }) + '<span class="pl">' + ic(PLAT[s.platform]) + '</span></a><p>' + esc(s.caption) + '</p><button class="rel" data-detail="' + rp.id + '">On the site: ' + esc(rp.title.replace(/\s*\(.*\)/, '')) + ' ' + ic('arrow') + '</button></article>';
     }).join('');
@@ -267,7 +273,7 @@
 
   /* ---------- Voices ---------- */
   function renderVoices() {
-    var tr = $('#voices');
+    var tr = $('#voices'); if (!tr) return;
     tr.innerHTML = NPS.voices.map(function (v) { return '<figure class="voice"><div class="stars" aria-label="Five stars">' + '<svg><use href="#i-star"/></svg>'.repeat(5) + '</div><q>' + esc(v.text) + '</q><cite>' + esc(v.who) + '</cite></figure>'; }).join('');
     var dots = $('#voiceDots');
     dots.innerHTML = NPS.voices.map(function (v, i) { return '<button aria-label="Review ' + (i + 1) + '" data-vdot="' + i + '"><i></i></button>'; }).join('');
@@ -358,13 +364,13 @@
       return;
     }
     if ((t = e.target.closest('[data-save]'))) { e.preventDefault(); e.stopPropagation(); toggleSave(t.getAttribute('data-save')); return; }
-    if ((t = e.target.closest('[data-share]'))) { e.preventDefault(); var id = t.getAttribute('data-share'); share(byId[id].title + ' · Newman Plastic Surgery', '#procedure/' + id); return; }
+    if ((t = e.target.closest('[data-share]'))) { e.preventDefault(); var id = t.getAttribute('data-share'); share(byId[id].title + ' · Newman Plastic Surgery', '', new URL(pageUrl(id), location.href).href); return; }
     if ((t = e.target.closest('[data-ffilter]'))) { fFilter = t.getAttribute('data-ffilter'); renderChips(); renderFeed(false); return; }
     if ((t = e.target.closest('[data-toconsult]'))) { e.preventDefault(); toConsult(t.getAttribute('data-toconsult') || null); return; }
     if ((t = e.target.closest('[data-clearlist]'))) { saved = []; persist(); refreshSaved(); return; }
     if ((t = e.target.closest('[data-soon]'))) { e.preventDefault(); toast(t.getAttribute('data-soon')); return; }
     if ((t = e.target.closest('[data-close]'))) { var d = t.closest('dialog'); if (d) { d.close(); var href = t.getAttribute('href'); if (href && href.charAt(0) === '#') { /* anchor handles scroll */ } } if (t.tagName === 'BUTTON') e.preventDefault(); return; }
-    if (e.target.closest('#shareSite')) { share('Newman Plastic Surgery', ''); return; }
+    if (e.target.closest('[data-sharesite]')) { share('Newman Plastic Surgery', ''); return; }
     if (e.target.closest('#feedMore')) { renderFeed(true); return; }
     var a = e.target.closest('a[href^="#"]');
     if (a && a.getAttribute('href').length > 1 && !a.hasAttribute('data-close')) { /* normal smooth scroll */ }
@@ -379,15 +385,14 @@
   function onScroll() { hdr.classList.toggle('is-scrolled', window.scrollY > 8); }
   window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
   if ('IntersectionObserver' in window) {
-    var secs = [['.hero', 'top'], ['#procedures', 'explore'], ['#discover', 'discover'], ['#consult', 'book']];
+    var secs = HOME ? [['.hero', 'top'], ['#procedures', 'explore'], ['#discover', 'discover'], ['#consult', 'book']] : [['#consult', 'book']];
     var vis = {};
-    var so = new IntersectionObserver(function (es) { es.forEach(function (en) { vis[en.target.dataset.t] = en.isIntersecting ? en.intersectionRatio : 0; }); var best = 'top', m = 0; Object.keys(vis).forEach(function (k) { if (vis[k] > m) { m = vis[k]; best = k; } }); setTab(best); }, { threshold: [0, .15, .3, .5, .75] });
+    var so = new IntersectionObserver(function (es) { es.forEach(function (en) { vis[en.target.dataset.t] = en.isIntersecting ? en.intersectionRatio : 0; }); var best = HOME ? 'top' : 'explore', m = 0; Object.keys(vis).forEach(function (k) { if (vis[k] > m) { m = vis[k]; best = k; } }); setTab(best); }, { threshold: [0, .15, .3, .5, .75] });
     secs.forEach(function (s) { var el = $(s[0]); if (el) { el.dataset.t = s[1]; so.observe(el); } });
     var rvo = new IntersectionObserver(function (es) { es.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('in'); rvo.unobserve(en.target); } }); }, { threshold: .12, rootMargin: '0px 0px -6% 0px' });
     $$('.rv').forEach(function (el) { rvo.observe(el); });
-    var auto = new IntersectionObserver(function (es) { if (es[0].isIntersecting && !$('#feedMore').hidden && fShown > 0 && window.__feedAuto) renderFeed(true); }, { rootMargin: '600px 0px' });
-    auto.observe($('#feedSentinel'));
-    $('#feedMore').addEventListener('click', function () { window.__feedAuto = true; });
+    var auto = new IntersectionObserver(function (es) { if (es[0].isIntersecting && HOME && !$('#feedMore').hidden && fShown > 0 && window.__feedAuto) renderFeed(true); }, { rootMargin: '600px 0px' });
+    if (HOME) { auto.observe($('#feedSentinel')); $('#feedMore').addEventListener('click', function () { window.__feedAuto = true; }); }
   } else { $$('.rv').forEach(function (el) { el.classList.add('in'); }); }
 
   /* ---------- Deep links ---------- */
@@ -405,6 +410,7 @@
   NPS.applySlots();
   var mq = window.matchMedia('(max-width: 759px)'); (mq.addEventListener ? mq.addEventListener('change', function () { NPS.applySlots(); }) : mq.addListener(function () { NPS.applySlots(); }));
   renderChips(); renderFeed(false); renderSocial(); renderVoices(); refreshSaved();
+  if (!HOME) setTab('explore');
   setTimeout(route, 50);
   if (window.NPS_DEBUG) window.NPS_DEBUG = { openDetail: openDetail, openSearch: openSearch };
 })();

@@ -97,6 +97,13 @@ rejuvenation, skin, surgical and non-surgical — the way they browse social.
   account and an email-handling decision, including HIPAA). Full plan in
   `docs/FORM-SECURITY.md`; starter code in `server/form-worker.js`.
 
+## Procedures (one standard format)
+
+Every procedure uses the same page format so the site stays cohesive and
+before-and-after photos are managed once, in the Library. See
+`PROCEDURE-PAGE.md`. Each procedure page has its own address and share card,
+supporting goal 6.
+
 ## Working agreement
 
 - One page at a time. We show it, collect feedback, then move on.

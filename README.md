@@ -44,6 +44,10 @@ The first page of the real rebuild: the **home page**, built to the project goal
 
 Includes: precise procedure **search** ("nose job", "breast augmentation", goals, typos), a **Discover** feed with **My list** (saved ideas go into the consultation request), **social linking** (shareable per-procedure links, related posts), a phone **tab bar** and slide-up sheets, and an **image model** that never stretches or squishes images and stores per-image fit settings.
 
+**Procedure pages:** every procedure uses one standard page format ([`docs/PROCEDURE-PAGE.md`](docs/PROCEDURE-PAGE.md)): hero, sticky section tabs, overview with an at-a-glance card, process, **Results from the Library** (with the 18+ confirmation for breast photos), FAQ, related procedures and previous/next. 42 pages are generated from data by `redesign-v1/tools/build-procedures.js`; each has its own address and its own **share card** (`tools/share-cards.js`, 1200 x 630) so links look great when shared.
+
+On phones the footer is slim (call, directions, social); the longer link lists live in the menu.
+
 Sample content (feed cards, social posts, procedure text) is draft until approved. Results, biography and financing links show a "next build" note until those pages are built.
 
 ## Redesign Concept 2

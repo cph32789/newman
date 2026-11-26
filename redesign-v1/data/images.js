@@ -21,7 +21,7 @@
      m      optional phone overrides {fx, fy, zoom, fit}
 ------------------------------------------------------------------- */
 window.NPS = window.NPS || {};
-var A = 'assets/img/';
+var A = (window.NPS_BASE || '') + 'assets/img/';
 NPS.images = {
   'hero-1600':{ src:A+'hero-1600.webp', w:1600, h:899, alt:'Illustrative portrait of a confident woman in warm evening light' },
   'hero-m':   { src:A+'hero-m.webp',    w:900,  h:929, alt:'Illustrative portrait of a confident woman in warm evening light' },
@@ -78,7 +78,10 @@ NPS.imageSettings = NPS.imageSettings || {};   /* Admin writes here (saved per s
   /* Apply saved fit to images already in the HTML (data-slot="hero"). */
   NPS.applySlots = function (root) {
     (root || document).querySelectorAll('img[data-slot]').forEach(function (img) {
-      var s = NPS.slot(img.getAttribute('data-slot'));
+      var slot = img.getAttribute('data-slot');
+      /* Only touch an image that has settings. Otherwise keep the fit it was built with. */
+      if (!(NPS.slotDefaults[slot] || NPS.imageSettings[slot] || stored()[slot])) return;
+      var s = NPS.slot(slot);
       img.style.cssText += ';' + NPS.fitStyle(s);
       var im = NPS.images[s.image];
       if (im && img.getAttribute('src') !== im.src && !img.closest('picture')) { img.src = im.src; }
