@@ -90,7 +90,7 @@
 
   /* ---------- Results gallery page ---------- */
   var page = $('#gallery'); if (!page) return;
-  var CATS = [['face', 'Face', 'Face'], ['breast', 'Breast', 'Breast'], ['body', 'Body', 'Body'], ['skin', 'Skin', 'Skin & aesthetics']];   // slug, label, category name
+  var CATS = NPS.library.catList().map(function (c) { return [c.slug, c.name, c.key]; });   // slug, label shown, category key
   var all = G.cases(), state = { cat: '', proc: '' }, list = $('#gList'), chips = $('#gChips'), procs = $('#gProcs'), count = $('#gCount');
   var gal = {}; NPS.library.galleries().forEach(function (g) { gal[g.id] = g; });
   var catOf = function (c) { return (gal[c.primary] || {}).cat || ''; };

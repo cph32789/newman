@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Gallery | Admin preview | Newman Plastic Surgery</title>
+<link rel="icon" href="../assets/img/favicon.png">
+<link rel="stylesheet" href="../assets/css/fonts.css?v=20261127j">
+<link rel="stylesheet" href="../assets/css/styles.css?v=20261127j">
+<link rel="stylesheet" href="../assets/css/admin.css?v=20261127j">
+</head>
+<body class="adm">
+<header id="ah"></header>
+<main class="wrap" style="padding-bottom:60px">
+  <nav class="side" id="an" aria-label="Admin sections"></nav>
+  <h1>The <em>Gallery.</em></h1>
+  <p class="intro">Manage every before-and-after gallery in one place. <b>Add</b>, <b>rename</b>, <b>hide</b> or <b>delete</b> a gallery. Decide whether it asks visitors to confirm they are <b>18 or older</b>. Inside each gallery, switch cases on or off, drag them into order, add new ones and correct any text.</p>
+  <div class="layout">
+    <aside>
+      <div class="side-l"><button class="btn btn--ink btn--sm" id="addG" type="button">+ Add gallery</button><div id="gl"></div></div>
+      <div class="side-s"><div class="tools" style="margin-top:0"><label>Gallery <select id="gsel"></select></label><button class="btn btn--ink btn--sm" id="addG2" type="button">+ Add gallery</button></div></div>
+    </aside>
+    <section id="main" aria-live="polite"></section>
+  </div>
+  <div class="tip">Preview: changes are saved in this browser so you can see them on the public <a class="link" href="../results/">Results gallery</a>. In the real Admin, Publish saves them for every visitor. Case details were copied from the current website; please check each one and mark it <b>Checked</b>.</div>
+  <div class="bar"><div class="wrap"><button class="btn btn--ink btn--sm" id="save" type="button">Save changes</button><button class="btn btn--line btn--sm" id="discard" type="button">Discard</button><span class="st" id="st" role="status"></span></div></div>
+</main>
+
+<dialog class="dlg" id="dAdd" aria-labelledby="dAddT">
+  <h2 id="dAddT">Add a gallery</h2>
+  <div class="tabs" role="group"><button class="ib" type="button" data-mode="proc" aria-pressed="true">For a procedure</button><button class="ib" type="button" data-mode="custom" aria-pressed="false">Custom gallery</button></div>
+  <div id="dProc"><label class="opt">Procedure<select id="dpSel"></select></label><p class="pv">The gallery will appear on that procedure’s page and in the Results gallery.</p></div>
+  <div id="dCustom" hidden><label class="opt">Name<input type="text" id="dcName" placeholder="e.g. Skin tightening"></label><label class="opt">Category<select id="dcCat"></select></label></div>
+  <div class="pbtn"><button class="btn btn--ink btn--sm" id="dOk" type="button">Add gallery</button><button class="btn btn--line btn--sm" id="dNo" type="button">Cancel</button></div>
+</dialog>
+
+<script src="../assets/js/admin-shell.js?v=20261127j" data-active="gallery"></script>
+<script src="../data/site.js?v=20261127j"></script>
+<script src="../data/procedures.js?v=20261127j"></script>
+<script src="../data/images.js?v=20261127j"></script>
+<script>window.NPS_BASE='../';</script>
+<script src="../data/library.js?v=20261127j"></script>
+<script>
+(function(){
+  var NPS=window.NPS, L=NPS.library, P=NPS.procedures, byProc={}; P.forEach(function(p){byProc[p.id]=p;});
+  var work=JSON.parse(JSON.stringify(L.load())), cur=(location.hash||'').replace('#','')||'facelift', openId=null, dirty=false, showDel=false;
+  var $=function(s){return document.querySelector(s);};
+  var st=$('#st'), main=$('#main');
+  var SHOW=['age','height','weight','postop','implant'], SHOWL={age:'Age',height:'Height',weight:'Weight',postop:'Time since surgery',implant:'Implants'};
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function mark(){dirty=true; st.textContent='Unsaved changes';}
+  var CASES, DEFS;
+  function recompute(){ CASES=L.merge(work); work.added.forEach(function(c){c.views.forEach(function(v){['before','after'].forEach(function(k){var p=v[k]; if(p.src) NPS.images[p.image]={src:p.src,w:p.w,h:p.h,alt:p.alt||''};});});}); DEFS=L.defs(work,CASES); }
+  function gset(id,k,v){ work.galleries[id]=work.galleries[id]||{}; work.galleries[id][k]=v; mark(); recompute(); }
+  function cset(c,k,v){ if(c.added){ var a=work.added.filter(function(x){return x.id===c.id;})[0]; if(k==='show'){a.show=Object.assign({},a.show,v);} else a[k]=v; } else { var o=work.cases[c.id]=work.cases[c.id]||{}; if(k==='show') o.show=Object.assign({},o.show,v); else o[k]=v; } mark(); recompute(); }
+  function inG(id,deleted){ return CASES.filter(function(c){return c.primary===id&&!!c.deleted===!!deleted;}).sort(function(a,b){return (a.order||0)-(b.order||0);}); }
+  function sidebar(){
+    var live=DEFS.ids.filter(function(i){return !DEFS.map[i].deleted;}), dead=DEFS.ids.filter(function(i){return DEFS.map[i].deleted;});
+    var cats=L.catList(), html='';
+    cats.forEach(function(cat){ var ids=live.filter(function(i){return DEFS.map[i].cat===cat.key;}); if(!ids.length) return;
+      html+='<div class="grp-h">'+esc(cat.name)+'</div><ul class="gl">'+ids.map(function(i){var g=DEFS.map[i]; return '<li><button type="button" data-g="'+esc(i)+'"'+(i===cur?' aria-current="true"':'')+'><span>'+esc(g.name)+(g.ageGate?'<span class="tg">18+</span>':'')+(g.hidden?'<span class="tg mute">HIDDEN</span>':'')+'</span><span class="ct">'+inG(i,false).length+'</span></button></li>';}).join('')+'</ul>'; });
+    if(dead.length) html+='<div class="grp-h">Deleted</div><ul class="gl">'+dead.map(function(i){return '<li><button type="button" data-g="'+esc(i)+'"'+(i===cur?' aria-current="true"':'')+'><span>'+esc(DEFS.map[i].name)+'</span><span class="ct">deleted</span></button></li>';}).join('')+'</ul>';
+    $('#gl').innerHTML=html;
+    $('#gsel').innerHTML=live.concat(dead).map(function(i){var g=DEFS.map[i]; return '<option value="'+esc(i)+'"'+(i===cur?' selected':'')+'>'+esc(g.name)+(g.ageGate?' (18+)':'')+(g.deleted?' (deleted)':'')+'</option>';}).join('');
+  }
+  function line(c){ var b=[]; if(c.age) b.push(c.age+' years old'); if(c.height) b.push(c.height); if(c.weight) b.push(c.weight); if(c.postop) b.push(c.postop); return b.join(' · ')||'No details'; }
+  function thumb(c){var v=c.views[0], a=NPS.images[v.before.image], b=NPS.images[v.after.image]; return '<span class="th"><span><img src="'+a.src+'" alt=""></span><span><img src="'+b.src+'" alt=""></span></span>';}
+  function render(){
+    recompute(); if(!DEFS.map[cur]) cur=DEFS.ids[0]; sidebar();
+    var g=DEFS.map[cur]; if(!g){ main.innerHTML='<div class="panel"><h2>No galleries yet</h2><p class="intro">Use “Add gallery” to start.</p></div>'; return; }
+    var L1=inG(cur,false), vis=L1.filter(function(c){return c.visible!==false;}).length, gone=inG(cur,true);
+    var h='<div class="panel"><h2>'+esc(g.name)+'</h2><p class="intro" style="margin:0">'+(g.procedure?'Appears on the '+esc(byProc[g.procedure].title)+' page and in the Results gallery.':'Custom gallery. Appears in the Results gallery.')+'</p>';
+    if(g.deleted) h+='<div class="banner"><span>This gallery is deleted and no longer shows on the site.</span><button class="ib" data-restoreg type="button">Restore gallery</button></div>';
+    h+='<div class="set">'+
+      '<label class="f">Gallery name<input type="text" data-gname value="'+esc(g.name)+'"></label>'+
+      '<label class="f">Category<select data-gcat>'+L.catList().map(function(c){return '<option value="'+esc(c.key)+'"'+(c.key===g.cat?' selected':'')+'>'+esc(c.name)+'</option>';}).join('')+'</select></label>'+
+      '<div class="sw-row"><span><b>Show this gallery publicly</b><small>Turn off to hide the whole gallery without deleting it.</small></span><label class="sw"><input type="checkbox" data-ghide'+(!g.hidden?' checked':'')+' aria-label="Show this gallery publicly"><i></i></label></div>'+
+      '<div class="sw-row"><span><b>Require 18+ confirmation</b><small>Visitors must confirm they are 18 or older before any photo in this gallery is shown.</small></span><label class="sw"><input type="checkbox" data-gage'+(g.ageGate?' checked':'')+' aria-label="Require 18+ confirmation"><i></i></label></div>'+
+      '</div><div class="pbtn"><button class="ib danger" data-delg type="button"'+(g.deleted?' disabled':'')+'>Delete gallery</button><span class="pv" style="margin:0">'+vis+' showing · '+(L1.length-vis)+' hidden · '+L1.filter(function(c){return !c.checked;}).length+' not yet checked</span></div></div>';
+    h+='<div class="chead"><h3>Cases</h3><button class="btn btn--ink btn--sm" data-addc type="button"'+(g.deleted?' disabled':'')+'>+ Add case</button></div>';
+    h+='<div id="newc"></div><ul class="lst" id="lst">'+L1.map(function(c,i){return caseRow(c,i,L1);}).join('')+(L1.length?'':'<li class="tip">No cases yet. Use “Add case”.</li>')+'</ul>';
+    if(gone.length) h+='<div class="chead"><h3 style="font-size:17px;color:var(--muted)">Deleted cases ('+gone.length+')</h3><button class="ib" data-togdel type="button">'+(showDel?'Hide':'Show')+'</button></div>'+(showDel?'<ul class="lst">'+gone.map(function(c){return '<li class="cs off" data-id="'+esc(c.id)+'"><div class="hd" style="grid-template-columns:auto 1fr auto">'+thumb(c)+'<div class="meta"><b>'+esc(c.patient||c.id)+' · '+esc(c.title||'')+'</b><small>'+esc(line(c))+'</small></div><div class="ctl"><button class="ib" data-restore type="button">Restore</button></div></div></li>';}).join('')+'</ul>':'');
+    main.innerHTML=h;
+  }
+  function caseRow(c,i,L1){
+    var on=c.visible!==false, chk=!!c.checked;
+    return '<li class="cs'+(on?'':' off')+(openId===c.id?' open':'')+'" data-id="'+esc(c.id)+'"><div class="hd"><span class="grip" data-grip title="Drag to reorder" aria-hidden="true">⋮⋮</span><span class="no">'+(i+1)+'</span>'+thumb(c)+
+      '<div class="meta"><b>'+esc(c.patient||c.id)+' · '+esc(c.title||'')+(chk?'<span class="abadge b-ok">CHECKED</span>':'<span class="abadge b-chk">TO CHECK</span>')+'</b><small>'+esc(c.addOn||'')+(c.addOn?' · ':'')+esc(line(c))+'</small></div>'+
+      '<div class="ctl"><button class="ib" data-up aria-label="Move up"'+(i===0?' disabled':'')+'>↑</button><button class="ib" data-down aria-label="Move down"'+(i===L1.length-1?' disabled':'')+'>↓</button><button class="ib" data-edit aria-expanded="'+(openId===c.id)+'">'+(openId===c.id?'Close':'Edit')+'</button>'+
+      '<label class="sw" title="Show in the gallery"><input type="checkbox" data-vis'+(on?' checked':'')+' aria-label="Show in the gallery"><i></i></label></div></div>'+(openId===c.id?editor(c):'')+'</li>';
+  }
+  function editor(c){
+    var lab={title:'Title',addOn:'Also done with (add-on)',patient:'Patient label',age:'Age',height:'Height',weight:'Weight',postop:'Time since surgery',implant:'Implant information'};
+    var shows=c.show||{};
+    return '<div class="ed"><div class="big"><div class="pics">'+c.views.map(function(v){return '<img src="'+NPS.images[v.before.image].src+'" alt="Before"><img src="'+NPS.images[v.after.image].src+'" alt="After"><small>'+esc(v.label)+' · before and after</small>';}).join('')+'</div>'+
+      '<div><div class="fg">'+L.fields.map(function(k){ return '<label class="'+(k==='implant'||k==='addOn'?'w':'')+'">'+lab[k]+'<input type="text" data-f="'+k+'" value="'+esc(c[k]==null?'':c[k])+'"></label>';}).join('')+'</div>'+
+      '<div class="chk" role="group" aria-label="Details shown to the public"><span style="font:600 12px/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);width:100%">Show these details publicly</span>'+SHOW.map(function(k){return '<label><input type="checkbox" data-show="'+k+'"'+(shows[k]!==false?' checked':'')+'> '+SHOWL[k]+'</label>';}).join('')+'</div>'+
+      '<div class="row2"><label class="chk" style="margin:0"><label><input type="checkbox" data-checked'+(c.checked?' checked':'')+'> I checked these details against our records</label></label>'+(c.added?'':'<button class="ib" data-revert type="button">Undo my edits</button>')+'<button class="ib danger" data-delc type="button">Delete case</button></div>'+
+      '<p class="pv">Public card: <b>'+esc(c.patient||'')+'</b> · '+esc(c.title||'')+(c.addOn?' · '+esc(c.addOn):'')+' · '+esc(line(c))+'</p></div></div></div>';
+  }
+  /* ---------- gallery-level actions ---------- */
+  document.addEventListener('click',function(e){
+    var b=e.target.closest('[data-g]'); if(b){ cur=b.getAttribute('data-g'); openId=null; showDel=false; history.replaceState(null,'','#'+cur); render(); return; }
+    if(e.target.closest('#addG,#addG2')){ openAdd(); return; }
+    if(e.target.closest('[data-delg]')){ if(confirm('Delete the “'+DEFS.map[cur].name+'” gallery? It disappears from the site. You can restore it afterwards.')){ gset(cur,'deleted',true); render(); } return; }
+    if(e.target.closest('[data-restoreg]')){ gset(cur,'deleted',false); render(); return; }
+    if(e.target.closest('[data-togdel]')){ showDel=!showDel; render(); return; }
+    if(e.target.closest('[data-addc]')){ newCase(); return; }
+  });
+  $('#gsel').addEventListener('change',function(){ cur=this.value; openId=null; showDel=false; history.replaceState(null,'','#'+cur); render(); });
+  main.addEventListener('change',function(e){
+    var t=e.target;
+    if(t.matches('[data-gcat]')){ gset(cur,'cat',t.value); render(); }
+    else if(t.matches('[data-ghide]')){ gset(cur,'hidden',!t.checked); render(); }
+    else if(t.matches('[data-gage]')){ gset(cur,'ageGate',t.checked); render(); }
+    var li=t.closest('.cs'); if(!li) return; var c=CASES.filter(function(x){return x.id===li.getAttribute('data-id');})[0]; if(!c) return;
+    if(t.matches('[data-vis]')){ cset(c,'visible',t.checked); render(); }
+    else if(t.matches('[data-show]')){ var o={}; o[t.getAttribute('data-show')]=t.checked; cset(c,'show',o); }
+    else if(t.matches('[data-checked]')){ cset(c,'checked',t.checked); render(); }
+  });
+  main.addEventListener('input',function(e){
+    var t=e.target;
+    if(t.matches('[data-gname]')){ gset(cur,'name',t.value.trim()||DEFS.map[cur].name); sidebar(); return; }
+    var f=t.getAttribute&&t.getAttribute('data-f'); if(!f) return;
+    var li=t.closest('.cs'), c=CASES.filter(function(x){return x.id===li.getAttribute('data-id');})[0], v=t.value.trim();
+    if(f==='age'&&/^\d+$/.test(v)) v=+v; cset(c,f,v);
+    c=CASES.filter(function(x){return x.id===li.getAttribute('data-id');})[0]; var pv=li.querySelector('.pv'); if(pv) pv.innerHTML='Public card: <b>'+esc(c.patient||'')+'</b> · '+esc(c.title||'')+(c.addOn?' · '+esc(c.addOn):'')+' · '+esc(line(c));
+  });
+  main.addEventListener('click',function(e){
+    var li=e.target.closest('.cs'); if(!li) return; var id=li.getAttribute('data-id'), L1=inG(cur,false), c=CASES.filter(function(x){return x.id===id;})[0], i=L1.indexOf(c);
+    if(e.target.closest('[data-up]')) mv(L1,i,i-1);
+    else if(e.target.closest('[data-down]')) mv(L1,i,i+1);
+    else if(e.target.closest('[data-edit]')){ openId=openId===id?null:id; render(); var n=main.querySelector('[data-id="'+id+'"]'); if(openId&&n) n.scrollIntoView({block:'nearest'}); }
+    else if(e.target.closest('[data-revert]')){ delete work.cases[id]; mark(); render(); }
+    else if(e.target.closest('[data-delc]')){ if(confirm('Delete this case? You can restore it from “Deleted cases”.')){ cset(c,'deleted',true); openId=null; render(); } }
+    else if(e.target.closest('[data-restore]')){ cset(c,'deleted',false); render(); }
+  });
+  function mv(L1,from,to){ if(to<0||to>=L1.length) return; var c=L1.splice(from,1)[0]; L1.splice(to,0,c); L1.forEach(function(x,i){ cset(x,'order',i+1); }); render(); }
+  /* drag to reorder */
+  var dragId=null;
+  main.addEventListener('pointerdown',function(e){ var g=e.target.closest('[data-grip]'); if(!g) return; var li=g.closest('.cs'); dragId=li.getAttribute('data-id'); li.classList.add('drag'); g.setPointerCapture&&g.setPointerCapture(e.pointerId); e.preventDefault(); });
+  main.addEventListener('pointermove',function(e){ if(!dragId) return; var el=document.elementFromPoint(e.clientX,e.clientY), over=el&&el.closest('.cs'); if(over&&over.getAttribute('data-id')!==dragId){ var L1=inG(cur,false), a=L1.map(function(x){return x.id;}).indexOf(dragId), b=L1.map(function(x){return x.id;}).indexOf(over.getAttribute('data-id')); if(a<0||b<0) return; L1.splice(b,0,L1.splice(a,1)[0]); L1.forEach(function(x,i){ cset(x,'order',i+1); }); var keep=dragId; render(); var n=main.querySelector('[data-id="'+keep+'"]'); if(n) n.classList.add('drag'); } });
+  function endDrag(){ if(!dragId) return; dragId=null; render(); }
+  main.addEventListener('pointerup',endDrag); main.addEventListener('pointercancel',endDrag);
+
+  /* ---------- add gallery ---------- */
+  var dlg=$('#dAdd'), mode='proc';
+  function openAdd(){
+    var used={}; DEFS.ids.forEach(function(i){ if(!DEFS.map[i].deleted) used[i]=1; });
+    $('#dpSel').innerHTML=P.filter(function(p){return !used[p.id];}).map(function(p){return '<option value="'+p.id+'">'+esc(p.title.replace(/\s*\(.*\)/,''))+' · '+esc(p.cat)+'</option>';}).join('');
+    $('#dcCat').innerHTML=L.catList().map(function(c){return '<option value="'+esc(c.key)+'">'+esc(c.name)+'</option>';}).join(''); $('#dcName').value='';
+    setMode('proc'); dlg.showModal();
+  }
+  function setMode(m){ mode=m; $('#dProc').hidden=m!=='proc'; $('#dCustom').hidden=m!=='custom'; dlg.querySelectorAll('[data-mode]').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-mode')===m);}); }
+  dlg.addEventListener('click',function(e){ var m=e.target.closest('[data-mode]'); if(m) setMode(m.getAttribute('data-mode')); });
+  $('#dNo').addEventListener('click',function(){dlg.close();});
+  $('#dOk').addEventListener('click',function(){
+    if(mode==='proc'){ var id=$('#dpSel').value; if(!id) return; work.galleries[id]=Object.assign(work.galleries[id]||{},{created:true,deleted:false}); cur=id; }
+    else { var name=$('#dcName').value.trim(); if(!name){ $('#dcName').focus(); return; } var id2='g-'+name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')+'-'+Date.now().toString(36); work.custom.push({id:id2,name:name,cat:$('#dcCat').value}); cur=id2; }
+    mark(); dlg.close(); history.replaceState(null,'','#'+cur); render();
+  });
+
+  /* ---------- add case (upload) ---------- */
+  function readImg(file,cb){
+    var r=new FileReader(); r.onload=function(){ var im=new Image(); im.onload=function(){ var max=1100,w=im.naturalWidth,h=im.naturalHeight,k=Math.min(1,max/w); w=Math.round(w*k); h=Math.round(h*k); var c=document.createElement('canvas'); c.width=w; c.height=h; c.getContext('2d').drawImage(im,0,0,w,h); cb({src:c.toDataURL('image/jpeg',.85),w:w,h:h}); }; im.src=r.result; }; r.readAsDataURL(file);
+  }
+  var up={};
+  function newCase(){
+    up={}; var g=DEFS.map[cur];
+    $('#newc').innerHTML='<div class="newcase"><b style="font:500 18px var(--sans)">Add a case to “'+esc(g.name)+'”</b><div class="fg" style="margin-top:12px"><label>Patient label<input type="text" id="ncPat" value="Patient '+(inG(cur,false).length+inG(cur,true).length+1)+'"></label><label>Title<input type="text" id="ncTitle" value="'+esc(g.name)+'"></label><label class="w">Also done with (optional)<input type="text" id="ncAdd"></label>'+
+      '<label>Age<input type="text" id="ncAge"></label><label>Time since surgery<input type="text" id="ncPost" placeholder="e.g. 6 months post-op"></label></div>'+
+      '<div class="up">'+[['b1','Before photo (required)'],['a1','After photo (required)'],['b2','Second view: before (optional)'],['a2','Second view: after (optional)']].map(function(x){return '<label class="drop">'+x[1]+'<input type="file" accept="image/*" data-up="'+x[0]+'"><img alt="" hidden></label>';}).join('')+'</div>'+
+      '<label class="fg" style="margin-top:12px;display:block"><label>Second view label<input type="text" id="ncV2" value="Side"></label></label>'+
+      '<div class="pbtn"><button class="btn btn--ink btn--sm" id="ncOk" type="button">Add case</button><button class="btn btn--line btn--sm" id="ncNo" type="button">Cancel</button><span class="pv" id="ncMsg" style="margin:0"></span></div></div>';
+    $('#newc').scrollIntoView({block:'nearest'});
+  }
+  main.addEventListener('change',function(e){
+    var f=e.target.getAttribute&&e.target.getAttribute('data-up'); if(!f||!e.target.files[0]) return; var box=e.target.closest('.drop');
+    readImg(e.target.files[0],function(r){ up[f]=r; var im=box.querySelector('img'); im.src=r.src; im.hidden=false; });
+  });
+  main.addEventListener('click',function(e){
+    if(e.target.id==='ncNo'){ $('#newc').innerHTML=''; return; }
+    if(e.target.id!=='ncOk') return;
+    if(!up.b1||!up.a1){ $('#ncMsg').textContent='Please add both a before and an after photo.'; return; }
+    var id='new-'+Date.now().toString(36), g=DEFS.map[cur], order=Math.max.apply(null,[0].concat(CASES.filter(function(c){return c.primary===cur;}).map(function(c){return c.order||0;})))+1;
+    function ph(k,view,ba){ var r=up[k]; return {image:id+'-'+view+'-'+ba,src:r.src,w:r.w,h:r.h,alt:(ba==='before'?'Before':'After')+': '+g.name+' patient, '+view+' view',fx:50,fy:40,zoom:1}; }
+    var views=[{label:'Front',before:ph('b1','front','before'),after:ph('a1','front','after')}];
+    if(up.b2&&up.a2) views.push({label:$('#ncV2').value.trim()||'View 2',before:ph('b2','view2','before'),after:ph('a2','view2','after')});
+    var c={id:id,added:true,procedures:[cur],primary:cur,title:$('#ncTitle').value.trim()||g.name,patient:$('#ncPat').value.trim(),visible:true,order:order,checked:true,show:{age:true,height:true,weight:true,implant:true,postop:true},views:views};
+    var add=$('#ncAdd').value.trim(), age=$('#ncAge').value.trim(), post=$('#ncPost').value.trim(); if(add) c.addOn=add; if(age) c.age=/^\d+$/.test(age)?+age:age; if(post) c.postop=post;
+    work.added.push(c); mark(); openId=id; render();
+  });
+  /* ---------- save / discard ---------- */
+  $('#save').addEventListener('click',function(){
+    try{ L.save(work); dirty=false; window.ADMIN&&ADMIN.log('Saved gallery changes'); ADMIN.refresh&&ADMIN.refresh(); st.textContent='Saved. The public gallery now follows these settings.'; }catch(e){ st.textContent='Could not save: this browser is out of room (large photos). Remove some uploaded cases.'; }
+  });
+  $('#discard').addEventListener('click',function(){ work=JSON.parse(JSON.stringify(L.load())); dirty=false; openId=null; render(); st.textContent='Unsaved changes discarded.'; });
+  window.addEventListener('beforeunload',function(e){ if(dirty){ e.preventDefault(); e.returnValue=''; } });
+  render();
+})();
+</script>
+</body>
+</html>

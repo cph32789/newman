@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Settings | Admin preview | Newman Plastic Surgery</title>
+<link rel="icon" href="../assets/img/favicon.png">
+<link rel="stylesheet" href="../assets/css/fonts.css?v=20261127j">
+<link rel="stylesheet" href="../assets/css/styles.css?v=20261127j">
+<link rel="stylesheet" href="../assets/css/admin.css?v=20261127j">
+</head>
+<body class="adm">
+<header id="ah"></header>
+<main class="wrap" style="padding-bottom:70px">
+<nav class="side" id="an" aria-label="Admin sections"></nav>
+
+<h1>Settings.</h1>
+<p class="intro">Practice details, who can sign in, how requests are delivered and how the site stays safe from spam.</p>
+<div class="panel" style="margin-top:22px"><h2>Practice details</h2><p class="intro" style="margin:0">Shown in the header, footer, Location page and search results.</p>
+  <div class="two-col" style="margin-top:14px" id="practice"></div></div>
+<div class="panel" style="margin-top:16px"><h2>Who receives requests</h2><p class="intro" style="margin:0">Where consultation requests are delivered. <span class="demo">TO BE DECIDED WITH THE PRACTICE</span></p>
+  <div class="two-col" style="margin-top:14px"><label class="field-a">Send new requests to<input type="email" id="sendTo" placeholder="name@practice.com"></label>
+  <label class="field-a">Also copy<input type="email" id="sendCc" placeholder="optional"></label>
+  <label class="field-a" style="grid-column:1/-1">Include in the email<select id="incl"><option>Name, contact details and chosen procedures only</option><option>Everything, including their goals text</option></select></label></div>
+  <p class="pv">Tip: keep private medical details out of email. The Inbox here holds the full request.</p></div>
+<div class="panel" style="margin-top:16px"><h2>Team</h2><p class="intro" style="margin:0">Who can sign in to this Admin.</p>
+  <table class="tbl"><thead><tr><th>Name</th><th>Role</th><th>Sign-in</th></tr></thead><tbody id="users"></tbody></table>
+  <div class="pbtn"><input type="email" id="inv" placeholder="Invite by email" style="min-height:46px;padding:0 14px;border:1px solid var(--line);border-radius:12px;background:var(--paper);font:400 17px var(--sans);min-width:260px"><select id="invRole" style="min-height:46px;padding:0 12px;border:1px solid var(--line);border-radius:12px;background:var(--paper);font:400 16px var(--sans)"><option>Editor</option><option>Admin</option></select><button class="btn btn--ink btn--sm" id="invGo" type="button">Send invite</button></div>
+  <p class="pv"><b>Editors</b> change pictures, procedures and galleries. <b>Admins</b> can also manage the team and settings.</p></div>
+<div class="panel" style="margin-top:16px"><h2>Sign-in &amp; security</h2>
+  <div class="sw-row"><span><b>2-step sign-in</b><small>After entering an email, you type a 6-digit code sent to it.</small></span><label class="sw"><input type="checkbox" checked disabled aria-label="2-step sign-in"><i></i></label></div>
+  <div class="sw-row"><span><b>Sign out automatically after</b><small>When the screen is left unattended.</small></span><select style="min-height:46px;padding:0 12px;border:1px solid var(--line);border-radius:12px;background:var(--paper);font:400 16px var(--sans)"><option>30 minutes</option><option selected>2 hours</option><option>8 hours</option></select></div>
+  <div class="sw-row"><span><b>Email me when someone signs in</b><small>From a new device or place.</small></span><label class="sw"><input type="checkbox" checked aria-label="Email me on sign-in"><i></i></label></div></div>
+<div class="panel" style="margin-top:16px"><h2>Spam protection</h2><p class="intro" style="margin:0">Layers that stop automated messages before they reach you.</p>
+  <table class="tbl"><tbody>
+   <tr><td><b>Hidden trap field</b><br><span class="muted">Only automated tools fill it in.</span></td><td><span class="pill ok">ON</span></td></tr>
+   <tr><td><b>Too-fast check</b><br><span class="muted">Forms sent in under 4 seconds are blocked.</span></td><td><span class="pill ok">ON</span></td></tr>
+   <tr><td><b>Link and keyword filter</b><br><span class="muted">Messages stuffed with links are held as spam.</span></td><td><span class="pill ok">ON</span></td></tr>
+   <tr><td><b>Send limits</b><br><span class="muted">One request per 90 seconds, three per hour, per person.</span></td><td><span class="pill ok">ON</span></td></tr>
+   <tr><td><b>Human check (Cloudflare Turnstile)</b><br><span class="muted">Invisible check on the server. Needs a free key.</span></td><td><span class="pill">NEEDS SETUP</span></td></tr>
+   <tr><td><b>Server-side checks</b><br><span class="muted">Repeat of every check on the server, plus delivery limits.</span></td><td><span class="pill">NEEDS SETUP</span></td></tr>
+  </tbody></table></div>
+<div class="panel" style="margin-top:16px"><h2>Activity log</h2><p class="intro" style="margin:0">Who changed what, and when.</p><div id="act"></div></div>
+<div class="panel" style="margin-top:16px"><h2>Backup</h2><p class="intro" style="margin:0">Download everything saved in this preview as one file.</p><div class="pbtn"><button class="btn btn--line btn--sm" id="dl" type="button">Download backup</button></div></div>
+<div class="bar"><div class="wrap"><button class="btn btn--ink btn--sm" id="save" type="button">Save settings</button><span class="st" id="st" role="status"></span></div></div>
+
+</main>
+<script src="../assets/js/admin-shell.js?v=20261127j" data-active="settings"></script>
+<script src="../data/site.js?v=20261127j"></script>
+<script>window.NPS_BASE='../';</script>
+<script>
+
+(function(){
+  var NPS=window.NPS, A=window.ADMIN, $=function(s){return document.querySelector(s);}, esc=A.esc, S=NPS.site||{};
+  var ed=A.ls.get('nps.siteEdits',{}), c=S.contact||{};
+  var fields=[['phone','Phone',ed.phone||c.phone||'407.481.9505'],['fax','Fax',ed.fax||'407.481.9506'],['street','Street',ed.street||'444 North Mills Avenue'],['city','City, state, ZIP',ed.city||'Orlando, Florida 32803'],['hours','Office hours',ed.hours||''],['instagram','Instagram address',ed.instagram||''],['facebook','Facebook address',ed.facebook||'']];
+  $('#practice').innerHTML=fields.map(function(f){return '<label class="field-a">'+f[1]+'<input type="text" data-k="'+f[0]+'" value="'+esc(f[2])+'"'+(f[0]==='hours'?' placeholder="e.g. Mon–Thu 9–5 (not on the current site)"':'')+'></label>';}).join('');
+  var users=A.ls.get('nps.users',[{n:'Charles Newman, Jr., MD',e:'On file',r:'Admin',s:'2-step on'},{n:'Dzi-Long Newman, PA-C',e:'On file',r:'Admin',s:'2-step on'}]);
+  function ru(){ $('#users').innerHTML=users.map(function(u){return '<tr><td><b>'+esc(u.n)+'</b><br><span class="muted">'+esc(u.e)+'</span></td><td>'+esc(u.r)+'</td><td><span class="pill ok">'+esc(u.s)+'</span></td></tr>';}).join(''); }
+  ru();
+  $('#invGo').addEventListener('click',function(){ var e=$('#inv').value.trim(); if(!/^\S+@\S+\.\S+$/.test(e)){ $('#inv').focus(); return; } users.push({n:e,e:e,r:$('#invRole').value,s:'Invite sent'}); A.ls.set('nps.users',users); A.log('Invited '+e); $('#inv').value=''; ru(); A.toast('Preview: the live Admin emails them a sign-in link.'); });
+  var sv=A.ls.get('nps.sendTo',{}); $('#sendTo').value=sv.to||''; $('#sendCc').value=sv.cc||''; if(sv.incl) $('#incl').value=sv.incl;
+  $('#save').addEventListener('click',function(){ var o={}; document.querySelectorAll('[data-k]').forEach(function(i){o[i.getAttribute('data-k')]=i.value.trim();}); A.ls.set('nps.siteEdits',o); A.ls.set('nps.sendTo',{to:$('#sendTo').value.trim(),cc:$('#sendCc').value.trim(),incl:$('#incl').value}); A.log('Saved settings'); A.refresh(); $('#st').textContent='Saved.'; });
+  var act=A.ls.get('nps.activity',[]); $('#act').innerHTML=act.length?'<table class="tbl"><tbody>'+act.slice(0,15).map(function(a){return '<tr><td style="width:150px;color:var(--muted)">'+A.ago(a.t)+'</td><td style="width:120px">'+esc(a.who)+'</td><td>'+esc(a.what)+'</td></tr>';}).join('')+'</tbody></table>':'<p class="pv">Nothing yet.</p>';
+  $('#dl').addEventListener('click',function(){ var all={}; Object.keys(localStorage).filter(function(k){return k.indexOf('nps.')===0;}).forEach(function(k){ try{all[k]=JSON.parse(localStorage.getItem(k));}catch(e){all[k]=localStorage.getItem(k);} }); var b=new Blob([JSON.stringify(all,null,2)],{type:'application/json'}), a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='newman-admin-backup.json'; a.click(); });
+})();
+
+</script>
+</body>
+</html>

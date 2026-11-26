@@ -656,7 +656,15 @@ window.NPS = window.NPS || {};
   var short = function (t) { return t.replace(/\s*\(.*\)/, ''); };
   L.fields = ['title', 'addOn', 'patient', 'age', 'height', 'weight', 'postop', 'implant'];
   L.base = JSON.parse(JSON.stringify(L.cases));            // the imported cases, untouched
-  L.categories = ['Face', 'Breast', 'Body', 'Skin & aesthetics'];
+  /* Categories: Admin ("Procedures > Categories") can add, rename, reorder, hide and delete them.
+     key = what procedures and galleries store; name = what visitors see. */
+  L.catList = function () {
+    var d = [{ key: 'Face', name: 'Face', slug: 'face' }, { key: 'Breast', name: 'Breast', slug: 'breast' }, { key: 'Body', name: 'Body', slug: 'body' }, { key: 'Skin & aesthetics', name: 'Skin', slug: 'skin' }], s = null;
+    try { s = JSON.parse(localStorage.getItem('nps.categories') || 'null'); } catch (e) {}
+    return (s && s.length ? s : d).filter(function (c) { return !c.hidden; });
+  };
+  L.catName = function (key) { var c = L.catList().filter(function (x) { return x.key === key; })[0]; return c ? c.name : key; };
+  L.categories = L.catList().map(function (c) { return c.key; });
   L.load = function () {
     var o = {}; try { o = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) {}
     o.cases = o.cases || {}; o.added = o.added || []; o.galleries = o.galleries || {}; o.custom = o.custom || []; return o;

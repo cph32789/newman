@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Procedures | Admin preview | Newman Plastic Surgery</title>
+<link rel="icon" href="../assets/img/favicon.png">
+<link rel="stylesheet" href="../assets/css/fonts.css?v=20261127j">
+<link rel="stylesheet" href="../assets/css/styles.css?v=20261127j">
+<link rel="stylesheet" href="../assets/css/admin.css?v=20261127j">
+</head>
+<body class="adm">
+<header id="ah"></header>
+<main class="wrap" style="padding-bottom:70px">
+<nav class="side" id="an" aria-label="Admin sections"></nav>
+
+<style>
+.layout{display:grid;gap:26px;margin-top:22px}@media(min-width:960px){.layout{grid-template-columns:300px 1fr;align-items:start}}
+.pl{max-height:70vh;overflow:auto;padding-right:4px}
+.pl h3{font:600 11px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:16px 2px 6px}
+.pl button{display:flex;width:100%;justify-content:space-between;gap:10px;align-items:center;padding:11px 14px;border:1px solid var(--line);border-radius:14px;background:var(--paper);text-align:left;font:500 15px/1.25 var(--sans);min-height:48px;margin-bottom:6px}
+.pl button[aria-current=true]{background:var(--teal-900);color:var(--paper);border-color:var(--teal-900)}
+.pl .tg{font:700 10px/1 var(--sans);letter-spacing:.08em;padding:3px 5px;border-radius:5px;background:#CDC3B3;color:#3a3128}
+.cat-row{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:14px 0;border-top:1px solid var(--line)}
+.cat-row .nm{display:flex;flex-direction:column;gap:4px}
+.cat-row small{color:var(--muted)}
+.cat-row .ctl{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.cat-row input[type=text]{min-height:46px;padding:0 14px;border:1px solid var(--line);border-radius:12px;background:var(--paper);font:400 17px var(--sans);min-width:200px}
+.prev{border:1px solid var(--line);border-radius:var(--r-lg);background:var(--paper);padding:22px;margin-top:14px}
+.prev h4{font:400 34px/1.05 var(--sans);letter-spacing:-.035em;margin:6px 0 8px}.prev em{font-family:var(--serif);color:var(--clay-ink)}
+.prev .bl{font:italic 400 22px/1.3 var(--serif);color:var(--clay-ink)}
+.prev dl{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:14px 0 0}.prev dt{font:600 11px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}.prev dd{margin:2px 0 0}
+.prev ol{margin:10px 0 0;padding-left:20px}
+.hint{color:var(--muted);font-size:13px;font-weight:400;letter-spacing:0;text-transform:none}
+.libg{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:8px;margin-top:6px}
+.libg button{border:2px solid transparent;border-radius:10px;overflow:hidden;aspect-ratio:1;padding:0;background:var(--sand-2)}
+.libg button[aria-pressed=true]{border-color:var(--clay)}.libg img{width:100%;height:100%;object-fit:cover;display:block}
+</style>
+<h1>Procedures <em>&amp; categories.</em></h1>
+<p class="intro">Add and edit every procedure and treatment: its name, description, recovery and questions. Organise them into categories. Each procedure gets its own page, search entry and share card when you publish.</p>
+<div class="seg" style="margin-top:18px" role="group"><button type="button" data-tab="p" aria-pressed="true">Procedures</button><button type="button" data-tab="c" aria-pressed="false">Categories</button></div>
+<div id="tabP" class="layout">
+  <aside><div class="pbtn" style="margin:0 0 10px"><button class="btn btn--ink btn--sm" id="addP" type="button">+ Add procedure</button></div>
+    <label class="field-a">Find<input type="search" id="q" placeholder="Search procedures"></label><div id="pl" class="pl"></div></aside>
+  <section id="ed" aria-live="polite"></section>
+</div>
+<div id="tabC" hidden>
+  <div class="panel" style="margin-top:18px"><h2>Categories</h2><p class="intro" style="margin:0">The groups visitors browse by. Rename them, change the order, hide one, or add a new one. A category can be deleted only when it has no procedures.</p>
+    <div id="cats"></div>
+    <div class="pbtn"><input type="text" id="newCat" placeholder="New category name" style="min-height:46px;padding:0 14px;border:1px solid var(--line);border-radius:12px;background:var(--paper);font:400 17px var(--sans);min-width:240px"><button class="btn btn--ink btn--sm" id="addC" type="button">+ Add category</button></div>
+    <p class="pv">New categories appear right away in the Gallery admin and the Results gallery. When published, they also get a card on the home page and a tab in the procedure explorer.</p></div>
+</div>
+<div class="bar"><div class="wrap"><button class="btn btn--ink btn--sm" id="save" type="button">Save changes</button><button class="btn btn--line btn--sm" id="discard" type="button">Discard</button><span class="st" id="st" role="status"></span></div></div>
+<div class="tip">Preview: changes are saved in this browser. In the live Admin, <b>Publish</b> rebuilds the procedure page, search, related lists and share card for each change.</div>
+
+</main>
+<script src="../assets/js/admin-shell.js?v=20261127j" data-active="procedures"></script>
+<script src="../data/site.js?v=20261127j"></script>
+<script>window.NPS_BASE='../';</script>
+<script src="../data/procedures.js?v=20261127j"></script>
+<script src="../data/images.js?v=20261127j"></script>
+<script src="../data/procedure-content.js?v=20261127j"></script>
+<script src="../data/library.js?v=20261127j"></script>
+<script>
+
+(function(){
+  var NPS=window.NPS, A=window.ADMIN, P=NPS.procedures, O=NPS.procOverrides||{}, L=NPS.library;
+  var $=function(s){return document.querySelector(s);}, esc=A.esc;
+  var edits=JSON.parse(JSON.stringify(A.ls.get('nps.procEdits',{}))), cats=JSON.parse(JSON.stringify(A.ls.get('nps.categories',null)||[{key:'Face',name:'Face',slug:'face'},{key:'Breast',name:'Breast',slug:'breast'},{key:'Body',name:'Body',slug:'body'},{key:'Skin & aesthetics',name:'Skin',slug:'skin'}]));
+  var cur=(location.hash||'').slice(1)||'facelift', dirty=false;
+  function mark(){dirty=true;$('#st').textContent='Unsaved changes';}
+  function all(){ var base=P.map(function(p){return Object.assign({},p,{ov:O[p.id]||{}});}); var out=base.map(function(p){var e=edits[p.id]||{}; return Object.assign({},p,e,{base:true});}); Object.keys(edits).forEach(function(id){ if(edits[id].custom) out.push(Object.assign({id:id,aka:[],concerns:[],related:[],ov:{}},edits[id])); }); return out; }
+  function toLines(a){return (a||[]).join('\n');}
+  function val(p,k){ var e=edits[p.id]||{}; return k in e?e[k]:(p[k]!=null?p[k]:(p.ov||{})[k]); }
+  function set(p,k,v){ edits[p.id]=edits[p.id]||{}; edits[p.id][k]=v; mark(); }
+  function list(){
+    var q=($('#q').value||'').toLowerCase(), h='';
+    cats.forEach(function(c){ var ps=all().filter(function(p){return !p.deleted&&p.cat===c.key&&(!q||p.title.toLowerCase().indexOf(q)>-1);}); if(!ps.length) return;
+      h+='<h3>'+esc(c.name)+'</h3>'+ps.map(function(p){return '<button data-p="'+esc(p.id)+'"'+(p.id===cur?' aria-current="true"':'')+'><span>'+esc(p.title.replace(/\s*\(.*\)/,''))+'</span>'+(p.hidden?'<span class="tg">HIDDEN</span>':(p.custom?'<span class="tg">NEW</span>':''))+'</button>';}).join(''); });
+    $('#pl').innerHTML=h;
+  }
+  function pairs(arr,sep){ return (arr||[]).map(function(x){return x.join(sep);}).join('\n'); }
+  function parsePairs(t,sep){ return t.split('\n').map(function(l){return l.trim();}).filter(Boolean).map(function(l){var i=l.indexOf(sep); return i<0?[l,'']:[l.slice(0,i).trim(),l.slice(i+1).trim()];}); }
+  function render(){
+    var p=all().filter(function(x){return x.id===cur;})[0]; if(!p){ $('#ed').innerHTML='<div class="panel"><h2>Select a procedure</h2></div>'; return; }
+    var ov=p.ov||{}, ovl=(edits[p.id]||{}); function g(k){ return k in ovl?ovl[k]:ov[k]; }
+    var imgs=Object.keys(NPS.images).filter(function(k){return !/^(facelift|breast|tummy|mommy|lipo|mwl|eyelid|nose|ear|male|inject|new|up-)/.test(k);});
+    var rel=p.related||[];
+    var h='<div class="panel"><h2>'+esc(p.title)+'</h2>'+(p.deleted?'<div class="banner"><span>Deleted. It no longer shows on the site.</span><button class="ib" data-restore type="button">Restore</button></div>':'')+
+      '<div class="two-col" style="margin-top:14px"><label class="field-a">Name<input type="text" data-f="title" value="'+esc(p.title)+'"></label>'+
+      '<label class="field-a">Category<select data-f="cat">'+cats.map(function(c){return '<option value="'+esc(c.key)+'"'+(c.key===p.cat?' selected':'')+'>'+esc(c.name)+'</option>';}).join('')+'</select></label>'+
+      '<label class="field-a">Type<select data-f="kind"><option value="surgical"'+(p.kind==='surgical'?' selected':'')+'>Surgical</option><option value="non-surgical"'+(p.kind!=='surgical'?' selected':'')+'>Non-surgical</option></select></label>'+
+      '<label class="field-a">Page address<input type="text" value="procedures/'+esc(p.id)+'/" disabled></label>'+
+      '<label class="field-a" style="grid-column:1/-1">One friendly line <span class="hint">(shown under the name)</span><input type="text" data-f="blurb" value="'+esc(p.blurb||'')+'"></label>'+
+      '<label class="field-a" style="grid-column:1/-1">Short description <span class="hint">(two calm sentences; no promises)</span><textarea data-f="detail">'+esc(p.detail||'')+'</textarea></label>'+
+      '<label class="field-a">Also known as <span class="hint">(one per line; how people search)</span><textarea data-lines="aka">'+esc(toLines(val(p,'aka')))+'</textarea></label>'+
+      '<label class="field-a">Goals in their own words <span class="hint">(one per line; improves search)</span><textarea data-lines="concerns">'+esc(toLines(val(p,'concerns')))+'</textarea></label></div>'+
+      '<div class="field-a" style="margin-top:14px">Card picture</div><div class="libg">'+imgs.map(function(k){return '<button type="button" data-img="'+esc(k)+'" aria-pressed="'+(k===p.img)+'" aria-label="'+esc(k)+'"><img src="'+NPS.images[k].src+'" alt=""></button>';}).join('')+'</div>'+
+      '<div class="field-a" style="margin-top:16px">Related procedures</div><div class="chk">'+P.filter(function(x){return x.id!==p.id;}).map(function(x){return '<label><input type="checkbox" data-rel="'+esc(x.id)+'"'+(rel.indexOf(x.id)>-1?' checked':'')+'> '+esc(x.title.replace(/\s*\(.*\)/,''))+'</label>';}).join('')+'</div></div>'+
+      '<div class="panel" style="margin-top:14px"><h2>Page content</h2><p class="intro" style="margin:0">Only what is special about this procedure. Common answers live once on “Your visit”.</p><div class="two-col" style="margin-top:14px">'+
+      '<label class="field-a" style="grid-column:1/-1">Overview paragraphs <span class="hint">(blank line between paragraphs)</span><textarea data-c="overview">'+esc(((g('overview')||[]).join?(g('overview')||[]).join('\n\n'):g('overview'))||'')+'</textarea></label>'+
+      '<label class="field-a">May be a good fit if <span class="hint">(one per line)</span><textarea data-c="good">'+esc(toLines(g('good')))+'</textarea></label>'+
+      '<label class="field-a">At a glance <span class="hint">(Label: value, one per line)</span><textarea data-c="glance">'+esc(pairs(g('glance'),': '))+'</textarea></label>'+
+      '<label class="field-a" style="grid-column:1/-1">Recovery &amp; timeline <span class="hint">(Phase | what happens, one per line)</span><textarea data-c="timeline" style="min-height:150px">'+esc(pairs(g('timeline'),' | '))+'</textarea></label>'+
+      '<label class="field-a" style="grid-column:1/-1">Questions &amp; answers <span class="hint">(Question? | Answer, one per line)</span><textarea data-c="faq" style="min-height:150px">'+esc(pairs(g('faq'),' | '))+'</textarea></label></div>'+
+      '<div class="pbtn"><label class="sw" title="Show on the site"><input type="checkbox" data-vis'+(!p.hidden?' checked':'')+' aria-label="Show on the site"><i></i></label><span class="pv" style="margin:0">'+(p.hidden?'Hidden from the site':'Visible on the site')+'</span><button class="ib danger" data-del type="button"'+(p.deleted?' disabled':'')+'>Delete procedure</button><a class="btn btn--line btn--sm" href="../procedures/'+esc(p.id)+'/" target="_blank" rel="noopener">View current page</a></div></div>'+
+      '<div class="prev" id="prev"></div>';
+    $('#ed').innerHTML=h; preview(p);
+  }
+  function preview(p){
+    var q=all().filter(function(x){return x.id===p.id;})[0], ovl=edits[p.id]||{}, ov=q.ov||{}; function g(k){ return k in ovl?ovl[k]:ov[k]; }
+    var ovw=g('overview'); ovw=Array.isArray(ovw)?ovw:(ovw?[ovw]:[q.detail||'']);
+    var gl=g('glance')||[['Type',q.kind==='surgical'?'Surgical':'Non-surgical']], tl=g('timeline')||[], fq=g('faq')||[];
+    $('#prev').innerHTML='<small class="eyebrow" style="font:600 11px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">Live preview of the page</small><div style="margin-top:8px;font:600 12px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--clay-ink)">'+esc(cats.filter(function(c){return c.key===q.cat;}).map(function(c){return c.name;})[0]||q.cat)+' · '+(q.kind==='surgical'?'Surgical':'Non-surgical')+'</div><h4>'+esc(q.title)+'</h4><p class="bl">'+esc(q.blurb||'')+'</p>'+ovw.map(function(t){return '<p>'+esc(t)+'</p>';}).join('')+
+      '<dl>'+gl.map(function(x){return '<div><dt>'+esc(x[0])+'</dt><dd>'+esc(x[1])+'</dd></div>';}).join('')+'</dl>'+(tl.length?'<p style="margin-top:16px"><b>Recovery &amp; timeline</b></p><ol>'+tl.map(function(x){return '<li><b>'+esc(x[0])+'.</b> '+esc(x[1])+'</li>';}).join('')+'</ol>':'')+(fq.length?'<p style="margin-top:16px"><b>Questions</b></p><ol>'+fq.map(function(x){return '<li>'+esc(x[0])+'</li>';}).join('')+'</ol>':'');
+  }
+  /* events */
+  document.addEventListener('click',function(e){
+    var t=e.target.closest('[data-tab]'); if(t){ var c=t.getAttribute('data-tab')==='c'; $('#tabP').hidden=c; $('#tabC').hidden=!c; document.querySelectorAll('[data-tab]').forEach(function(b){b.setAttribute('aria-pressed',b===t);}); if(c) renderCats(); return; }
+    var b=e.target.closest('[data-p]'); if(b){ cur=b.getAttribute('data-p'); history.replaceState(null,'','#'+cur); list(); render(); return; }
+    if(e.target.closest('#addP')){ var name=prompt('Name of the new procedure or treatment?'); if(!name||!name.trim()) return; var id=name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')+'-'+Date.now().toString(36).slice(-3); edits[id]={custom:true,title:name.trim(),cat:cats[0].key,kind:'non-surgical',blurb:'',detail:'',img:'f-glow',aka:[],concerns:[],related:[]}; cur=id; mark(); list(); render(); return; }
+    var im=e.target.closest('[data-img]'); if(im){ var p=all().filter(function(x){return x.id===cur;})[0]; set(p,'img',im.getAttribute('data-img')); render(); return; }
+    var p2=all().filter(function(x){return x.id===cur;})[0];
+    if(e.target.closest('[data-del]')){ if(confirm('Delete “'+p2.title+'”? It disappears from the site and search. You can restore it.')){ set(p2,'deleted',true); list(); render(); } return; }
+    if(e.target.closest('[data-restore]')){ set(p2,'deleted',false); list(); render(); return; }
+    /* categories */
+    var cb=e.target.closest('[data-cup],[data-cdown],[data-cdel]'); if(cb){ var k=cb.getAttribute('data-cup')||cb.getAttribute('data-cdown')||cb.getAttribute('data-cdel'), i=cats.map(function(c){return c.key;}).indexOf(k);
+      if(cb.hasAttribute('data-cup')&&i>0){ cats.splice(i-1,0,cats.splice(i,1)[0]); }
+      if(cb.hasAttribute('data-cdown')&&i<cats.length-1){ cats.splice(i+1,0,cats.splice(i,1)[0]); }
+      if(cb.hasAttribute('data-cdel')){ if(all().some(function(p){return p.cat===k&&!p.deleted;})) { alert('Move or delete this category’s procedures first.'); return; } if(confirm('Delete this category?')) cats.splice(i,1); }
+      mark(); renderCats(); return; }
+    if(e.target.closest('#addC')){ var n=$('#newCat').value.trim(); if(!n) { $('#newCat').focus(); return; } var slug=n.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); if(cats.some(function(c){return c.slug===slug;})) slug+='-'+Date.now().toString(36).slice(-3); cats.push({key:'c-'+slug,name:n,slug:slug}); $('#newCat').value=''; mark(); renderCats(); return; }
+  });
+  document.addEventListener('input',function(e){
+    var t=e.target; var p=all().filter(function(x){return x.id===cur;})[0];
+    if(t.matches&&t.matches('[data-f]')){ set(p,t.getAttribute('data-f'),t.value); if(t.getAttribute('data-f')==='title'){ list(); } preview(p); }
+    else if(t.matches&&t.matches('[data-lines]')){ set(p,t.getAttribute('data-lines'),t.value.split('\n').map(function(x){return x.trim();}).filter(Boolean)); }
+    else if(t.matches&&t.matches('[data-c]')){ var k=t.getAttribute('data-c'), v=t.value; var o; if(k==='overview') o=v.split(/\n\s*\n/).map(function(x){return x.trim();}).filter(Boolean); else if(k==='good') o=v.split('\n').map(function(x){return x.trim();}).filter(Boolean); else if(k==='glance') o=parsePairs(v,':'); else o=parsePairs(v,'|'); set(p,k,o); preview(p); }
+    else if(t.id==='q') list();
+    else if(t.matches&&t.matches('[data-cname]')){ var c=cats.filter(function(x){return x.key===t.getAttribute('data-cname');})[0]; if(c){ c.name=t.value; mark(); } }
+  });
+  document.addEventListener('change',function(e){
+    var t=e.target, p=all().filter(function(x){return x.id===cur;})[0];
+    if(t.matches('[data-f]')){ set(p,t.getAttribute('data-f'),t.value); list(); preview(p); }
+    else if(t.matches('[data-rel]')){ var r=(val(p,'related')||[]).slice(), id=t.getAttribute('data-rel'), i=r.indexOf(id); if(t.checked&&i<0) r.push(id); if(!t.checked&&i>-1) r.splice(i,1); set(p,'related',r); }
+    else if(t.matches('[data-vis]')){ set(p,'hidden',!t.checked); list(); render(); }
+    else if(t.matches('[data-chide]')){ var c=cats.filter(function(x){return x.key===t.getAttribute('data-chide');})[0]; c.hidden=!t.checked; mark(); renderCats(); }
+  });
+  function renderCats(){
+    var ps=all().filter(function(p){return !p.deleted;});
+    $('#cats').innerHTML=cats.map(function(c,i){ var n=ps.filter(function(p){return p.cat===c.key;}).length; return '<div class="cat-row"><div class="nm"><input type="text" data-cname="'+esc(c.key)+'" value="'+esc(c.name)+'" aria-label="Category name"><small>'+n+' procedure'+(n===1?'':'s')+' · address #'+esc(c.slug)+(c.hidden?' · hidden':'')+'</small></div><div class="ctl"><button class="ib" data-cup="'+esc(c.key)+'" aria-label="Move up"'+(i===0?' disabled':'')+'>↑</button><button class="ib" data-cdown="'+esc(c.key)+'" aria-label="Move down"'+(i===cats.length-1?' disabled':'')+'>↓</button><label class="sw" title="Show on the site"><input type="checkbox" data-chide="'+esc(c.key)+'"'+(!c.hidden?' checked':'')+' aria-label="Show on the site"><i></i></label><button class="ib danger" data-cdel="'+esc(c.key)+'">Delete</button></div></div>'; }).join('');
+  }
+  $('#save').addEventListener('click',function(){ if(A.ls.set('nps.procEdits',edits)&&A.ls.set('nps.categories',cats)){ dirty=false; A.log('Saved procedure and category changes'); A.refresh(); $('#st').textContent='Saved.'; } else $('#st').textContent='Could not save in this browser.'; });
+  $('#discard').addEventListener('click',function(){ edits=JSON.parse(JSON.stringify(A.ls.get('nps.procEdits',{}))); cats=JSON.parse(JSON.stringify(A.ls.get('nps.categories',null)||cats)); dirty=false; list(); render(); renderCats(); $('#st').textContent='Unsaved changes discarded.'; });
+  window.addEventListener('beforeunload',function(e){ if(dirty){ e.preventDefault(); e.returnValue=''; } });
+  list(); render();
+})();
+
+</script>
+</body>
+</html>

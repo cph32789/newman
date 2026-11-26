@@ -80,3 +80,6 @@ One page manages every before-and-after gallery:
 - **Cases inside a gallery:** switch on/off, drag or use arrows to reorder, edit any text, choose which details are public, mark "checked", add a case (upload before/after photos, optional second view) and delete/restore.
 - Preview: saved in the browser (`localStorage nps.gallery2`). The real Admin will publish for every visitor.
 - Imported cases: 197 across 16 galleries, copied from the current website. Details must be checked against records. Not imported (irregular source pages): tummy tuck patient 28, mommy makeover patient 4, massive weight loss patient 3, and injectables patients 3, 9 and 11.
+
+## Admin sections (preview, `redesign-v1/admin/`)
+Dashboard · Pages & images (image-fit tool: replace a picture, focus, zoom, cover/contain, separate phone settings) · Procedures (add/edit, content fields with live preview; **Categories**: add, rename, reorder, hide, delete) · Gallery · Inbox (new / answered / blocked spam) · Settings (practice details, request delivery, team, sign-in and spam protection, activity log, backup) · Sign-in demo (email + 6-digit code). The header **Publish** button lists unpublished sections. All saved in the browser for now (keys `nps.*`).

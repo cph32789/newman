@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Pages & images | Admin preview | Newman Plastic Surgery</title>
+<link rel="icon" href="../assets/img/favicon.png">
+<link rel="stylesheet" href="../assets/css/fonts.css?v=20261127j">
+<link rel="stylesheet" href="../assets/css/styles.css?v=20261127j">
+<link rel="stylesheet" href="../assets/css/admin.css?v=20261127j">
+</head>
+<body class="adm">
+<header id="ah"></header>
+<main class="wrap" style="padding-bottom:70px">
+<nav class="side" id="an" aria-label="Admin sections"></nav>
+
+<style>
+.layout{display:grid;gap:26px;margin-top:26px}@media(min-width:960px){.layout{grid-template-columns:300px 1fr;align-items:start}}
+.pl h3{font:600 11px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:16px 2px 6px}
+.pl button{display:flex;width:100%;gap:12px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:14px;background:var(--paper);text-align:left;font:500 15px/1.25 var(--sans);min-height:56px;margin-bottom:6px}
+.pl button[aria-current=true]{background:var(--teal-900);color:var(--paper);border-color:var(--teal-900)}
+.pl .tn{flex:none;width:40px;height:40px;border-radius:8px;overflow:hidden;background:var(--sand-2)}
+.pl .tn img{width:100%;height:100%;object-fit:cover;display:block}
+.pl small{display:block;opacity:.65;font-size:12px}
+.pv2{display:grid;gap:22px;margin-top:16px}@media(min-width:900px){.pv2{grid-template-columns:1fr 230px;align-items:start}}
+.pv2 .box{background:var(--sand);border-radius:var(--r-lg);padding:16px}
+.pv2 .box>small{display:block;font:600 11px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.pv2 .frame{position:relative;overflow:hidden;background:var(--sand-2);cursor:crosshair;box-shadow:var(--shadow)}
+.pv2 .frame .dot{position:absolute;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;border:2px solid #fff;background:var(--clay);box-shadow:0 0 0 2px rgba(0,0,0,.35);pointer-events:none}
+.sl{display:grid;gap:14px;margin-top:16px}.sl label{display:grid;grid-template-columns:90px 1fr 54px;align-items:center;gap:12px;font:500 15px var(--sans)}
+.sl input[type=range]{width:100%;accent-color:var(--clay);min-height:34px}
+.sl output{font:600 13px var(--sans);color:var(--muted);text-align:right}
+.libg{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px;margin-top:12px}
+.libg button{border:2px solid transparent;border-radius:10px;overflow:hidden;aspect-ratio:1;padding:0;background:var(--sand-2)}
+.libg button[aria-pressed=true]{border-color:var(--clay)}
+.libg img{width:100%;height:100%;object-fit:cover;display:block}
+.fine2{color:var(--muted);font-size:14px;margin-top:10px}
+</style>
+
+<h1>Pages <em>&amp; images.</em></h1>
+<p class="intro">Pick a page, pick a picture, and decide how it fits. Pictures are <b>never stretched or squished</b>. You choose the focus point and zoom, separately for desktop and phone, and your choice is saved with the picture.</p>
+<div class="layout">
+  <aside>
+    <label class="field-a" style="margin-bottom:10px">Find a page<input type="search" id="q" placeholder="e.g. facelift, home"></label>
+    <div id="pl"></div>
+  </aside>
+  <section id="ed" aria-live="polite"></section>
+</div>
+<div class="bar"><div class="wrap"><button class="btn btn--ink btn--sm" id="save" type="button">Save image settings</button><button class="btn btn--line btn--sm" id="reset" type="button">Reset this picture</button><span class="st" id="st" role="status"></span></div></div>
+<div class="tip">Preview: settings are saved in this browser and shown on the public pages here. In the live Admin, Publish saves them for every visitor.</div>
+
+</main>
+<script src="../assets/js/admin-shell.js?v=20261127j" data-active="pages"></script>
+<script src="../data/site.js?v=20261127j"></script>
+<script>window.NPS_BASE='../';</script>
+<script src="../data/procedures.js?v=20261127j"></script>
+<script src="../data/images.js?v=20261127j"></script>
+<script src="../data/procedure-content.js?v=20261127j"></script>
+<script>
+
+(function(){
+  var NPS=window.NPS, A=window.ADMIN, P=NPS.procedures;
+  var $=function(s){return document.querySelector(s);}, esc=A.esc;
+  var store=A.ls.get('nps.imageSettings',{}), custom=A.ls.get('nps.customImages',{});
+  Object.keys(custom).forEach(function(k){NPS.images[k]=custom[k];});
+  var FR={ // aspect ratios of the real frames: [desktop, phone], shape
+    'hero':{d:'16/9',m:'4/5',n:'Home · big picture at the top'},
+    'cat.face':{d:'4/3.5',m:'3/4.6',n:'Home · Face card'},'cat.breast':{d:'4/3.5',m:'3/4.6',n:'Home · Breast card'},'cat.body':{d:'4/3.5',m:'3/4.6',n:'Home · Body card'},'cat.skin':{d:'4/3.5',m:'3/4.6',n:'Home · Skin card'},
+    'surgeon':{d:'.86',m:'.86',n:'Home and Meet Dr. Newman · portrait',arch:1}
+  };
+  var pages=[['Home',['hero','cat.face','cat.breast','cat.body','cat.skin','surgeon']],['Meet Dr. Newman',['surgeon']]];
+  var PN={'hero':'Top picture','cat.face':'Face card','cat.breast':'Breast card','cat.body':'Body card','cat.skin':'Skin card','surgeon':'Dr. Newman portrait'};
+  P.forEach(function(p){ var k='proc.'+p.id; FR[k]={d:'4/3.3',m:'4/4.7',n:p.title+' page · top picture'}; NPS.slotDefaults[k]=NPS.slotDefaults[k]||{image:p.img,fx:50,fy:38,zoom:1,fit:'cover'}; });
+  var cur='hero', draft={}, mobile=false;
+  function base(slot){ var d=NPS.slotDefaults[slot]||{}; return Object.assign({fx:50,fy:40,zoom:1,fit:'cover'},d,store[slot]||{}); }
+  function load(slot){ var s=base(slot); draft=JSON.parse(JSON.stringify({image:s.image,fx:s.fx,fy:s.fy,zoom:s.zoom,fit:s.fit,m:s.m||null})); mobile=false; }
+  function eff(m){ var s={image:draft.image,fx:draft.fx,fy:draft.fy,zoom:draft.zoom,fit:draft.fit}; if(m&&draft.m) s=Object.assign(s,draft.m); return s; }
+  function thumbOf(slot){ var s=base(slot), im=NPS.images[s.image]; return im?im.src:''; }
+  function list(q){
+    q=(q||'').toLowerCase(); var h='';
+    pages.forEach(function(pg){ if(q&&pg[0].toLowerCase().indexOf(q)<0) return; h+='<h3>'+esc(pg[0])+'</h3>'+pg[1].map(function(sl){return '<button data-s="'+sl+'"'+(sl===cur?' aria-current="true"':'')+'><span class="tn"><img src="'+thumbOf(sl)+'" alt=""></span><span>'+esc(PN[sl])+'<small>'+(store[sl]?'Edited':'Default')+'</small></span></button>';}).join(''); });
+    var pp=P.filter(function(p){return !q||p.title.toLowerCase().indexOf(q)>-1||'procedure'.indexOf(q)>-1;}); if(pp.length) h+='<h3>Procedure pages ('+pp.length+')</h3>'+pp.map(function(p){var sl='proc.'+p.id; return '<button data-s="'+sl+'"'+(sl===cur?' aria-current="true"':'')+'><span class="tn"><img src="'+thumbOf(sl)+'" alt=""></span><span>'+esc(p.title.replace(/\s*\(.*\)/,''))+'<small>'+(store[sl]?'Edited':'Default')+'</small></span></button>';}).join('');
+    $('#pl').className='pl'; $('#pl').innerHTML=h;
+  }
+  function frameHtml(w,asp,s,arch){ var im=NPS.images[s.image]; if(!im) return ''; var rad=arch?'border-radius:999px 999px 20px 20px;':'border-radius:18px;';
+    return '<div class="frame" data-fr style="width:'+w+';aspect-ratio:'+asp+';'+rad+'"><img class="fit" src="'+im.src+'" alt="" width="'+im.w+'" height="'+im.h+'" style="'+NPS.fitStyle(s)+'"><span class="dot" style="left:'+s.fx+'%;top:'+s.fy+'%"></span></div>'; }
+  function render(){
+    var f=FR[cur], libIds=Object.keys(NPS.images).filter(function(k){return !/^(facelift|breast|tummy|mommy|lipo|mwl|eyelid|nose|ear|male|inject|new)/.test(k);});
+    var sd=eff(false), sm=eff(true), editing=mobile?sm:sd, im=NPS.images[draft.image];
+    var h='<div class="panel"><h2>'+esc(f.n)+'</h2><p class="intro" style="margin:0">Where it shows: '+(cur.indexOf('proc.')===0?'the top of that procedure’s page':'the home page'+(cur==='surgeon'?' and the Meet Dr. Newman page':''))+'.</p>'+
+      '<div class="pv2"><div class="box"><small>Desktop</small>'+frameHtml('min(100%,560px)',f.d,sd,f.arch)+'<p class="fine2">Click the picture to set the focus point.</p></div>'+
+      '<div class="box"><small>Phone</small>'+frameHtml('190px',f.m,sm,f.arch)+'</div></div>'+
+      '<div class="seg" style="margin-top:18px" role="group" aria-label="Which screen to adjust"><button type="button" data-m="0" aria-pressed="'+!mobile+'">Adjust desktop</button><button type="button" data-m="1" aria-pressed="'+mobile+'">Adjust phone</button></div>'+
+      (mobile&&!draft.m?'<div class="banner"><span>Phones currently use the desktop settings.</span><button class="ib" data-mstart type="button">Set different phone settings</button></div>':'')+
+      '<div class="sl"><label>Focus left–right<input type="range" min="0" max="100" data-k="fx" value="'+editing.fx+'"><output>'+editing.fx+'%</output></label>'+
+      '<label>Focus up–down<input type="range" min="0" max="100" data-k="fy" value="'+editing.fy+'"><output>'+editing.fy+'%</output></label>'+
+      '<label>Zoom<input type="range" min="1" max="3" step="0.05" data-k="zoom" value="'+editing.zoom+'"><output>'+(+editing.zoom).toFixed(2)+'×</output></label></div>'+
+      '<div class="pbtn"><span class="field-a" style="gap:0"><span style="margin-right:12px;display:inline">Fit</span></span><div class="seg" role="group" aria-label="Fit"><button type="button" data-fit="cover" aria-pressed="'+(editing.fit!=='contain')+'">Fill the frame (crop)</button><button type="button" data-fit="contain" aria-pressed="'+(editing.fit==='contain')+'">Show the whole picture</button></div>'+(mobile&&draft.m?'<button class="ib" data-mclear type="button">Use desktop settings on phones</button>':'')+'</div>'+
+      '<p class="fine2">Never stretched: the picture keeps its true proportions in every frame. “Fill” crops to fit; “Show the whole picture” leaves space around it.</p></div>'+
+      '<div class="panel" style="margin-top:14px"><h2>Replace the picture</h2><p class="intro" style="margin:0">Upload a new photo, or choose one already on the site.</p>'+
+      '<div class="pbtn"><label class="btn btn--ink btn--sm" style="cursor:pointer">Upload a photo<input type="file" accept="image/*" id="up" hidden></label><span class="pv" style="margin:0">'+(im?esc(im.w+' × '+im.h+' px'):'')+(im&&im.w<900&&cur==='hero'?' · small for a large frame; a bigger photo will look sharper':'')+'</span></div>'+
+      '<div class="libg" role="group" aria-label="Pictures already on the site">'+libIds.map(function(k){var m=NPS.images[k]; return '<button type="button" data-img="'+esc(k)+'" aria-pressed="'+(k===draft.image)+'" aria-label="'+esc(m.alt||k)+'"><img src="'+m.src+'" alt=""></button>';}).join('')+'</div></div>';
+    $('#ed').innerHTML=h;
+  }
+  function stuff(){ list($('#q').value); render(); }
+  document.addEventListener('click',function(e){
+    var b=e.target.closest('[data-s]'); if(b){ cur=b.getAttribute('data-s'); load(cur); stuff(); return; }
+    var fr=e.target.closest('[data-fr]'); if(fr){ var r=fr.getBoundingClientRect(), x=Math.round(Math.max(0,Math.min(100,(e.clientX-r.left)/r.width*100))), y=Math.round(Math.max(0,Math.min(100,(e.clientY-r.top)/r.height*100))); upd({fx:x,fy:y}); return; }
+    if(e.target.closest('[data-mstart]')){ draft.m={fx:draft.fx,fy:draft.fy,zoom:draft.zoom,fit:draft.fit}; render(); return; }
+    if(e.target.closest('[data-mclear]')){ draft.m=null; mobile=false; render(); mark(); return; }
+    var m=e.target.closest('[data-m]'); if(m){ mobile=m.getAttribute('data-m')==='1'; render(); return; }
+    var ft=e.target.closest('[data-fit]'); if(ft){ upd({fit:ft.getAttribute('data-fit')}); return; }
+    var im=e.target.closest('[data-img]'); if(im){ draft.image=im.getAttribute('data-img'); if(draft.m) delete draft.m.image; mark(); render(); return; }
+  });
+  function mark(){ $('#st').textContent='Unsaved changes'; }
+  function upd(o){ if(mobile){ if(!draft.m){ if(Object.keys(o).length){ draft.m={fx:draft.fx,fy:draft.fy,zoom:draft.zoom,fit:draft.fit}; } } Object.assign(draft.m,o); } else Object.assign(draft,o); mark(); render(); }
+  document.addEventListener('input',function(e){ var k=e.target.getAttribute&&e.target.getAttribute('data-k'); if(!k) return; var v=+e.target.value, o={}; o[k]=v; if(mobile){ if(!draft.m) draft.m={fx:draft.fx,fy:draft.fy,zoom:draft.zoom,fit:draft.fit}; Object.assign(draft.m,o); } else Object.assign(draft,o); mark();
+    var out=e.target.nextElementSibling; if(out) out.textContent=(k==='zoom'?v.toFixed(2)+'×':v+'%'); var sd=eff(false),sm=eff(true), frs=document.querySelectorAll('[data-fr]'); [sd,sm].forEach(function(s,i){ var img=frs[i]&&frs[i].querySelector('img'), dot=frs[i]&&frs[i].querySelector('.dot'); if(img) img.style.cssText=NPS.fitStyle(s); if(dot){dot.style.left=s.fx+'%';dot.style.top=s.fy+'%';} }); });
+  document.addEventListener('change',function(e){ if(e.target.id==='up'&&e.target.files[0]){ var r=new FileReader(); r.onload=function(){ var im=new Image(); im.onload=function(){ var max=1800,k=Math.min(1,max/im.naturalWidth),w=Math.round(im.naturalWidth*k),h=Math.round(im.naturalHeight*k),c=document.createElement('canvas'); c.width=w;c.height=h;c.getContext('2d').drawImage(im,0,0,w,h); var id='up-'+Date.now().toString(36); custom[id]={src:c.toDataURL('image/jpeg',.86),w:w,h:h,alt:'Uploaded picture'}; NPS.images[id]=custom[id]; draft.image=id; if(draft.m) delete draft.m.image; mark(); render(); }; im.src=r.result; }; r.readAsDataURL(e.target.files[0]); }});
+  $('#q').addEventListener('input',function(){ list(this.value); });
+  $('#save').addEventListener('click',function(){
+    var s={image:draft.image,fx:draft.fx,fy:draft.fy,zoom:+draft.zoom,fit:draft.fit}; if(draft.m) s.m=draft.m; store[cur]=s;
+    var used={}; Object.keys(store).forEach(function(k){used[store[k].image]=1; if(store[k].m&&store[k].m.image) used[store[k].m.image]=1;}); var keep={}; Object.keys(custom).forEach(function(k){ if(used[k]) keep[k]=custom[k]; });
+    if(A.ls.set('nps.imageSettings',store)&&A.ls.set('nps.customImages',keep)){ A.log('Saved picture settings: '+FR[cur].n); A.refresh(); $('#st').textContent='Saved. Open the page to see it.'; list($('#q').value); } else $('#st').textContent='Could not save: this browser is out of room (large photos).';
+  });
+  $('#reset').addEventListener('click',function(){ delete store[cur]; A.ls.set('nps.imageSettings',store); A.refresh(); load(cur); stuff(); $('#st').textContent='Back to the default.'; });
+  load(cur); stuff();
+})();
+
+</script>
+</body>
+</html>

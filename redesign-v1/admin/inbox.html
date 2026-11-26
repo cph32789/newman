@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Inbox | Admin preview | Newman Plastic Surgery</title>
+<link rel="icon" href="../assets/img/favicon.png">
+<link rel="stylesheet" href="../assets/css/fonts.css?v=20261127j">
+<link rel="stylesheet" href="../assets/css/styles.css?v=20261127j">
+<link rel="stylesheet" href="../assets/css/admin.css?v=20261127j">
+</head>
+<body class="adm">
+<header id="ah"></header>
+<main class="wrap" style="padding-bottom:70px">
+<nav class="side" id="an" aria-label="Admin sections"></nav>
+
+<style>
+.layout{display:grid;gap:22px;margin-top:22px}@media(min-width:960px){.layout{grid-template-columns:360px 1fr;align-items:start}}
+.ml{display:grid;gap:8px}
+.ml button{display:grid;gap:4px;width:100%;text-align:left;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:var(--paper)}
+.ml button[aria-current=true]{border-color:var(--teal-900);box-shadow:0 0 0 2px var(--teal-900) inset}
+.ml b{font:500 16px var(--sans)}.ml span{color:var(--muted);font-size:14px}
+.ml .top{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.ml .unread b{font-weight:700}
+.msg dl{display:grid;gap:14px;margin:16px 0 0}.msg dt{font:600 11px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}.msg dd{margin:3px 0 0;font-size:17px;line-height:1.5}
+.why{margin-top:16px;padding:14px 16px;border-radius:12px;background:#F4E4DF;color:#6B2415;font-size:15px}
+</style>
+<h1>Inbox.</h1>
+<p class="intro">Consultation requests from the website. New requests are marked. Anything the spam protection stops is kept in its own tab, so a real person is never lost. <span class="demo">SAMPLE REQUESTS</span></p>
+<div class="seg" style="margin-top:18px" role="group" aria-label="Folder"><button type="button" data-f="new" aria-pressed="true">New</button><button type="button" data-f="replied" aria-pressed="false">Answered</button><button type="button" data-f="spam" aria-pressed="false">Blocked spam</button></div>
+<div class="layout"><div class="ml" id="ml"></div><div id="md"></div></div>
+<div class="tip">Who receives these requests, what the email contains, and an automatic reply are set under <a class="link" href="settings.html">Settings</a>. Please do not put private medical details in a request.</div>
+
+</main>
+<script src="../assets/js/admin-shell.js?v=20261127j" data-active="inbox"></script>
+<script src="../data/site.js?v=20261127j"></script>
+<script>window.NPS_BASE='../';</script>
+<script>
+
+(function(){
+  var A=window.ADMIN, $=function(s){return document.querySelector(s);}, esc=A.esc, H=3600000, D=24*H;
+  var seed=[
+   {id:'m1',status:'new',name:'Jessica M.',email:'jessica@example.com',phone:'407-555-0118',interest:'Face',list:['Facelift','Eyelid surgery'],goals:'I’m 52 and my jawline has really started to change. I’d like to understand what my options are and what recovery looks like.',t:Date.now()-2*H,page:'Facelift'},
+   {id:'m2',status:'new',name:'Danielle R.',email:'danielle@example.com',phone:'',interest:'Breast',list:['Breast augmentation','Breast lift'],goals:'Planning for next spring. Could you tell me about financing and when I could be seen?',t:Date.now()-5*H,page:'Breast augmentation'},
+   {id:'m3',status:'new',name:'Karen T.',email:'karen@example.com',phone:'407-555-0170',interest:'Skin & glow',list:['Halo laser','Botox'],goals:'',t:Date.now()-D,page:'Home'},
+   {id:'m4',status:'replied',name:'Alicia P.',email:'alicia@example.com',phone:'',interest:'Body',list:['Tummy tuck'],goals:'After two kids. Would like a consultation in January.',t:Date.now()-3*D,page:'Tummy tuck',note:'Called and booked 1/14.'},
+   {id:'m5',status:'spam',name:'SEO Services',email:'rank@spam.example',phone:'',interest:'',list:[],goals:'Boost your google ranking now http://spam.example http://more.example',t:Date.now()-6*H,page:'Home',why:['Message contains links','Submitted in 1.2 seconds (people take longer)']},
+   {id:'m6',status:'spam',name:'bot123',email:'bot@spam.example',phone:'',interest:'',list:[],goals:'',t:Date.now()-D,page:'Home',why:['Hidden field was filled in (only automated tools do this)']}
+  ];
+  var box=A.ls.get('nps.inbox',null)||seed, folder='new', cur=null;
+  function save(){ A.ls.set('nps.inbox',box); A.refresh(); }
+  function render(){
+    var ms=box.filter(function(m){return m.status===folder;});
+    $('#ml').innerHTML=ms.length?ms.map(function(m){ return '<button data-id="'+m.id+'"'+(m.id===cur?' aria-current="true"':'')+(m.status==='new'?' class="unread"':'')+'><div class="top"><b>'+esc(m.name)+'</b><span>'+A.ago(m.t)+'</span></div><span>'+esc(m.interest||'No interest chosen')+(m.list&&m.list.length?' · '+m.list.length+' saved':'')+'</span></button>'; }).join(''):'<div class="panel"><b>Nothing here.</b><p class="intro" style="margin:6px 0 0">You’re all caught up.</p></div>';
+    var m=box.filter(function(x){return x.id===cur;})[0];
+    $('#md').innerHTML=m?detail(m):'';
+  }
+  function detail(m){
+    var acts=m.status==='spam'?'<button class="btn btn--ink btn--sm" data-act="notspam" type="button">This is a real person</button><button class="btn btn--line btn--sm" data-act="del" type="button">Delete</button>':
+      '<a class="btn btn--ink btn--sm" href="mailto:'+esc(m.email)+'?subject=Your%20consultation%20request">Reply by email</a>'+(m.phone?'<a class="btn btn--line btn--sm" href="tel:'+esc(m.phone)+'">Call '+esc(m.phone)+'</a>':'')+(m.status==='new'?'<button class="btn btn--line btn--sm" data-act="done" type="button">Mark answered</button>':'<button class="btn btn--line btn--sm" data-act="reopen" type="button">Mark as new</button>')+'<button class="btn btn--line btn--sm" data-act="spam" type="button">Mark as spam</button>';
+    return '<div class="panel msg"><h2>'+esc(m.name)+' <span class="pill '+(m.status==='new'?'new':m.status==='spam'?'spam':'ok')+'">'+(m.status==='new'?'NEW':m.status==='spam'?'BLOCKED':'ANSWERED')+'</span></h2><p class="intro" style="margin:0">'+A.ago(m.t)+' · from the '+esc(m.page)+' page</p>'+
+      '<dl><div><dt>Email</dt><dd>'+esc(m.email)+'</dd></div>'+(m.phone?'<div><dt>Phone</dt><dd>'+esc(m.phone)+'</dd></div>':'')+'<div><dt>Interested in</dt><dd>'+esc(m.interest||'Not chosen')+'</dd></div>'+
+      (m.list&&m.list.length?'<div><dt>Their saved list</dt><dd>'+m.list.map(esc).join(', ')+'</dd></div>':'')+(m.goals?'<div><dt>Their goals</dt><dd>'+esc(m.goals)+'</dd></div>':'')+(m.note?'<div><dt>Your note</dt><dd>'+esc(m.note)+'</dd></div>':'')+'</dl>'+
+      (m.why?'<div class="why"><b>Why it was blocked</b><ul style="margin:6px 0 0;padding-left:20px">'+m.why.map(function(w){return '<li>'+esc(w)+'</li>';}).join('')+'</ul></div>':'')+
+      '<div class="pbtn">'+acts+'</div></div>';
+  }
+  document.addEventListener('click',function(e){
+    var f=e.target.closest('[data-f]'); if(f){ folder=f.getAttribute('data-f'); cur=null; document.querySelectorAll('[data-f]').forEach(function(b){b.setAttribute('aria-pressed',b===f);}); var first=box.filter(function(m){return m.status===folder;})[0]; cur=first?first.id:null; render(); return; }
+    var b=e.target.closest('[data-id]'); if(b){ cur=b.getAttribute('data-id'); render(); return; }
+    var a=e.target.closest('[data-act]'); if(!a) return; var m=box.filter(function(x){return x.id===cur;})[0]; if(!m) return; var k=a.getAttribute('data-act');
+    if(k==='done'){ m.status='replied'; A.log('Marked a request answered'); } else if(k==='reopen') m.status='new'; else if(k==='spam'){ m.status='spam'; m.why=m.why||['Marked as spam by you']; } else if(k==='notspam'){ m.status='new'; delete m.why; } else if(k==='del'){ box=box.filter(function(x){return x.id!==m.id;}); }
+    cur=null; var nx=box.filter(function(x){return x.status===folder;})[0]; cur=nx?nx.id:null; save(); render();
+  });
+  var f0=box.filter(function(m){return m.status==='new';})[0]; cur=f0?f0.id:null; render();
+})();
+
+</script>
+</body>
+</html>
