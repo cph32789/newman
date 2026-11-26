@@ -14,13 +14,9 @@
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   var G = NPS.gallery = {};
 
-  /* ---------- which procedures need 18+ ---------- */
-  G.gateList = function () {
-    try { var s = localStorage.getItem('nps.ageGate'); if (s) { var a = JSON.parse(s); if (Array.isArray(a)) return a; } } catch (e) {}
-    return (NPS.library && NPS.library.ageGate && NPS.library.ageGate.procedures) || [];
-  };
-  G.isGated = function (c) { var g = G.gateList(); return (c.procedures || []).some(function (p) { return g.indexOf(p) > -1; }); };
-  G.cases = function () { return (NPS.library ? NPS.library.cases : []).filter(function (c) { return c.visible !== false; }).sort(function (a, b) { return (a.order || 0) - (b.order || 0); }); };
+  /* ---------- galleries, visibility and 18+ come from the Gallery admin layer (data/library.js) ---------- */
+  G.isGated = function (c) { return NPS.library.isGated(c); };
+  G.cases = function () { return NPS.library.publicCases(); };
 
   /* ---------- 18+ dialog ---------- */
   var verified = false; try { verified = sessionStorage.getItem('npsAge18') === '1'; } catch (e) {}
@@ -54,7 +50,7 @@
     if (c.height && s.height !== false) bits.push(c.height);
     if (c.weight && s.weight !== false) bits.push(c.weight);
     if (c.postop && s.postop !== false) bits.push(c.postop);
-    var pr = link && c.primary && NPS.procedures.filter(function (p) { return p.id === c.primary; })[0];
+    var gl = link && NPS.library.gallery(c.primary), pr = gl && gl.procedure && NPS.procedures.filter(function (p) { return p.id === gl.procedure; })[0];
     return '<div class="cinfo">' + (c.patient ? '<span class="pt">' + esc(c.patient) + '</span>' : '') + '<b>' + esc(c.title) + '</b>' + (c.addOn ? '<span class="addon">' + esc(c.addOn.charAt(0).toUpperCase() + c.addOn.slice(1)) + '</span>' : '') +
       (bits.length ? '<ul>' + bits.map(function (b) { return '<li>' + esc(b) + '</li>'; }).join('') + '</ul>' : '') +
       (c.implant && s.implant !== false ? '<span class="implant">Implants: ' + esc(c.implant) + '</span>' : '') +
@@ -94,30 +90,31 @@
 
   /* ---------- Results gallery page ---------- */
   var page = $('#gallery'); if (!page) return;
-  var CATS = [['face', 'Face', 'Face'], ['breast', 'Breast', 'Breast'], ['body', 'Body', 'Body'], ['skin', 'Skin', 'Skin & aesthetics']];   // slug, label, category in procedures.js
-  var P = NPS.procedures, byId = {}; P.forEach(function (p) { byId[p.id] = p; });
-  var catOf = function (c) { var p = byId[c.primary || c.procedures[0]]; return p ? p.cat : ''; };
+  var CATS = [['face', 'Face', 'Face'], ['breast', 'Breast', 'Breast'], ['body', 'Body', 'Body'], ['skin', 'Skin', 'Skin & aesthetics']];   // slug, label, category name
   var all = G.cases(), state = { cat: '', proc: '' }, list = $('#gList'), chips = $('#gChips'), procs = $('#gProcs'), count = $('#gCount');
-  function short(t) { return t.replace(/\s*\(.*\)/, ''); }
+  var gal = {}; NPS.library.galleries().forEach(function (g) { gal[g.id] = g; });
+  var catOf = function (c) { return (gal[c.primary] || {}).cat || ''; };
+  var gname = function (id) { return (gal[id] || {}).name || id; };
   function draw() {
     var cs = all.filter(function (c) { return (!state.cat || catOf(c) === state.cat) && (!state.proc || c.primary === state.proc); });
     chips.innerHTML = '<button class="chip" type="button" data-cat="" aria-pressed="' + !state.cat + '">All <span class="n">' + all.length + '</span></button>' +
       CATS.map(function (k) {
         var n = all.filter(function (c) { return catOf(c) === k[2]; }).length, lock = all.some(function (c) { return catOf(c) === k[2] && G.isGated(c); });
+        if (!n) return '';
         return '<button class="chip" type="button" data-cat="' + esc(k[2]) + '" aria-pressed="' + (state.cat === k[2]) + '">' + k[1] + (lock ? ' <span class="age">18+</span>' : '') + ' <span class="n">' + n + '</span></button>';
       }).join('');
-    var ids = []; all.forEach(function (c) { if (c.primary && (!state.cat || catOf(c) === state.cat) && ids.indexOf(c.primary) < 0) ids.push(c.primary); });
+    var ids = []; all.forEach(function (c) { if ((!state.cat || catOf(c) === state.cat) && ids.indexOf(c.primary) < 0) ids.push(c.primary); });
     procs.hidden = !state.cat || ids.length < 2;
-    procs.innerHTML = '<span class="lbl">Procedure</span>' + '<button class="chip chip--sm" type="button" data-proc="" aria-pressed="' + !state.proc + '">All</button>' +
-      ids.map(function (id) { return '<button class="chip chip--sm" type="button" data-proc="' + id + '" aria-pressed="' + (state.proc === id) + '">' + esc(short(byId[id].title)) + '</button>'; }).join('');
-    count.textContent = cs.length + (cs.length === 1 ? ' case' : ' cases') + (state.proc ? ' · ' + short(byId[state.proc].title) : state.cat ? ' · ' + (CATS.filter(function (k) { return k[2] === state.cat; })[0] || [0, state.cat])[1] : '');
+    procs.innerHTML = '<span class="lbl">Gallery</span>' + '<button class="chip chip--sm" type="button" data-proc="" aria-pressed="' + !state.proc + '">All</button>' +
+      ids.map(function (id) { return '<button class="chip chip--sm" type="button" data-proc="' + esc(id) + '" aria-pressed="' + (state.proc === id) + '">' + esc(gname(id)) + '</button>'; }).join('');
+    count.textContent = cs.length + (cs.length === 1 ? ' case' : ' cases') + (state.proc ? ' · ' + gname(state.proc) : state.cat ? ' · ' + (CATS.filter(function (k) { return k[2] === state.cat; })[0] || [0, state.cat])[1] : '');
     if (!cs.length) { list.removeAttribute('data-n'); list.innerHTML = '<div class="rempty"><b>Photos are shared in the office.</b><span>To protect patient privacy, many results are shown only during a consultation. Ask Dr. Newman to show you examples that match your goals.</span><a class="btn btn--champagne" href="#consult">Ask about results</a></div>'; }
     else G.mount(list, cs, { links: true });
     if ((state.cat || state.proc) && cs.length && cs.every(G.isGated) && !verified) G.ask();
   }
   function fromHash() {
     var h = decodeURIComponent((location.hash || '').slice(1)), m = h.match(/^show-(.+)$/);
-    state.proc = m && byId[m[1]] ? m[1] : ''; state.cat = state.proc ? byId[state.proc].cat : (CATS.filter(function (k) { return k[0] === h || k[2] === h; })[0] || ['', '', ''])[2];
+    state.proc = m && gal[m[1]] ? m[1] : ''; state.cat = state.proc ? gal[state.proc].cat : (CATS.filter(function (k) { return k[0] === h || k[2] === h; })[0] || ['', '', ''])[2];
   }
   function setHash() { var h = state.proc ? 'show-' + state.proc : state.cat ? (CATS.filter(function (k) { return k[2] === state.cat; })[0] || [''])[0] : ''; history.replaceState(null, '', h ? '#' + h : location.pathname + location.search); }
   page.addEventListener('click', function (e) {

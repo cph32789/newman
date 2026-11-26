@@ -72,3 +72,11 @@ everything else uses careful general wording. **Dr. Newman must review all
 procedure text, "at a glance" facts and FAQ answers before launch.** Library
 case details were copied from the current website's gallery ordering and must
 be verified against the original records.
+
+## Gallery admin (`redesign-v1/admin/`)
+One page manages every before-and-after gallery:
+- **Galleries:** add (for a procedure, or a custom one), rename, change category, hide, delete and restore.
+- **18+ confirmation:** a switch on each gallery. Default today: the breast galleries only.
+- **Cases inside a gallery:** switch on/off, drag or use arrows to reorder, edit any text, choose which details are public, mark "checked", add a case (upload before/after photos, optional second view) and delete/restore.
+- Preview: saved in the browser (`localStorage nps.gallery2`). The real Admin will publish for every visitor.
+- Imported cases: 197 across 16 galleries, copied from the current website. Details must be checked against records. Not imported (irregular source pages): tummy tuck patient 28, mommy makeover patient 4, massive weight loss patient 3, and injectables patients 3, 9 and 11.
