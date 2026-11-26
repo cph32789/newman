@@ -19,7 +19,8 @@ This repository holds two things, both published with GitHub Pages:
 /redesign-2/          second redesign concept (index.html, gallery.html, images/)
 /redesign-3/          third redesign concept (index.html, gallery.html, images/)
 /redesign-v1/         Redesign v1: the real rebuild, one page at a time (home page first)
-/docs/                PROJECT-GOALS.md and DESIGN-SYSTEM.md
+/docs/                PROJECT-GOALS.md, DESIGN-SYSTEM.md, FORM-SECURITY.md
+/server/              reference code for the protected contact-form service (not deployed)
 /.nojekyll            lets GitHub Pages serve underscore folders as-is
 ```
 

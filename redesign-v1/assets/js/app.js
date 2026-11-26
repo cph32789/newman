@@ -201,7 +201,7 @@
 
   /* ---------- Feed (Discover) ---------- */
   var FILTERS = [['all', 'All'], ['face', 'Face'], ['breast', 'Breast'], ['body', 'Body'], ['skin', 'Skin & glow'], ['nonsurgical', 'Non-surgical'], ['surgical', 'Surgical'], ['learn', 'Learn']];
-  var fFilter = 'all', fShown = 0, STEP = 6, FIRST = 8;
+  var fFilter = 'all', fShown = 0, STEP = 6, FIRST = 9;
   function feedItems() { return NPS.feed.filter(function (c) { return fFilter === 'all' || c.tags.indexOf(fFilter) > -1; }); }
   function firstSentence(t) { var m = String(t).match(/^.*?[.!?](\s|$)/); return m ? m[0].trim() : t; }
   function saveBtn(id) { return '<button class="act" data-save="' + id + '" aria-pressed="' + isSaved(id) + '" aria-label="Save">' + ic('heart') + '</button>'; }
@@ -216,7 +216,7 @@
     }
     if (c.type === 'insight') {
       return '<article class="fc text t-' + (c.tone || 'sand') + '"' + delay + '><p class="eyebrow">' + esc(c.eyebrow) + '</p><h3>' + esc(c.title) + '</h3>' + (c.text ? '<p>' + esc(c.text) + '</p>' : '') + (c.list ? '<ul>' + c.list.map(function (l) { return '<li>' + esc(l) + '</li>'; }).join('') + '</ul>' : '') +
-        (c.ref ? '<button class="link" data-detail="' + c.ref + '" style="align-self:flex-start;margin-top:6px">' + esc(c.cta) + ' ' + ic('arrow') + '</button>' : '<button class="link" data-toconsult style="align-self:flex-start;margin-top:6px">' + esc(c.cta) + ' ' + ic('arrow') + '</button>') + '</article>';
+        (c.ref ? '<button class="link" data-detail="' + c.ref + '" style="align-self:flex-start">' + esc(c.cta) + ' ' + ic('arrow') + '</button>' : '<button class="link" data-toconsult style="align-self:flex-start">' + esc(c.cta) + ' ' + ic('arrow') + '</button>') + '</article>';
     }
     if (c.type === 'quote') {
       return '<article class="fc quote text t-' + (c.tone || 'sand') + '"' + delay + '><div class="stars" aria-label="Five stars">' + '<svg><use href="#i-star"/></svg>'.repeat(5) + '</div><blockquote>“' + esc(c.text) + '”</blockquote><cite>' + esc(c.who) + '</cite></article>';
@@ -235,8 +235,20 @@
     while (frag.firstChild) box.appendChild(frag.firstChild);
     fShown += slice.length;
     $('#feedMore').hidden = fShown >= items.length;
-    NPS.applySlots(box); refreshSaved();
+    NPS.applySlots(box); refreshSaved(); balanceFeed();
   }
+  /* Keep rows complete: if the last row would be short, widen the last card so the grid always ends square. */
+  function balanceFeed() {
+    var box = $('#feed'), cards = $$('.fc', box);
+    cards.forEach(function (c) { c.classList.remove('is-wide', 'is-wide2'); });
+    var cols = getComputedStyle(box).gridTemplateColumns.split(' ').length, n = cards.length;
+    if (cols < 2 || !n) return;
+    var r = n % cols; if (!r) return;
+    var last = cards[n - 1];
+    if (r === 1) last.classList.add('is-wide');
+    else if (cols === 3 && r === 2) last.classList.add('is-wide2');
+  }
+  var balT; window.addEventListener('resize', function () { clearTimeout(balT); balT = setTimeout(balanceFeed, 120); });
   function renderChips() {
     $('#feedChips').innerHTML = FILTERS.map(function (f) { return '<button class="chip" data-ffilter="' + f[0] + '" aria-pressed="' + (f[0] === fFilter) + '">' + f[1] + '</button>'; }).join('');
   }
@@ -276,15 +288,60 @@
     else if (saved.length) { var g2 = $('#gl'); if (!g2.value) g2.value = 'I’m interested in: ' + saved.map(function (s) { return byId[s].title.replace(/\s*\(.*\)/, ''); }).join(', ') + '.'; }
     setTimeout(function () { $('#consult').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }); setTimeout(function () { var f = $('#fn'); if (f) f.focus({ preventScroll: true }); }, 700); }, 80);
   }
-  $('#form').addEventListener('submit', function (e) {
+  /* ---------- Consultation form: layered spam protection ----------
+     Front-end layers (this file) slow bots and catch the obvious ones.
+     The server MUST re-check everything (see docs/FORM-SECURITY.md), because
+     anything running in a browser can be bypassed by a determined bot.
+       1. Honeypot field      people never see it; bots fill it
+       2. Time trap           real people take more than a few seconds
+       3. Human interaction   needs real pointer/keyboard activity
+       4. Human check         Cloudflare Turnstile (invisible), when configured
+       5. Link / junk filter  spam is mostly links and keyword stuffing
+       6. Cooldown + hourly cap per browser
+       7. Bots that trip a trap get a normal "thanks" and nothing is sent
+  ---------------------------------------------------------------- */
+  var FC = (NPS.site && NPS.site.form) || {}, formEl = $('#form');
+  var formStart = 0, signals = 0, tsToken = '', tsLoaded = false;
+  ['pointerdown', 'keydown', 'touchstart', 'focusin'].forEach(function (ev) { formEl.addEventListener(ev, function (e) { if (e.isTrusted) { signals++; if (!formStart) formStart = Date.now(); } }, { passive: true }); });
+  function loadTurnstile() {
+    if (tsLoaded || !FC.turnstileSiteKey) return; tsLoaded = true;
+    var box = $('#humanCheck'); box.hidden = false;
+    window.__npsTs = function () { window.turnstile.render(box, { sitekey: FC.turnstileSiteKey, appearance: 'interaction-only', callback: function (t) { tsToken = t; } }); };
+    var s = document.createElement('script'); s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=__npsTs&render=explicit'; s.async = true; s.defer = true; document.head.appendChild(s);
+  }
+  formEl.addEventListener('focusin', loadTurnstile, { once: true });
+  function hits() { try { return JSON.parse(localStorage.getItem('nps.sends') || '[]').filter(function (t) { return Date.now() - t < 3600000; }); } catch (e) { return []; } }
+  function junky(text) {
+    var urls = (text.match(/(https?:\/\/|www\.|\b[a-z0-9-]+\.(com|net|org|ru|xyz|top|click|info|biz)\b)/ig) || []).length;
+    var words = /(viagra|cialis|crypto|bitcoin|casino|seo services|backlinks|loan offer|click here|whatsapp|telegram|forex|guest post)/i.test(text);
+    return urls > 0 || words;
+  }
+  function thank() { formEl.hidden = true; $('#thanks').hidden = false; $('#formList').hidden = true; }
+  formEl.addEventListener('submit', function (e) {
     e.preventDefault();
-    var f = e.target, ok = true;
-    ['fn', 'em'].forEach(function (id) { var i = $('#' + id); var v = i.value.trim(); var bad = !v || (id === 'em' && !/^\S+@\S+\.\S+$/.test(v)); i.style.borderColor = bad ? 'var(--clay)' : ''; if (bad) { ok = false; if (ok === false && !f._f) { f._f = 1; i.focus(); } } });
-    f._f = 0;
-    if (!ok) { toast('Please add your name and a valid email'); return; }
-    f.hidden = true; $('#thanks').hidden = false; $('#formList').hidden = true;
+    var ok = true, firstBad = null;
+    ['fn', 'em'].forEach(function (id) { var i = $('#' + id); var v = i.value.trim(); var bad = !v || (id === 'em' && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)); i.style.borderColor = bad ? 'var(--clay)' : ''; if (bad) { ok = false; firstBad = firstBad || i; } });
+    if (!ok) { toast('Please add your name and a valid email'); firstBad.focus(); return; }
+    var data = { first: $('#fn').value.trim(), last: $('#ln').value.trim(), email: $('#em').value.trim(), phone: $('#ph').value.trim(), interest: $('#in').value, goals: $('#gl').value.trim() };
+    var all = [data.first, data.last, data.goals].join(' ');
+    // Human-friendly message for honest people who include a link or pasted text
+    if (junky(all)) { toast('Please remove web links and promotional text, then try again'); $('#gl').focus(); return; }
+    // Silent traps: pretend success so bots learn nothing
+    var elapsed = formStart ? (Date.now() - formStart) / 1000 : 0;
+    if ($('#nps_hp_url').value || signals < 4 || elapsed < (FC.minSeconds || 4)) { thank(); return; }
+    var sends = hits();
+    if (sends.length && Date.now() - sends[sends.length - 1] < (FC.cooldownSeconds || 90) * 1000) { toast('Thanks. Please wait a moment before sending another request.'); return; }
+    if (sends.length >= (FC.maxPerHour || 3)) { toast('You’ve reached the limit for now. Please call us at 407.481.9505.'); return; }
+    if (FC.turnstileSiteKey && !tsToken) { toast('One moment, we’re confirming you’re human. Please try again.'); return; }
+    var btn = formEl.querySelector('button[type=submit]'); btn.disabled = true;
+    function done() { sends.push(Date.now()); try { localStorage.setItem('nps.sends', JSON.stringify(sends)); } catch (x) {} btn.disabled = false; thank(); }
+    if (!FC.endpoint) { done(); return; }                      // design preview: nothing is sent
+    fetch(FC.endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'omit',
+      body: JSON.stringify({ data: data, saved: saved, turnstile: tsToken, elapsed: Math.round(elapsed), signals: signals, hp: $('#nps_hp_url').value }) })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); done(); })
+      .catch(function () { btn.disabled = false; toast('Something went wrong. Please call us at 407.481.9505.'); });
   });
-  $('#formReset').addEventListener('click', function () { $('#form').hidden = false; $('#thanks').hidden = true; refreshSaved(); $('#fn').focus(); });
+  $('#formReset').addEventListener('click', function () { $('#form').hidden = false; $('#thanks').hidden = true; formStart = 0; signals = 0; refreshSaved(); $('#fn').focus(); });
 
   /* ---------- Click delegation ---------- */
   document.addEventListener('click', function (e) {

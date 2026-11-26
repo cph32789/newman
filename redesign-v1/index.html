@@ -14,10 +14,10 @@
 <link rel="icon" href="assets/img/favicon.png">
 <link rel="preload" href="assets/fonts/DMSans-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/CormorantGaramond-italic.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/css/fonts.css?v=20261126b">
-<link rel="stylesheet" href="assets/css/styles.css?v=20261126b">
+<link rel="stylesheet" href="assets/css/fonts.css?v=20261126f">
+<link rel="stylesheet" href="assets/css/styles.css?v=20261126f">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"MedicalBusiness","name":"Newman Plastic Surgery","telephone":"+1-407-481-9505","email":"info@newmanplasticsurgery.com",
+{"@context":"https://schema.org","@type":"MedicalBusiness","name":"Newman Plastic Surgery","telephone":"+1-407-481-9505",
  "address":{"@type":"PostalAddress","streetAddress":"444 North Mills Avenue","addressLocality":"Orlando","addressRegion":"FL","postalCode":"32803","addressCountry":"US"},
  "medicalSpecialty":"PlasticSurgery",
  "sameAs":["https://www.instagram.com/newmanplasticsurgery/","https://www.facebook.com/NewmanPlasticSurgery/","http://www.youtube.com/channel/UCwtsEnjalS_yFDs0IAo2SNw","https://www.pinterest.com/dnewman0566/"]}
@@ -250,13 +250,14 @@
       <address>444 North Mills Avenue<br>Orlando, Florida 32803</address>
       <div class="links">
         <a class="link" href="https://www.google.com/maps/search/?api=1&amp;query=Newman+Plastic+Surgery+444+North+Mills+Avenue+Orlando+FL" target="_blank" rel="noopener">Plan your visit <svg><use href="#i-arrow"/></svg></a>
-        <a class="link" href="mailto:info@newmanplasticsurgery.com">Email the practice <svg><use href="#i-arrow"/></svg></a>
+        <button class="link" type="button" data-toconsult>Send us a message <svg><use href="#i-arrow"/></svg></button>
       </div>
     </div>
     <div class="form rv" id="formWrap">
       <p class="eyebrow">Request a consultation</p>
       <div class="mylist-note" id="formList" hidden></div>
-      <form id="form" novalidate>
+      <form id="form" novalidate autocomplete="on">
+        <div class="hp" aria-hidden="true"><label for="nps_hp_url">Leave this field empty</label><input id="nps_hp_url" name="nps_hp_url" type="text" tabindex="-1" autocomplete="off"></div>
         <div class="fgrid">
           <div class="field"><label for="fn">First name</label><input id="fn" name="first" autocomplete="given-name" required></div>
           <div class="field"><label for="ln">Last name</label><input id="ln" name="last" autocomplete="family-name" required></div>
@@ -266,8 +267,10 @@
             <select id="in" name="interest"><option>Let’s explore my options</option><option>Face</option><option>Breast</option><option>Body</option><option>Skin &amp; aesthetics</option></select></div>
           <div class="field full"><label for="gl">Your goals <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:400">(optional)</span></label><textarea id="gl" name="goals" placeholder="Tell us a little about what you’re hoping for."></textarea></div>
         </div>
+        <div id="humanCheck" class="human" hidden></div>
         <button class="btn btn--ink" type="submit">Request a consultation <svg><use href="#i-arrow"/></svg></button>
         <p class="fine"><strong>Design preview:</strong> this form does not send anything yet. Please don’t include private medical information. To reach the practice now, call 407.481.9505.</p>
+        <p class="fine" style="margin-top:8px">Protected against automated spam. We never share your details.</p>
       </form>
       <div class="thanks" id="thanks" hidden role="status">
         <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--clay)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.500"/><path d="m8 12.500 2.800 2.800L16.500 9.500"/></svg>
@@ -363,7 +366,7 @@
     <div class="mfoot" style="margin-top:0">
       <a class="btn btn--ink" href="tel:+14074819505"><svg><use href="#i-phone"/></svg>Call 407.481.9505</a>
       <a class="btn btn--line" href="#consult" data-close>Request online</a>
-      <a class="btn btn--line" href="mailto:info@newmanplasticsurgery.com">Email the practice</a>
+      <button class="btn btn--line" type="button" data-toconsult>Send us a message</button>
       <a class="link" href="https://www.google.com/maps/search/?api=1&amp;query=Newman+Plastic+Surgery+444+North+Mills+Avenue+Orlando+FL" target="_blank" rel="noopener">444 North Mills Avenue, Orlando <svg><use href="#i-arrow"/></svg></a>
     </div>
   </div>
@@ -371,11 +374,11 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="data/site.js?v=20261126b"></script>
-<script src="data/procedures.js?v=20261126b"></script>
-<script src="data/feed.js?v=20261126b"></script>
-<script src="data/images.js?v=20261126b"></script>
-<script src="assets/js/search.js?v=20261126b"></script>
-<script src="assets/js/app.js?v=20261126b"></script>
+<script src="data/site.js?v=20261126f"></script>
+<script src="data/procedures.js?v=20261126f"></script>
+<script src="data/feed.js?v=20261126f"></script>
+<script src="data/images.js?v=20261126f"></script>
+<script src="assets/js/search.js?v=20261126f"></script>
+<script src="assets/js/app.js?v=20261126f"></script>
 </body>
 </html>

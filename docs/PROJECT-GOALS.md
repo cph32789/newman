@@ -34,6 +34,10 @@ directions, **style and look-and-feel win** (goal 9).
     point, zoom, cover or whole image) and those settings are **saved** so the
     image displays exactly as they chose (see "Image rule" below).
 
+11. **Stop bot spam.** The doctor and his wife must not be flooded with bot
+    email. We use as many protections as possible, in layers (see
+    `FORM-SECURITY.md`). The practice's email address is never published.
+
 ## Image rule (goal 10)
 
 - Every image is drawn inside a frame at its true proportions. Distortion is
@@ -84,6 +88,14 @@ rejuvenation, skin, surgical and non-surgical — the way they browse social.
   request, turning browsing into a warm conversation starter.
 - Always calm, never pushy, no medical promises; every card ends in a soft next
   step (learn more, save, share, begin a conversation).
+
+## Spam protection (goal 11)
+
+- Live now: no published email address, honeypot, time trap, human-activity
+  check, link/junk filter, cooldown and hourly cap, and silent traps.
+- Next: connect Turnstile and the form service (needs the practice's Cloudflare
+  account and an email-handling decision, including HIPAA). Full plan in
+  `docs/FORM-SECURITY.md`; starter code in `server/form-worker.js`.
 
 ## Working agreement
 
