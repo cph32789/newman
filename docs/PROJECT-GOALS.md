@@ -56,7 +56,7 @@ directions, **style and look-and-feel win** (goal 9).
 - Returns a short, precise list: **Best match** first, then **Also relevant**.
 - Powered by the procedure catalog (`data/procedures.js`): every procedure has
   its alternate names and goal phrases, which Admin lets the team edit.
-- Open from anywhere: header, hero, phone tab bar, or the `/` key.
+- Instagram-style: a **Search** button in the desktop header and a **Search** tab on phones open a dedicated search screen (not a box on the page) with **Recent**, **Suggested** and an **Explore** tile grid. Typing shows round-avatar results; recent searches are remembered and can be cleared. Also opens with the `/` key.
 
 ## Social linking (goal 6)
 

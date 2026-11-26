@@ -59,7 +59,7 @@
       <a href="#visit">Your visit</a>
     </nav>
     <div class="hdr-act">
-      <button type="button" class="search-pill" data-open="search" aria-label="Search procedures"><svg><use href="#i-search"/></svg><span>Search procedures</span><kbd>/</kbd></button>
+      <button type="button" class="search-btn" data-open="search" aria-label="Search"><svg><use href="#i-search"/></svg><span>Search</span></button>
       <button type="button" class="icon-btn" data-open="list" aria-label="My list"><svg><use href="#i-heart"/></svg><span class="badge" id="listCount" hidden>0</span></button>
       <a class="phone" href="tel:+14074819505">407.481.9505</a>
       <a class="btn btn--ink btn--sm" href="#consult">Request a consultation</a>
@@ -81,19 +81,6 @@
     <h1 id="h1" class="display">The beauty of feeling <em>like you.</em></h1>
     <p class="sub">Thoughtfully considered plastic surgery. Deeply personal care.</p>
 
-    <button type="button" class="hero-search" data-open="search" aria-label="Search procedures">
-      <svg class="s"><use href="#i-search"/></svg>
-      <span id="heroPlaceholder">Search “nose job”</span>
-      <b>Search</b>
-    </button>
-    <div class="hero-chips" role="list" aria-label="Popular searches">
-      <button class="chip" role="listitem" data-q="Rhinoplasty">Rhinoplasty</button>
-      <button class="chip" role="listitem" data-q="Breast augmentation">Breast augmentation</button>
-      <button class="chip" role="listitem" data-q="Facelift">Facelift</button>
-      <button class="chip" role="listitem" data-q="Botox">Botox</button>
-      <button class="chip" role="listitem" data-q="Tummy tuck">Tummy tuck</button>
-      <button class="chip" role="listitem" data-q="Glow">Skin glow</button>
-    </div>
     <div class="hero-cta">
       <a class="btn btn--champagne" href="#consult">Begin your conversation <svg><use href="#i-arrow"/></svg></a>
       <a class="btn btn--ghost" href="#surgeon">Meet Dr. Newman</a>
@@ -322,19 +309,18 @@
 <nav class="tabbar" aria-label="App navigation">
   <a class="tab" href="#top" data-tab="top"><svg><use href="#i-home"/></svg>Home</a>
   <button class="tab" data-open="explore" data-tab="explore"><svg><use href="#i-grid"/></svg>Explore</button>
-  <button class="tab mid" data-open="search" aria-label="Search"><span class="o"><svg><use href="#i-search"/></svg></span><em>Search</em></button>
+  <button class="tab" data-open="search" data-tab="search"><svg><use href="#i-search"/></svg>Search</button>
   <a class="tab" href="#discover" data-tab="discover"><svg><use href="#i-spark"/></svg>Discover</a>
   <button class="tab" data-open="book" data-tab="book"><svg><use href="#i-cal"/></svg>Book</button>
 </nav>
 
 <!-- ============================ SHEETS ============================ -->
-<dialog class="sheet center" id="sheet-search" aria-label="Search procedures">
-  <span class="grab"></span>
-  <div class="top"><h2>Search</h2><button class="close" data-close aria-label="Close search"><svg><use href="#i-close"/></svg></button></div>
-  <div class="scroll">
-    <div class="sbox"><svg><use href="#i-search"/></svg><input id="q" type="search" placeholder="Try “nose job” or “facelift”" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="Search procedures"><button type="button" id="qClear" aria-label="Clear" hidden><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><use href="#i-close"/></svg></button></div>
-    <div id="sbody"></div>
+<dialog class="sheet full searchscreen" id="sheet-search" aria-label="Search">
+  <div class="shead">
+    <label class="sbox"><svg><use href="#i-search"/></svg><input id="q" type="search" placeholder="Search procedures and goals" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="Search procedures and goals"><button type="button" id="qClear" aria-label="Clear search" hidden><svg class="x"><use href="#i-close"/></svg></button></label>
+    <button type="button" class="cancel" data-close>Cancel</button>
   </div>
+  <div class="scroll" id="sbody"></div>
 </dialog>
 
 <dialog class="sheet center wide" id="sheet-explore" aria-label="All procedures">
