@@ -189,7 +189,7 @@ ${own.length ? `<!-- 4. RESULTS (this procedure's own Library cases) -->
     <div class="cases" id="cases" data-proc="${p.id}"></div>
     <div class="rfoot" style="margin-top:34px">
       <p class="note">Individual results vary. Some photographs are available only during an office visit.${NPS.library.ageGate.procedures.indexOf(p.id) > -1 ? ' These photos require age confirmation (18+).' : ''}</p>
-      <button class="btn btn--champagne" data-soon="The full results gallery is part of the next build.">View the full gallery <svg><use href="#i-arrow"/></svg></button>
+      <a class="btn btn--champagne" href="../../results/#procedure/${p.id}">View all ${esc(name.toLowerCase())} results <svg><use href="#i-arrow"/></svg></a>
     </div>
   </div>
 </section>` : `<!-- 4. RESULTS (slim: none of its own cases) -->
