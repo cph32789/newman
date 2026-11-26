@@ -1,6 +1,6 @@
 /* ------------------------------------------------------------------
    LIBRARY: before & after cases.
-   Admin ("Library") will manage this list. The team can:
+   Admin ("Gallery") will manage this list. The team can:
      - upload photos or videos and attach them to one or more procedures
      - mark each case Visible / Hidden
      - drag cases into the order they want
@@ -148,14 +148,14 @@ window.NPS = window.NPS || {};
     /* IMPORT-END */
   ] };
 
-  /* 18+ CONFIRMATION: Admin ("Galleries") chooses which procedures need it.
+  /* 18+ CONFIRMATION: Admin ("Gallery privacy") chooses which procedures need it.
      A case is locked when ANY procedure it belongs to is in this list.
      Today only the breast procedures require it. */
   NPS.library.ageGate = { procedures: ['breast-augmentation', 'breast-lift', 'breast-reduction', 'breast-reconstruction', 'male-breast-reduction', 'implant-exchange'] };
 })();
 
 /* ---------------------------------------------------------------
-   ADMIN OVERRIDES (Library admin). Visible / order / corrected text
+   ADMIN OVERRIDES (Gallery admin). Visible / order / corrected text
    chosen in Admin are layered over the cases above. In this preview
    they are kept in this browser (localStorage "nps.library"); in the
    real Admin, Publish saves them for every visitor.

@@ -775,3 +775,10 @@ html.pp{scroll-padding-top:calc(var(--hdr) + 76px)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .case .clink{margin-top:8px;font:500 15px/1.3 var(--sans);color:var(--clay-ink);border-bottom:1px solid currentColor;align-self:flex-start;padding-bottom:2px}
 .rempty .btn{margin-top:4px}
+
+/* Locked (18+) photo tile: clear, high-contrast call to action */
+.clock{gap:12px;cursor:pointer;border:0;font-family:var(--sans)}
+.clock svg{width:34px;height:34px;stroke:var(--champagne);fill:none;stroke-width:1.5}
+.clock b{color:var(--paper)}
+.clock span{display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border-radius:999px;background:var(--champagne);color:var(--teal-950);letter-spacing:.06em;font-size:12px}
+.clock:hover span{background:var(--paper)}

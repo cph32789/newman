@@ -68,7 +68,7 @@
     box.innerHTML = cases.map(function (c) {
       var gated = G.isGated(c) && !verified;
       return '<article class="case" data-case="' + c.id + '"' + (gated ? ' data-gated="1"' : '') + '><div class="pair" data-pair>' + pair(c, 0, gated) +
-        (gated ? '<button class="clock" type="button" data-verify><b>Photos for viewers 18+</b><span>Confirm your age to view</span></button>' : '') + '</div>' +
+        (gated ? '<button class="clock" type="button" data-verify aria-label="Confirm you are 18 or older to view these photos"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><b>Photos for viewers 18+</b><span>Tap to confirm your age</span></button>' : '') + '</div>' +
         (c.views.length > 1 ? '<div class="views" role="group" aria-label="Choose a view">' + c.views.map(function (v, i) { return '<button type="button" data-view="' + i + '" aria-pressed="' + (i === 0) + '">' + esc(v.label) + '</button>'; }).join('') + '</div>' : '') +
         info(c, opts.links) + '</article>';
     }).join('');
