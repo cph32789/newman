@@ -12,7 +12,6 @@
      primary      the ONE procedure whose page shows it in full (others link to it)
      title        e.g. "Abdominoplasty"          addOn   e.g. "with Liposuction to Hips and Thighs"
      age, height, weight, implant, postop        patient     e.g. "Patient 1"
-     ageGate      true for breast cases: visitors confirm they are 18+ first
      visible      true/false                      order       lower shows first
      views        one or more Before/After pairs  (front, side, three-quarter ...)
      show         which details are public for this case
@@ -30,8 +29,7 @@ window.NPS = window.NPS || {};
   function ph(id, w, h, alt, fx, fy) { return { image: img(id, w, h, alt), fx: fx == null ? 50 : fx, fy: fy == null ? 40 : fy, zoom: 1 }; }
 
   NPS.library = { cases: [
-    { id: 'facelift-1', procedures: ['facelift'], primary: 'facelift', title: 'Facelift', addOn: 'with TCA peel', patient: 'Patient 1', age: 46, postop: '8 months post-op',
-      ageGate: false, visible: true, order: 1,
+    { id: 'facelift-1', procedures: ['facelift'], primary: 'facelift', title: 'Facelift', addOn: 'with TCA peel', patient: 'Patient 1', age: 46, postop: '8 months post-op', visible: true, order: 1,
       show: { age: true, height: true, weight: true, implant: true, postop: true },
       views: [
         { label: 'Front', before: ph('facelift-1-front-before', 446, 356, 'Before: facelift patient, front view', 50, 35), after: ph('facelift-1-front-after', 379, 304, 'After: facelift patient, front view', 50, 35) },
@@ -39,26 +37,27 @@ window.NPS = window.NPS || {};
       ] },
 
     { id: 'breast-aug-1', procedures: ['breast-augmentation'], primary: 'breast-augmentation', title: 'Breast augmentation', addOn: 'with circum-areolar left breast lift', patient: 'Patient 1', age: 28, height: '5′3″', weight: '130 lbs',
-      implant: 'Silicone, smooth, moderate profile. Right 397 cc, left 371 cc',
-      ageGate: true, visible: true, order: 1,
+      implant: 'Silicone, smooth, moderate profile. Right 397 cc, left 371 cc', visible: true, order: 1,
       show: { age: true, height: true, weight: true, implant: true, postop: true },
       views: [ { label: 'Front', before: ph('breast-1-before', 800, 533, 'Before: breast augmentation patient, front view', 50, 40), after: ph('breast-1-after', 800, 533, 'After: breast augmentation patient, front view', 50, 40) } ] },
-    { id: 'breast-aug-2', procedures: ['breast-augmentation'], primary: 'breast-augmentation', title: 'Breast augmentation', patient: 'Patient 4',
-      ageGate: true, visible: true, order: 2,
+    { id: 'breast-aug-2', procedures: ['breast-augmentation'], primary: 'breast-augmentation', title: 'Breast augmentation', patient: 'Patient 4', visible: true, order: 2,
       show: { age: true, height: true, weight: true, implant: true, postop: true },
       views: [ { label: 'Front', before: ph('breast-2-before', 800, 533, 'Before: breast augmentation patient, front view', 50, 40), after: ph('breast-2-after', 800, 533, 'After: breast augmentation patient, front view', 50, 40) } ] },
 
-    { id: 'tummy-1', procedures: ['tummy-tuck', 'mommy-makeover'], primary: 'tummy-tuck', title: 'Abdominoplasty', addOn: 'with liposuction to hips and thighs', patient: 'Patient 1', age: 32, height: '5′4″', weight: '180 lbs',
-      ageGate: false, visible: true, order: 1,
+    { id: 'tummy-1', procedures: ['tummy-tuck', 'mommy-makeover'], primary: 'tummy-tuck', title: 'Abdominoplasty', addOn: 'with liposuction to hips and thighs', patient: 'Patient 1', age: 32, height: '5′4″', weight: '180 lbs', visible: true, order: 1,
       show: { age: true, height: true, weight: true, implant: true, postop: true },
       views: [
         { label: 'Three-quarter', before: ph('tummy-1-3q-before', 663, 528, 'Before: abdominoplasty patient, three-quarter view', 50, 45), after: ph('tummy-1-3q-after', 662, 534, 'After: abdominoplasty patient, three-quarter view', 50, 45) },
         { label: 'Front', before: ph('tummy-1-front-before', 578, 562, 'Before: abdominoplasty patient, front view', 50, 45), after: ph('tummy-1-front-after', 546, 562, 'After: abdominoplasty patient, front view', 50, 45) }
       ] },
 
-    { id: 'inject-1', procedures: ['botox', 'fillers'], primary: 'botox', title: 'Injectable treatment', patient: 'Patient 1',
-      ageGate: false, visible: true, order: 1,
+    { id: 'inject-1', procedures: ['botox', 'fillers'], primary: 'botox', title: 'Injectable treatment', patient: 'Patient 1', visible: true, order: 1,
       show: { age: true, height: true, weight: true, implant: true, postop: true },
       views: [ { label: 'Front', before: ph('inject-1-before', 800, 533, 'Before: injectable treatment patient, front view', 50, 35), after: ph('inject-1-after', 800, 533, 'After: injectable treatment patient, front view', 50, 35) } ] }
   ] };
+
+  /* 18+ CONFIRMATION: Admin ("Galleries") chooses which procedures need it.
+     A case is locked when ANY procedure it belongs to is in this list.
+     Today only the breast procedures require it. */
+  NPS.library.ageGate = { procedures: ['breast-augmentation', 'breast-lift', 'breast-reduction', 'breast-reconstruction', 'male-breast-reduction', 'implant-exchange'] };
 })();

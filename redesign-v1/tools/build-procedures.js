@@ -34,10 +34,23 @@ const sheets = home.slice(home.indexOf('<dialog class="sheet full searchscreen"'
 const rebase = (h, up) => h
   .replace(/href="#top"/g, 'href="' + up + '"')
   .replace(/href="#visit"/g, 'href="' + up + 'your-visit/"')
-  .replace(/href="#(discover|surgeon|results)"/g, 'href="' + up + '#$1"')
+  .replace(/href="#surgeon"/g, 'href="' + up + 'meet-dr-newman/"')
+  .replace(/href="#results"/g, 'href="' + up + 'results/"')
+  .replace(/href="(your-visit|meet-dr-newman|results)\//g, 'href="' + up + '$1/')
+  .replace(/href="#discover"/g, 'href="' + up + '#discover"')
   .replace(/(src|href)="assets\//g, '$1="' + up + 'assets/');
 const toBase = h => rebase(h, '../../');
 
+const ageDialog = () => `<dialog class="sheet center" id="sheet-age" aria-labelledby="age-t">
+  <span class="grab"></span>
+  <div class="top"><h2>Age confirmation</h2><button class="close" data-close aria-label="Close"><svg><use href="#i-close"/></svg></button></div>
+  <div class="scroll">
+    <h3 id="age-t" class="dtitle" style="margin-top:6px">Are you 18 <em style="font-family:var(--serif);font-style:italic;color:var(--clay-ink)">or older?</em></h3>
+    <p class="dtext">These photographs are intended for adults only. Please confirm you are at least 18 years of age to continue.</p>
+    <div class="dacts" style="margin-top:26px"><button class="btn btn--ink" id="age-yes" type="button">Yes, I am 18 or older</button><button class="btn btn--line" id="age-no" type="button">No</button></div>
+    <p class="note" id="age-msg" role="status" style="margin-top:14px;min-height:22px"></p>
+  </div>
+</dialog>`;
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const short = t => t.replace(/\s*\(.*\)/, '');
 const ASSET = f => '../../assets/img/' + f;
@@ -175,7 +188,7 @@ ${own.length ? `<!-- 4. RESULTS (this procedure's own Library cases) -->
     <p class="lead" style="max-width:26em">Photos of ${esc(name.toLowerCase())} patients, shared with permission. Every person and outcome is different.</p></div>
     <div class="cases" id="cases" data-proc="${p.id}"></div>
     <div class="rfoot" style="margin-top:34px">
-      <p class="note">Individual results vary. Some photographs are available only during an office visit.${p.cat === 'Breast' ? ' Breast photos require age confirmation (18+).' : ''}</p>
+      <p class="note">Individual results vary. Some photographs are available only during an office visit.${NPS.library.ageGate.procedures.indexOf(p.id) > -1 ? ' These photos require age confirmation (18+).' : ''}</p>
       <button class="btn btn--champagne" data-soon="The full results gallery is part of the next build.">View the full gallery <svg><use href="#i-arrow"/></svg></button>
     </div>
   </div>
@@ -224,16 +237,7 @@ ${toBase(consult)}
 ${toBase(footer)}
 ${toBase(tabbar)}
 ${toBase(sheets)}
-<dialog class="sheet center" id="sheet-age" aria-labelledby="age-t">
-  <span class="grab"></span>
-  <div class="top"><h2>Age confirmation</h2><button class="close" data-close aria-label="Close"><svg><use href="#i-close"/></svg></button></div>
-  <div class="scroll">
-    <h3 id="age-t" class="dtitle" style="margin-top:6px">Are you 18 <em style="font-family:var(--serif);font-style:italic;color:var(--clay-ink)">or older?</em></h3>
-    <p class="dtext">These photographs show breast surgery results and are intended for adults only. Please confirm you are at least 18 years of age to continue.</p>
-    <div class="dacts" style="margin-top:26px"><button class="btn btn--ink" id="age-yes" type="button">Yes, I am 18 or older</button><button class="btn btn--line" id="age-no" type="button">No</button></div>
-    <p class="note" id="age-msg" role="status" style="margin-top:14px;min-height:22px"></p>
-  </div>
-</dialog>
+${ageDialog()}
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>window.NPS_BASE='../../';</script>
@@ -245,6 +249,7 @@ ${toBase(sheets)}
 <script src="../../data/library.js?v=${VERSION}"></script>
 <script src="../../assets/js/search.js?v=${VERSION}"></script>
 <script src="../../assets/js/app.js?v=${VERSION}"></script>
+<script src="../../assets/js/gallery.js?v=${VERSION}"></script>
 <script src="../../assets/js/procedure.js?v=${VERSION}"></script>
 </body>
 </html>
@@ -317,6 +322,160 @@ ${['site', 'procedures', 'feed', 'images', 'procedure-content', 'library'].map(f
 `;
 }
 
+
+/* ---------------- Generic page shell for the standalone pages (one level deep) ---------------- */
+function shell({ title, desc, dir, body, ageGate, extraScripts, ld }) {
+  const up = '../', rb = h => rebase(h, up), url = SITE_URL + dir + '/';
+  return `<!doctype html>
+<html lang="en" class="pp">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>${esc(title)} | Newman Plastic Surgery</title>
+<meta name="description" content="${esc(desc)}">
+<meta name="theme-color" content="#0A2A2F">
+<link rel="canonical" href="${url}">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Newman Plastic Surgery"><meta property="og:title" content="${esc(title)} · Newman Plastic Surgery"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${url}">
+<meta property="og:image" content="${SITE_URL}assets/share/${dir}.jpg?v=${VERSION}"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="${SITE_URL}assets/share/${dir}.jpg?v=${VERSION}">
+<link rel="icon" href="../assets/img/favicon.png">
+<link rel="preload" href="../assets/fonts/DMSans-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../assets/css/fonts.css?v=${VERSION}">
+<link rel="stylesheet" href="../assets/css/styles.css?v=${VERSION}">
+${ld ? '<script type="application/ld+json">' + JSON.stringify(ld) + '</script>' : ''}
+</head>
+<body id="top">
+${sprite}
+<a class="skip" href="#main">Skip to content</a>
+${rb(header)}
+<main id="main">
+${body}
+${rb(consult)}
+</main>
+${rb(footer)}
+${rb(tabbar)}
+${rb(sheets)}
+${ageGate ? ageDialog() : ''}
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>window.NPS_BASE='../';</script>
+${['site', 'procedures', 'feed', 'images', 'procedure-content', 'library'].map(f => `<script src="../data/${f}.js?v=${VERSION}"></script>`).join('\n')}
+<script src="../assets/js/search.js?v=${VERSION}"></script>
+<script src="../assets/js/app.js?v=${VERSION}"></script>
+${(extraScripts || []).map(f => `<script src="../assets/js/${f}?v=${VERSION}"></script>`).join('\n')}
+</body>
+</html>
+`;
+}
+
+/* ---------------- Meet Dr. Newman ---------------- */
+const TEAM = [['Joanne Dyl', 'Financial Administrator'], ['Rena Pierpont', 'Patient Care Coordinator'], ['Beth Green', 'Patient Care Coordinator'], ['Alma Ortiz', 'Lead Medical Assistant'], ['Suzanna Suto', 'Medical Esthetician / Medical Assistant'], ['Cara Kravetz', 'Medical Assistant'], ['Georgia Walker', 'Medical Assistant']];
+const initials = n => n.split(/\s+/).filter(w => /^[A-Z]/.test(w)).slice(0, 2).map(w => w[0]).join('');
+function buildMeet() {
+  const body = `
+<section class="surgeon section on-dark" aria-labelledby="mT" style="padding-top:clamp(48px,7vw,110px)">
+  <div class="wrap grid">
+    <div class="portrait">
+      <div class="arch frame"><img class="fit" data-slot="surgeon" src="../assets/img/dr-newman.png" alt="Charles E. Newman, Jr., MD" width="341" height="341"></div>
+      <div class="cap"><span>Charles E. Newman, Jr., MD</span><span>Plastic &amp; reconstructive surgeon</span></div>
+    </div>
+    <div class="copy">
+      <p class="eyebrow">Meet your surgeon</p>
+      <h1 id="mT" class="display" style="margin-top:14px">Charles Newman, Jr., <em>M.D.</em></h1>
+      <p>A native of Orlando who came home to join the medical community he grew up in. Dr. Newman is proud to be board certified by the American Board of Plastic Surgery.</p>
+      <p>His goal is a professional, comfortable, informative and individualized experience, and he prides himself on being available, with open communication and the highest level of patient care.</p>
+      <div class="creds">
+        <div><strong>Board-certified</strong>American Board of Plastic Surgery</div>
+        <div><strong>Trained at</strong>Wake Forest Baptist Medical Center</div>
+        <div><strong>Cosmetic</strong>Face · Breast · Body</div>
+        <div><strong>Reconstructive</strong>Including breast reconstruction</div>
+      </div>
+      <div class="actions"><a class="btn btn--champagne" href="#consult">Request a consultation <svg><use href="#i-arrow"/></svg></a><a class="link" href="#team">Meet the team</a></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="path" aria-labelledby="pT">
+  <div class="wrap pgrid" style="align-items:start">
+    <div class="pmain"><p class="eyebrow">Training</p><h2 id="pT" class="h2">A path that <em>led home.</em></h2>
+      <p>Dr. Newman trained broadly, in every area of plastic surgery, with leaders in the field.</p></div>
+    <ol class="tline">
+      <li><h3>Undergraduate</h3><p>Davidson College in Davidson, North Carolina, where he majored in Biology.</p></li>
+      <li><h3>Medical school</h3><p>University of South Florida College of Medicine, back home in Florida.</p></li>
+      <li><h3>Residency</h3><p>Wake Forest University Baptist Medical Center in Winston-Salem: general surgery and all aspects of plastic surgery, including reconstructive, cosmetic, pediatric reconstruction, hand surgery, microsurgery and endoscopic techniques.</p></li>
+      <li><h3>Mentors</h3><p>Trained under prominent leaders in plastic surgery, including Dr. Malcolm Marks, Dr. Louis Argenta and Dr. Wayne Meredith.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="section on-sand" id="practice" aria-labelledby="prT">
+  <div class="wrap">
+    <div class="head"><p class="eyebrow">The practice</p><h2 id="prT" class="h2" style="margin-top:14px">The full breadth of <em>care.</em></h2></div>
+    <div class="mcards">
+      <a class="mcard" href="../#explore/Face"><b>Face</b><span>Facial, brow and eyelid rejuvenation.</span></a>
+      <a class="mcard" href="../#explore/Breast"><b>Breast</b><span>Augmentation, reduction and lift, plus reconstruction.</span></a>
+      <a class="mcard" href="../#explore/Body"><b>Body</b><span>Abdominoplasty, thigh lift, liposuction and massive weight loss reconstruction.</span></a>
+      <a class="mcard" href="../#explore/Skin%20%26%20aesthetics"><b>Minimally invasive</b><span>Peels, lasers, fillers, Botox®, implants and fat injections.</span></a>
+    </div>
+    <div class="pgrid" style="margin-top:56px;align-items:start">
+      <div class="pmain"><h3 style="margin-top:0">Reconstructive surgery</h3>
+        <p>Although he maintains a successful cosmetic practice, Dr. Newman finds reconstructive surgery very rewarding. He uses tissue expanders and implants, TRAM and latissimus flap techniques for breast reconstruction.</p></div>
+      <div class="pmain"><h3 style="margin-top:0">Skin cancer</h3>
+        <p>Among his other major interests is skin cancer (melanoma, squamous cell and basal cell carcinoma). He often works with other physicians to reconstruct soft tissue defects.</p></div>
+    </div>
+    <p class="note" style="margin-top:34px">Dr. Newman attends national and regional meetings to stay abreast of the latest technologies in his field and applies them appropriately. He is a devoted husband and father of four with strong ties to the Orlando community.</p>
+  </div>
+</section>
+
+<section class="section" id="dzi" aria-labelledby="dzT">
+  <div class="wrap pgrid" style="align-items:start">
+    <div class="pmain"><p class="eyebrow">Physician assistant</p><h2 id="dzT" class="h2">Dzi-Long Newman, <em>MPAS, PA-C.</em></h2>
+      <p>Dzi is a board certified physician assistant. She earned her Bachelor of Science in Microbiology and Cell Science and her Master’s degree in Physician Assistant Sciences (2000) at the University of Florida.</p>
+      <p>She began her career at Tampa General Hospital on the Hand and Microsurgery Team, training in hand injuries and disorders, microsurgery, flaps and wound repair. She later worked in a respected North Carolina dermatology practice focused on skin care, medical and surgical dermatology and skin cancer treatment.</p></div>
+    <div class="pmain"><p style="margin-top:0">Dzi keeps current through continuing education in plastic and reconstructive surgery, dermatologic surgery and cosmetic medicine. She is enthusiastic about the options available to people of all ages and skin types, and helps you achieve and maintain the best outcomes for your skin and decide what is right for you.</p>
+      <p>Her experience in hand surgery and dermatology complements the care offered in our practice. As a mother of four, she has particular insight into the modern woman’s balance of personal and professional life.</p></div>
+  </div>
+</section>
+
+<section class="section on-sand" id="team" aria-labelledby="tmT">
+  <div class="wrap">
+    <div class="head head--split"><div><p class="eyebrow">Our team</p><h2 id="tmT" class="h2" style="margin-top:14px">People with a <em>heart for patient care.</em></h2></div>
+    <p class="lead" style="max-width:24em">Each has a strong medical background and shares our commitment to your having the best possible experience.</p></div>
+    <ul class="team">${TEAM.map(([n, r]) => `<li><span class="mono" aria-hidden="true">${initials(n)}</span><div><b>${esc(n)}</b><span>${esc(r)}</span></div></li>`).join('')}</ul>
+    <p class="note" style="margin-top:26px">Sample content for the design review. Team photos will be added in Admin. Biography text needs Dr. Newman’s review before launch.</p>
+  </div>
+</section>`;
+  return shell({ title: 'Meet Dr. Newman', desc: 'Meet Charles Newman, Jr., M.D., a board certified Orlando plastic and reconstructive surgeon, and the Newman Plastic Surgery team.', dir: 'meet-dr-newman', body,
+    ld: { '@context': 'https://schema.org', '@type': 'Physician', name: 'Charles E. Newman, Jr., MD', medicalSpecialty: 'PlasticSurgery', url: SITE_URL + 'meet-dr-newman/', worksFor: { '@type': 'MedicalBusiness', name: 'Newman Plastic Surgery', address: { '@type': 'PostalAddress', streetAddress: '444 North Mills Avenue', addressLocality: 'Orlando', addressRegion: 'FL', postalCode: '32803' } } } });
+}
+
+/* ---------------- Results gallery (cases come from the Library, filtered in the browser) ---------------- */
+function buildResults() {
+  const body = `
+<section class="vhero wrap" aria-labelledby="rT">
+  <p class="eyebrow">Results</p>
+  <h1 id="rT" class="display" style="margin-top:14px">Real people. <em>Individual possibilities.</em></h1>
+  <p class="dblurb">Before-and-after photos shared with permission. Every person, procedure and outcome is different, and many photographs are available only in the office.</p>
+</section>
+<section class="gfilters" id="gallery" aria-label="Filter results">
+  <div class="wrap">
+    <div class="gchips" id="gChips" role="group" aria-label="Category"></div>
+    <div class="gchips gprocs" id="gProcs" role="group" aria-label="Procedure" hidden></div>
+  </div>
+</section>
+<section class="section on-dark" aria-labelledby="gT" style="padding-top:clamp(34px,4vw,56px)">
+  <div class="wrap">
+    <p class="eyebrow" id="gCount" role="status" aria-live="polite" style="margin-bottom:22px"></p>
+    <h2 id="gT" class="sr">Cases</h2>
+    <div class="cases" id="gList"></div>
+    <div class="rfoot" style="margin-top:34px">
+      <p class="note">Individual results vary. Photos show patients who gave permission. Some categories require age confirmation (18+).</p>
+      <a class="btn btn--champagne" href="#consult">Request a consultation <svg><use href="#i-arrow"/></svg></a>
+    </div>
+  </div>
+</section>`;
+  return shell({ title: 'Before and after results', desc: 'Browse before-and-after photos from Newman Plastic Surgery by category and procedure. Shared with patient permission.', dir: 'results', body, ageGate: true, extraScripts: ['gallery.js'] });
+}
+
 let n = 0;
 P.forEach(p => {
   const dir = path.join(ROOT, 'procedures', p.id);
@@ -326,4 +485,5 @@ P.forEach(p => {
 });
 fs.mkdirSync(path.join(ROOT, 'your-visit'), { recursive: true });
 fs.writeFileSync(path.join(ROOT, 'your-visit', 'index.html'), buildVisit());
-console.log('built', n, 'procedure pages + your-visit');
+['meet-dr-newman', 'results'].forEach((d, i) => { fs.mkdirSync(path.join(ROOT, d), { recursive: true }); fs.writeFileSync(path.join(ROOT, d, 'index.html'), i ? buildResults() : buildMeet()); });
+console.log('built', n, 'procedure pages + your-visit + meet-dr-newman + results');

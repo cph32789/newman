@@ -62,10 +62,12 @@ const sizeFor = t => { const n = t.length; return n <= 12 ? 120 : n <= 20 ? 100 
   }
   await shoot('home.jpg', { eyebrow: 'Plastic surgery & aesthetics', title: 'The beauty of feeling <em>like you.</em>', blurb: 'Thoughtfully considered plastic surgery. Deeply personal care.', image: 'assets/img/hero-1600.webp', fx: 72, fy: 24, size: 88 });
   await shoot('landing.jpg', { eyebrow: 'Website redesign preview', title: 'Newman Plastic Surgery <em>redesign.</em>', blurb: 'See the new home page and explore the earlier concepts.', image: 'assets/img/hero-1600.webp', fx: 72, fy: 24, size: 76 });
+  await shoot('meet-dr-newman.jpg', { eyebrow: 'Meet your surgeon', title: 'Charles Newman, Jr., <em>M.D.</em>', blurb: 'Board certified plastic and reconstructive surgeon in Orlando.', image: 'assets/img/hero-1600.webp', fx: 72, fy: 24, size: 78 });
+  await shoot('results.jpg', { eyebrow: 'Results', title: 'Real people. <em>Individual possibilities.</em>', blurb: 'Before-and-after photos shared with permission.', image: 'assets/img/hero-1600.webp', fx: 72, fy: 24, size: 74 });
   for (const p of P) {
     const im = NPS.images[p.img], rel = im.src.replace(/^.*assets\/img\//, 'assets/img/');
     await shoot('procedures/' + p.id + '.jpg', { eyebrow: p.cat + ' · ' + (p.kind === 'surgical' ? 'Surgical' : 'Non-surgical'), title: nameHtml(p.title), blurb: p.blurb, image: rel, fx: 50, fy: 38, size: sizeFor(p.title) });
   }
   await b.close();
-  console.log('made', 2 + P.length, 'share cards');
+  console.log('made', 4 + P.length, 'share cards');
 })();
