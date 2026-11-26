@@ -36,7 +36,7 @@ const rebase = (h, up) => h
   .replace(/href="#visit"/g, 'href="' + up + 'your-visit/"')
   .replace(/href="#surgeon"/g, 'href="' + up + 'meet-dr-newman/"')
   .replace(/href="#results"/g, 'href="' + up + 'results/"')
-  .replace(/href="(your-visit|meet-dr-newman|results)\//g, 'href="' + up + '$1/')
+  .replace(/href="(your-visit|meet-dr-newman|results|insurance-financing|location)\//g, 'href="' + up + '$1/')
   .replace(/href="#discover"/g, 'href="' + up + '#discover"')
   .replace(/(src|href)="assets\//g, '$1="' + up + 'assets/');
 const toBase = h => rebase(h, '../../');
@@ -271,7 +271,7 @@ function buildVisit() {
 <meta name="theme-color" content="#0A2A2F">
 <link rel="canonical" href="${url}">
 <meta property="og:type" content="article"><meta property="og:site_name" content="Newman Plastic Surgery"><meta property="og:title" content="Your visit and common questions · Newman Plastic Surgery"><meta property="og:url" content="${url}">
-<meta property="og:image" content="${SITE_URL}assets/share/home.jpg?v=${VERSION}"><meta name="twitter:card" content="summary_large_image">
+<meta property="og:image" content="${SITE_URL}assets/share/your-visit.jpg?v=${VERSION}"><meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="../assets/img/favicon.png">
 <link rel="preload" href="../assets/fonts/DMSans-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="../assets/css/fonts.css?v=${VERSION}">
@@ -476,6 +476,94 @@ function buildResults() {
   return shell({ title: 'Before and after results', desc: 'Browse before-and-after photos from Newman Plastic Surgery by category and procedure. Shared with patient permission.', dir: 'results', body, ageGate: true, extraScripts: ['gallery.js'] });
 }
 
+/* ---------------- Insurance & financing ---------------- */
+function buildInsurance() {
+  const body = `
+<section class="vhero wrap" aria-labelledby="iT">
+  <p class="eyebrow">Your care</p>
+  <h1 id="iT" class="display" style="margin-top:14px">Insurance <em>&amp; financing.</em></h1>
+  <p class="dblurb">Clear answers about what insurance may cover, how to pay, and who to call. Nothing here is a surprise at your visit.</p>
+  <div class="acts"><a class="btn btn--ink" href="tel:+14074819505"><svg><use href="#i-phone"/></svg>Call 407.481.9505</a><a class="btn btn--line" href="#consult">Request a consultation</a></div>
+</section>
+
+<section class="section on-sand" aria-labelledby="ccT">
+  <div class="wrap">
+    <div class="head"><p class="eyebrow">Two kinds of plastic surgery</p><h2 id="ccT" class="h2" style="margin-top:14px">Cosmetic <em>and reconstructive.</em></h2></div>
+    <div class="mcards two">
+      <div class="mcard static"><b>Cosmetic surgery</b><span>Reshapes normal structures of the body to improve appearance and self-esteem. Because it is elective, it is usually <b>not covered</b> by health insurance.</span></div>
+      <div class="mcard static"><b>Reconstructive surgery</b><span>Treats abnormal structures caused by congenital defects, developmental abnormalities, trauma, infection, tumors or disease. It is generally performed to improve function, and may also approximate a normal appearance. It is generally <b>covered by most health insurance policies</b>, though coverage for specific procedures and levels of coverage can vary greatly.</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="inT">
+  <div class="wrap pgrid" style="align-items:start">
+    <div class="pmain"><p class="eyebrow">If you are using insurance</p><h2 id="inT" class="h2">What to <em>know first.</em></h2>
+      <p>Insurance is a contract between you and your plan, so the best first step is a quick check with your provider, or a call to our office.</p></div>
+    <ul class="dotsl">
+      <li><span><b>Your policy is your contract.</b> You are responsible for its terms and guidelines, including co-payments, deductibles, fees and services your plan does not cover.</span></li>
+      <li><span><b>HMO plans.</b> If you have an HMO plan, or a primary care physician is listed on your card, a referral from that physician is required before you make your appointment.</span></li>
+      <li><span><b>Marketplace plans.</b> Some plans offered through the Affordable Care Act Marketplace carry national company names but limit which providers you can use. We are contracted with only a select few of them.</span></li>
+      <li><span><b>Please check first.</b> Ask your insurance provider whether Newman Plastic Surgery is contracted with your specific plan, or <a class="link" href="tel:+14074819505">call the office</a>.</span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="section on-dark" aria-labelledby="fnT">
+  <div class="wrap pgrid" style="align-items:start">
+    <div class="pmain"><p class="eyebrow">Patient financing</p><h2 id="fnT" class="h2">Cosmetic care that is <em>within reach.</em></h2></div>
+    <div>
+      <p style="color:rgba(255,251,244,.86);max-width:36em">Cosmetic procedures are affordable at Newman Plastic Surgery. We accept all major credit cards and CareCredit (restrictions apply).</p>
+      <p style="color:rgba(255,251,244,.86);max-width:36em;margin-top:14px">For billing and insurance questions, or for more information, please contact the office.</p>
+      <div class="acts" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:24px"><a class="btn btn--champagne" href="tel:+14074819505"><svg><use href="#i-phone"/></svg>Call the office</a><a class="btn btn--line" style="color:var(--paper);border-color:rgba(255,251,244,.4)" href="../your-visit/#questions">Common questions</a></div>
+    </div>
+  </div>
+</section>
+<section class="nextsteps" aria-label="Next steps"><div class="wrap">
+  <a href="../your-visit/"><small>Plan your visit</small><b>What happens at a consultation</b><svg><use href="#i-arrow"/></svg></a>
+  <a href="../location/"><small>Find us</small><b>Location &amp; directions</b><svg><use href="#i-arrow"/></svg></a>
+</div></section>
+<p class="wrap note" style="padding-block:0 28px">Sample wording for the design review, taken from the current website. The office should confirm all insurance and payment details before launch.</p>`;
+  return shell({ title: 'Insurance and financing', desc: 'Insurance and payment at Newman Plastic Surgery in Orlando: cosmetic versus reconstructive coverage, HMO referrals, and patient financing with CareCredit.', dir: 'insurance-financing', body });
+}
+
+/* ---------------- Location & directions ---------------- */
+const MAPS = 'https://www.google.com/maps/search/?api=1&query=Newman+Plastic+Surgery+444+North+Mills+Avenue+Orlando+FL';
+const ROUTES = [
+  ['From I-4 (Daytona or Altamonte)', ['Take the Colonial (US 50) exit off I-4 West and turn left at the bottom of the exit.', 'Continue east to the Mills Ave (US 17-92) stoplight and turn right.', 'At the second stoplight (Amelia and Mills) we are immediately on your right.']],
+  ['From Kissimmee or Tampa (I-4 East)', ['Take I-4 to Exit 83A and continue north to Colonial Drive.', 'Follow Colonial Drive to Mills Ave and turn right.', 'At the second stoplight, which is Amelia, we are on that corner, on your right.']],
+  ['From Titusville or Cocoa', ['Take the Beachline (528) to FL 417 north toward Orlando, then FL 408 West.', 'Exit at Mills Avenue and turn right. Mills becomes a one-way street (SR 15) around a small lake; follow the SR 15 signs through a sharp left and a sharp right.', 'When you see two-way traffic again you are at Robinson St. Continue north on Mills through Livingston St. We are on your left just before Amelia, and the YMCA (a large blue and red building) is on your right.']],
+  ['From south Orlando', ['Take Orange Avenue north through downtown. Just after Lake Eola, turn right on Robinson.', 'Follow Robinson to Mills (the second stoplight) and turn left.', 'Continue to the second stoplight. The YMCA (large blue and red building) is on your right, and we are on your left just before the light.']],
+  ['From Windermere, Winter Garden or Ocoee', ['Take FL 408 East to the Mills Ave exit and turn left.', 'Mills becomes a one-way street (SR 15) around a small lake; follow the SR 15 signs through a sharp left and a sharp right.', 'At Robinson St, continue north on Mills through Livingston St. We are on your left just before Amelia, with the YMCA on your right.']],
+  ['From Winter Park', ['Take US 17-92 south past Colonial (SR 50).', 'Continue through the second stoplight. We are at the first driveway on the right.']]
+];
+function buildLocation() {
+  const body = `
+<section class="vhero wrap" aria-labelledby="lT">
+  <p class="eyebrow">Visit us</p>
+  <h1 id="lT" class="display" style="margin-top:14px">Find us in <em>Orlando.</em></h1>
+  <p class="dblurb">Our office is on North Mills Avenue, at the corner of Amelia.</p>
+</section>
+<section class="wrap" aria-label="Contact details">
+  <div class="mcards">
+    <div class="mcard static"><small class="eyebrow">Address</small><b style="font-size:24px">444 North Mills Avenue<br>Orlando, Florida 32803</b><a class="btn btn--ink btn--sm" style="align-self:flex-start;margin-top:auto" href="${MAPS}" target="_blank" rel="noopener">Get directions</a></div>
+    <div class="mcard static"><small class="eyebrow">Call</small><b style="font-size:34px">407.481.9505</b><span>Fax 407.481.9506</span><a class="btn btn--line btn--sm" style="align-self:flex-start;margin-top:auto" href="tel:+14074819505"><svg><use href="#i-phone"/></svg>Call now</a></div>
+    <div class="mcard static"><small class="eyebrow">Write to us</small><b style="font-size:24px">Send a message</b><span>Use the form below. Please do not include private medical details.</span><a class="btn btn--line btn--sm" style="align-self:flex-start;margin-top:auto" href="#consult">Request a consultation</a></div>
+    <div class="mcard static"><small class="eyebrow">Billing &amp; insurance</small><b style="font-size:24px">Questions about paying?</b><span>Our team can help with billing and insurance inquiries.</span><a class="btn btn--line btn--sm" style="align-self:flex-start;margin-top:auto" href="../insurance-financing/">Insurance &amp; financing</a></div>
+  </div>
+</section>
+<section class="section" aria-labelledby="drT">
+  <div class="wrap pgrid" style="align-items:start">
+    <div class="pmain"><p class="eyebrow">Directions</p><h2 id="drT" class="h2">Getting <em>here.</em></h2>
+      <p>Choose where you are coming from. Look for the YMCA, a large blue and red building, across from our office.</p>
+      <p class="note" style="margin-top:20px">Directions are taken from the current website and should be confirmed before launch.</p></div>
+    <div class="faqs">${ROUTES.map(([t, st], n) => `<details${n === 0 ? ' open' : ''}><summary>${esc(t)}</summary><ol class="dirs">${st.map(x => `<li>${esc(x)}</li>`).join('')}</ol></details>`).join('')}</div>
+  </div>
+</section>`;
+  return shell({ title: 'Location and directions', desc: 'Newman Plastic Surgery, 444 North Mills Avenue, Orlando, Florida 32803. Phone 407.481.9505. Directions from I-4, downtown, Winter Park and beyond.', dir: 'location', body,
+    ld: { '@context': 'https://schema.org', '@type': 'MedicalBusiness', name: 'Newman Plastic Surgery', telephone: '+1-407-481-9505', url: SITE_URL, address: { '@type': 'PostalAddress', streetAddress: '444 North Mills Avenue', addressLocality: 'Orlando', addressRegion: 'FL', postalCode: '32803', addressCountry: 'US' } } });
+}
+
 let n = 0;
 P.forEach(p => {
   const dir = path.join(ROOT, 'procedures', p.id);
@@ -485,5 +573,5 @@ P.forEach(p => {
 });
 fs.mkdirSync(path.join(ROOT, 'your-visit'), { recursive: true });
 fs.writeFileSync(path.join(ROOT, 'your-visit', 'index.html'), buildVisit());
-['meet-dr-newman', 'results'].forEach((d, i) => { fs.mkdirSync(path.join(ROOT, d), { recursive: true }); fs.writeFileSync(path.join(ROOT, d, 'index.html'), i ? buildResults() : buildMeet()); });
+[['meet-dr-newman', buildMeet], ['results', buildResults], ['insurance-financing', buildInsurance], ['location', buildLocation]].forEach(([d, fn]) => { fs.mkdirSync(path.join(ROOT, d), { recursive: true }); fs.writeFileSync(path.join(ROOT, d, 'index.html'), fn()); });
 console.log('built', n, 'procedure pages + your-visit + meet-dr-newman + results');
