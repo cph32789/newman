@@ -61,7 +61,7 @@
   }
   function render() {
     if (!box) return;
-    var cases = (NPS.library ? NPS.library.cases : []).filter(function (c) { return c.visible !== false && c.procedures.indexOf(id) > -1; })
+    var cases = (NPS.library ? NPS.library.cases : []).filter(function (c) { return c.visible !== false && c.primary === id; })
       .sort(function (a, b) { return (a.order || 0) - (b.order || 0); });
     if (!cases.length) {
       box.innerHTML = '<div class="rempty"><b>Photos are shared in the office.</b><span>To protect patient privacy, many results are shown only during a consultation. Ask Dr. Newman to show you examples that match your goals.</span><button class="btn btn--champagne" type="button" data-toconsult="' + id + '">Ask about results</button></div>';

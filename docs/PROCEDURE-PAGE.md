@@ -4,30 +4,35 @@ Every procedure uses **one format**. Adding a procedure means adding its
 information, not designing a page. This keeps the site cohesive and means every
 procedure's before-and-after photos are managed the same way, in one place.
 
-## The sections (same order on every page)
+## The sections (only what is unique to the procedure is shown)
 
-| # | Section | What it holds | Where the content comes from |
-|---|---|---|---|
-| 1 | **Hero** | Name, one-line promise, photo, Request / Save / Share, "also known as" | Procedure record + its image slot |
-| 2 | **Sticky section tabs** | Overview · Process · Results · FAQ (always in view; shows where you are) | Automatic |
-| 3 | **Overview** | What it is, "May be a good fit if", "Worth discussing", and an **At a glance** card | Procedure record (defaults fill anything blank) |
-| 4 | **Process** | Four steps: what to expect | Defaults by surgical / non-surgical, editable per procedure |
-| 5 | **Results** | Before-and-after cases for this procedure | **Library** (visible cases, in the order set in Admin) |
-| 6 | **FAQ** | Six standard questions, editable | Shared questions, per-procedure overrides |
-| 7 | **Related + Previous/Next** | Three related procedures; move through the category | Procedure record |
-| 8 | **Request a consultation** | The same form as the home page | Shared |
+Anything identical across procedures lives **once** on the shared **Your visit**
+page (`your-visit/`) and is linked, never repeated.
+
+| Section | Shown when | Source |
+|---|---|---|
+| **Hero** | always | Procedure record + image slot |
+| **Sticky tabs** | 2+ sections (tabs adapt: Overview, Recovery, Results, Questions) | Automatic |
+| **Overview** + At a glance (+ "May be a good fit if") | always (glance/fit list only if written, else Type/Area/Also called) | `procOverrides[id]` |
+| **Recovery & timeline** | the procedure has its own `timeline`; otherwise a one-line "Your path" strip linking to Your visit | `procOverrides[id].timeline` |
+| **Results** (dark) | the Library has cases whose `primary` is this procedure; otherwise a slim line: "See results for X" (related case) or "Photos are shared in the office" | Library |
+| **Questions** | the procedure has its own 3-4 `faq`; general answers live on Your visit | `procOverrides[id].faq` |
+| **Next steps** | always: links to Your visit and Common questions | Shared |
+| **Related + Previous/Next**, **Consultation form** | always | Procedure record / shared |
+
+Shared content (journey, what we cover at a consult, common questions incl.
+insurance and payment) is in `NPS.visit` and builds `your-visit/`.
 
 ## Mobile
 - Hero text and buttons first, photo below; back arrow returns to the category.
-- The four section tabs stay pinned under the header and all fit on screen (no
+- The section tabs stay pinned under the header and all fit on screen (no
   sideways swiping). They highlight as you scroll.
 - Results cards, FAQ and related cards stack in one column. Photos keep their
   true proportions at every size.
 - The phone tab bar and slide-up sheets work exactly as on the home page.
 
 ## Before & After and the Library
-- A case in the Library is attached to one or more procedures. It then appears
-  on every page it is attached to, automatically.
+- A case in the Library has a **primary** procedure and may list others. It shows in full on its primary page; other pages link to it ("See results for X").
 - Admin controls per case: **Visible / Hidden**, **order** (drag), which
   **details are public** (age, height, weight, implants, time since surgery,
   add-on procedures), and extra **views** (front, side, three-quarter).

@@ -31,10 +31,12 @@ const footer = grab(/<footer class="foot">[\s\S]*?<\/footer>/, 'footer');
 const tabbar = grab(/<nav class="tabbar"[\s\S]*?<\/nav>/, 'tabbar');
 const consult = grab(/<section class="consult section" id="consult"[\s\S]*?<\/section>/, 'consult');
 const sheets = home.slice(home.indexOf('<dialog class="sheet full searchscreen"'), home.indexOf('<div class="toast"'));
-const toBase = h => h
-  .replace(/href="#top"/g, 'href="../../"')
-  .replace(/href="#(discover|surgeon|results|visit)"/g, 'href="../../#$1"')
-  .replace(/(src|href)="assets\//g, '$1="../../assets/');
+const rebase = (h, up) => h
+  .replace(/href="#top"/g, 'href="' + up + '"')
+  .replace(/href="#visit"/g, 'href="' + up + 'your-visit/"')
+  .replace(/href="#(discover|surgeon|results)"/g, 'href="' + up + '#$1"')
+  .replace(/(src|href)="assets\//g, '$1="' + up + 'assets/');
+const toBase = h => rebase(h, '../../');
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const short = t => t.replace(/\s*\(.*\)/, '');
@@ -51,11 +53,17 @@ function img(slot, key, fx, fy, extra) {
 
 function build(p) {
   const kind = p.kind === 'surgical' ? 'surgical' : 'non-surgical';
-  const D = NPS.procDefaults[kind], O = NPS.procOverrides[p.id] || {};
+  const O = NPS.procOverrides[p.id] || {};
   const name = short(p.title);
-  const overview = O.overview || [p.detail, 'At your consultation, Dr. Newman will listen to your goals, explain your options clearly, and give you an honest picture of what to expect, including risks, recovery and cost.'];
-  const glance = O.glance || D.glance, good = O.good || D.good, discuss = O.discuss || D.discuss, steps = O.steps || D.steps;
-  const faq = NPS.procFaq.map(([q, a]) => [q.replace('{t}', name), a.replace('{recovery}', D.recovery)]);
+  /* Only what is UNIQUE to this procedure is shown. Shared answers live once on /your-visit/. */
+  const overview = O.overview || [p.detail];
+  const aka = (p.aka || []).filter(a => a.toLowerCase() !== p.title.toLowerCase() && a.length < 26).slice(0, 3);
+  const glance = O.glance || [['Type', kind === 'surgical' ? 'Surgical' : 'Non-surgical'], ['Area', p.cat]].concat(aka.length ? [['Also called', aka.join(', ')]] : []);
+  const good = O.good || null, timeline = O.timeline || null, faq = O.faq || null;
+  const own = (NPS.library.cases || []).filter(c => c.visible !== false && c.primary === p.id);
+  const seeAlso = (NPS.library.cases || []).filter(c => c.visible !== false && c.primary !== p.id && c.procedures.indexOf(p.id) > -1 && c.primary && byId[c.primary]);
+  const seeAlsoP = seeAlso.length ? byId[seeAlso[0].primary] : null;
+  const tabs = [['overview', 'Overview']].concat(timeline ? [['recovery', 'Recovery']] : [], own.length ? [['results', 'Results']] : [], faq ? [['faq', 'Questions']] : []);
   const sameCat = P.filter(x => x.cat === p.cat), i = sameCat.findIndex(x => x.id === p.id);
   const prev = sameCat[(i - 1 + sameCat.length) % sameCat.length], next = sameCat[(i + 1) % sameCat.length];
   const related = (p.related || []).map(r => byId[r]).filter(Boolean).slice(0, 3);
@@ -118,18 +126,15 @@ ${toBase(header)}
   <div class="pimg frame">${img('proc.' + p.id, p.img, 50, 38, ' fetchpriority="high"')}</div>
 </section>
 
-<!-- Sticky section navigation (stays visible while you read) -->
-<div class="ptabs" id="ptabs">
+${tabs.length > 1 ? `<!-- Sticky section navigation (stays visible while you read) -->
+<div class="ptabs" id="ptabs" style="--n:${tabs.length}">
   <div class="wrap">
     <nav aria-label="On this page">
-      <a href="#overview" data-sec="overview" aria-current="true">Overview</a>
-      <a href="#process" data-sec="process">Process</a>
-      <a href="#results" data-sec="results">Results</a>
-      <a href="#faq" data-sec="faq">FAQ</a>
+      ${tabs.map(([k, l], n) => `<a href="#${k}" data-sec="${k}"${n === 0 ? ' aria-current="true"' : ''}>${l}</a>`).join('\n      ')}
     </nav>
     <a class="btn btn--ink btn--sm" href="#consult" data-toconsult="${p.id}">Request a consultation</a>
   </div>
-</div>
+</div>` : ''}
 
 <!-- 2. OVERVIEW -->
 <section class="section" id="overview" aria-labelledby="ovT">
@@ -138,10 +143,8 @@ ${toBase(header)}
       <p class="eyebrow">Overview</p>
       <h2 id="ovT" class="h2">About <em>${esc(name)}.</em></h2>
       ${overview.map(t => `<p>${esc(t)}</p>`).join('\n      ')}
-      <h3>May be a good fit if</h3>
-      <ul class="ticks">${good.map(t => `<li>${esc(t)}</li>`).join('')}</ul>
-      <h3>Worth discussing at your consultation</h3>
-      <ul class="dotsl">${discuss.map(t => `<li>${esc(t)}</li>`).join('')}</ul>
+      ${good ? `<h3>May be a good fit if</h3>
+      <ul class="ticks">${good.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}
     </div>
     <aside class="glance" aria-label="At a glance">
       <h3>At a glance</h3>
@@ -150,16 +153,22 @@ ${toBase(header)}
   </div>
 </section>
 
-<!-- 3. PROCESS -->
-<section class="section on-sand" id="process" aria-labelledby="prT">
+${timeline ? `<!-- 3. RECOVERY & TIMELINE (specific to this procedure) -->
+<section class="section on-sand" id="recovery" aria-labelledby="prT">
   <div class="wrap">
-    <div class="head head--split"><div><p class="eyebrow">What to expect</p><h2 id="prT" class="h2" style="margin-top:14px">Your path, <em>step by step.</em></h2></div>
-    <p class="lead" style="max-width:24em">No pressure and no surprises. You decide at every step.</p></div>
-    <div class="steps four">${steps.map(([t, d], n) => `<div class="step"><span class="n">${n + 1}</span><div><h3>${esc(t)}</h3><p>${esc(d)}</p></div></div>`).join('')}</div>
+    <div class="head head--split"><div><p class="eyebrow">Recovery &amp; timeline</p><h2 id="prT" class="h2" style="margin-top:14px">What to expect, <em>and when.</em></h2></div>
+    <p class="lead" style="max-width:24em">A general guide. Dr. Newman will tailor it to you.</p></div>
+    <ol class="tline">${timeline.map(([t, d]) => `<li><h3>${esc(t)}</h3><p>${esc(d)}</p></li>`).join('')}</ol>
   </div>
-</section>
+</section>` : `<!-- 3. PATH (compact; the full journey lives once on Your visit) -->
+<section class="pathstrip" aria-label="Your path">
+  <div class="wrap">
+    <ol>${NPS.visit.journey[kind === 'surgical' ? 'surgical' : 'nonsurgical'].map(([t]) => `<li>${esc(t)}</li>`).join('')}</ol>
+    <a class="link" href="../../your-visit/">See what each step involves <svg><use href="#i-arrow"/></svg></a>
+  </div>
+</section>`}
 
-<!-- 4. RESULTS (managed in the Library) -->
+${own.length ? `<!-- 4. RESULTS (this procedure's own Library cases) -->
 <section class="section on-dark" id="results" aria-labelledby="reT">
   <div class="wrap">
     <div class="head head--split"><div><p class="eyebrow">Real results</p><h2 id="reT" class="h2" style="margin-top:14px">See the <em>difference.</em></h2></div>
@@ -170,14 +179,28 @@ ${toBase(header)}
       <button class="btn btn--champagne" data-soon="The full results gallery is part of the next build.">View the full gallery <svg><use href="#i-arrow"/></svg></button>
     </div>
   </div>
-</section>
+</section>` : `<!-- 4. RESULTS (slim: none of its own cases) -->
+<section class="rslim" aria-label="Results">
+  <div class="wrap">
+    <p>${seeAlsoP ? `Results for this treatment are shown with <b>${esc(short(seeAlsoP.title))}</b>.` : `<b>Photos are shared in the office.</b> Ask Dr. Newman to show you examples that match your goals.`}</p>
+    ${seeAlsoP ? `<a class="btn btn--line btn--sm" href="../${seeAlsoP.id}/#results">See results for ${esc(short(seeAlsoP.title))} <svg><use href="#i-arrow"/></svg></a>` : `<button class="btn btn--line btn--sm" type="button" data-toconsult="${p.id}">Ask about examples</button>`}
+  </div>
+</section>`}
 
-<!-- 5. FAQ -->
+${faq ? `<!-- 5. QUESTIONS (specific to this procedure) -->
 <section class="section" id="faq" aria-labelledby="faT">
   <div class="wrap pgrid" style="align-items:start">
-    <div class="pmain"><p class="eyebrow">Good questions</p><h2 id="faT" class="h2">Before you <em>decide.</em></h2>
+    <div class="pmain"><p class="eyebrow">Good questions</p><h2 id="faT" class="h2">About <em>${esc(name.toLowerCase())}.</em></h2>
       <p>Can’t find your question? <button class="link" data-toconsult="${p.id}" style="display:inline-flex">Ask us</button></p></div>
     <div class="faqs">${faq.map(([q, a], n) => `<details${n === 0 ? ' open' : ''}><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('')}</div>
+  </div>
+</section>` : ''}
+
+<!-- Shared next steps: the same answers for every procedure, written once -->
+<section class="nextsteps" aria-label="Next steps">
+  <div class="wrap">
+    <a href="../../your-visit/"><small>Plan your visit</small><b>What happens at a consultation</b><svg><use href="#i-arrow"/></svg></a>
+    <a href="../../your-visit/#questions"><small>Insurance, payment, risks</small><b>Common questions</b><svg><use href="#i-arrow"/></svg></a>
   </div>
 </section>
 
@@ -228,6 +251,72 @@ ${toBase(sheets)}
 `;
 }
 
+
+/* ---------------- Shared "Your visit" page: written once, linked from every procedure ---------------- */
+function buildVisit() {
+  const up = '../', rb = h => rebase(h, up), V = NPS.visit, url = SITE_URL + 'your-visit/';
+  const journey = (k, label) => `<div class="jcol"><h3>${label}</h3><div class="steps four">${V.journey[k].map(([t, d], n) => `<div class="step"><span class="n">${n + 1}</span><div><h3>${esc(t)}</h3><p>${esc(d)}</p></div></div>`).join('')}</div></div>`;
+  return `<!doctype html>
+<html lang="en" class="pp">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Your visit and common questions | Newman Plastic Surgery</title>
+<meta name="description" content="What happens at a consultation, what to bring, and answers about risks, insurance and payment at Newman Plastic Surgery in Orlando.">
+<meta name="theme-color" content="#0A2A2F">
+<link rel="canonical" href="${url}">
+<meta property="og:type" content="article"><meta property="og:site_name" content="Newman Plastic Surgery"><meta property="og:title" content="Your visit and common questions · Newman Plastic Surgery"><meta property="og:url" content="${url}">
+<meta property="og:image" content="${SITE_URL}assets/share/home.jpg?v=${VERSION}"><meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../assets/img/favicon.png">
+<link rel="preload" href="../assets/fonts/DMSans-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../assets/css/fonts.css?v=${VERSION}">
+<link rel="stylesheet" href="../assets/css/styles.css?v=${VERSION}">
+<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: V.faq.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) })}</script>
+</head>
+<body id="top">
+${sprite}
+<a class="skip" href="#main">Skip to content</a>
+${rb(header)}
+<main id="main">
+<section class="vhero wrap">
+  <p class="eyebrow">Your visit</p>
+  <h1 class="display" style="margin-top:14px">Nothing to prepare. <em>Just come as you are.</em></h1>
+  <p class="dblurb">What happens at a consultation, what to bring, and straight answers to the questions people ask most.</p>
+  <div class="acts"><a class="btn btn--ink" href="#consult">Request a consultation <svg><use href="#i-arrow"/></svg></a><a class="btn btn--line" href="#questions">Common questions</a></div>
+</section>
+<section class="section on-sand" id="journey">
+  <div class="wrap">
+    <div class="head"><p class="eyebrow">The journey</p><h2 class="h2" style="margin-top:14px">Step by <em>step.</em></h2></div>
+    ${journey('surgical', 'If you are considering surgery')}${journey('nonsurgical', 'If you are considering a non-surgical treatment')}
+  </div>
+</section>
+<section class="section" id="bring">
+  <div class="wrap pgrid" style="align-items:start">
+    <div class="pmain"><p class="eyebrow">At your consultation</p><h2 class="h2">Worth <em>talking through.</em></h2><p>Bring your questions, and your saved list if you made one. These are the things we will cover together.</p></div>
+    <ul class="dotsl">${V.discuss.map(t => `<li>${esc(t)}</li>`).join('')}</ul>
+  </div>
+</section>
+<section class="section on-sand" id="questions" aria-labelledby="qT">
+  <div class="wrap pgrid" style="align-items:start">
+    <div class="pmain"><p class="eyebrow">Common questions</p><h2 id="qT" class="h2">Good questions, <em>plain answers.</em></h2><p>Questions about one procedure are answered on that procedure’s page.</p></div>
+    <div class="faqs">${V.faq.map(([q, a], n) => `<details${n === 0 ? ' open' : ''}><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('')}</div>
+  </div>
+</section>
+${rb(consult)}
+</main>
+${rb(footer)}
+${rb(tabbar)}
+${rb(sheets)}
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>window.NPS_BASE='../';</script>
+${['site', 'procedures', 'feed', 'images', 'procedure-content', 'library'].map(f => `<script src="../data/${f}.js?v=${VERSION}"></script>`).join('\n')}
+<script src="../assets/js/search.js?v=${VERSION}"></script>
+<script src="../assets/js/app.js?v=${VERSION}"></script>
+</body>
+</html>
+`;
+}
+
 let n = 0;
 P.forEach(p => {
   const dir = path.join(ROOT, 'procedures', p.id);
@@ -235,4 +324,6 @@ P.forEach(p => {
   fs.writeFileSync(path.join(dir, 'index.html'), build(p));
   n++;
 });
-console.log('built', n, 'procedure pages');
+fs.mkdirSync(path.join(ROOT, 'your-visit'), { recursive: true });
+fs.writeFileSync(path.join(ROOT, 'your-visit', 'index.html'), buildVisit());
+console.log('built', n, 'procedure pages + your-visit');
