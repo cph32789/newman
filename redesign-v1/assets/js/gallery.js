@@ -86,7 +86,11 @@
 
   /* ---------- Procedure page: its own cases ---------- */
   var pid = document.body.getAttribute('data-proc'), one = $('#cases[data-proc]');
-  if (pid && one) G.mount(one, G.cases().filter(function (c) { return c.primary === pid; }));
+  if (pid && one) {
+    var mine = G.cases().filter(function (c) { return c.primary === pid; });
+    if (mine.length) G.mount(one, mine);
+    else one.innerHTML = '<div class="rempty"><b>Photos are shared in the office.</b><span>To protect patient privacy, many results are shown only during a consultation. Ask Dr. Newman to show you examples that match your goals.</span><button class="btn btn--champagne" type="button" data-toconsult="' + pid + '">Ask about results</button></div>';
+  }
 
   /* ---------- Results gallery page ---------- */
   var page = $('#gallery'); if (!page) return;
@@ -112,10 +116,10 @@
     if ((state.cat || state.proc) && cs.length && cs.every(G.isGated) && !verified) G.ask();
   }
   function fromHash() {
-    var h = decodeURIComponent((location.hash || '').slice(1)), m = h.match(/^procedure\/(.+)$/);
+    var h = decodeURIComponent((location.hash || '').slice(1)), m = h.match(/^show-(.+)$/);
     state.proc = m && byId[m[1]] ? m[1] : ''; state.cat = state.proc ? byId[state.proc].cat : (CATS.filter(function (k) { return k[0] === h || k[2] === h; })[0] || ['', '', ''])[2];
   }
-  function setHash() { var h = state.proc ? 'procedure/' + state.proc : state.cat ? (CATS.filter(function (k) { return k[2] === state.cat; })[0] || [''])[0] : ''; history.replaceState(null, '', h ? '#' + h : location.pathname + location.search); }
+  function setHash() { var h = state.proc ? 'show-' + state.proc : state.cat ? (CATS.filter(function (k) { return k[2] === state.cat; })[0] || [''])[0] : ''; history.replaceState(null, '', h ? '#' + h : location.pathname + location.search); }
   page.addEventListener('click', function (e) {
     var a = e.target.closest('[data-cat]'), b = e.target.closest('[data-proc]');
     if (a && a.tagName === 'BUTTON') { state.cat = a.getAttribute('data-cat'); state.proc = ''; setHash(); draw(); }
