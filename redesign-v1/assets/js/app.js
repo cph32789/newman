@@ -399,7 +399,7 @@
   function route() {
     var h = decodeURIComponent(location.hash || '');
     var m;
-    if ((m = h.match(/^#procedure\/(.+)$/))) { if (byId[m[1]]) openDetail(m[1]); }
+    if ((m = h.match(/^#procedure\/(.+)$/))) { if (document.getElementById('gallery')) { history.replaceState(null, '', '#show-' + m[1]); return; } if (byId[m[1]]) openDetail(m[1]); }
     else if ((m = h.match(/^#search\/(.+)$/))) openSearch(m[1]);
     else if ((m = h.match(/^#explore\/?(.*)$/))) openExplorer(m[1] || 'All');
     else if (h === '#list') { renderList(); openSheet('list'); }
