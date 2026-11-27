@@ -292,6 +292,7 @@ const server = http.createServer(async (req, res) => {
       return json(res, 404, { ok: false });
     }
 
+    if (p === '/admin') return send(res, 302, '', { Location: '/admin/' });
     /* admin pages need the admin sign-in (the sign-in page itself does not) */
     if (/^\/admin(\/|$)/.test(p) && !/^\/admin\/signin\.html$/.test(p) && !isAdmin) return send(res, 302, '', { Location: '/admin/signin.html' });
 

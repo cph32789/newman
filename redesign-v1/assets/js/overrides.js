@@ -17,6 +17,7 @@
       Object.keys(te.members).forEach(function (id) { var e = te.members[id]; if (e && e.custom && !NPS.team.members.some(function (m) { return m.id === id; })) list.push(Object.assign({ id: id }, e)); });
       var ord = te.order || [], pos = function (id) { var i = ord.indexOf(id); return i < 0 ? 1e6 : i; };
       list = list.map(function (m, i) { m.__i = i; return m; }).sort(function (a, b) { return pos(a.id) - pos(b.id) || a.__i - b.__i; });
+      NPS.team.principals = NPS.team.principals.map(function (pr) { return Object.assign({}, pr, te.members[pr.id] || {}); });
       NPS.team.members = list.filter(function (m) { return !m.hidden && !m.deleted; });
       if (te.intro != null && te.intro !== '') NPS.team.intro = te.intro;
     }

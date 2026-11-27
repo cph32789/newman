@@ -379,17 +379,16 @@ ${(extraScripts || []).map(f => `<script src="../assets/js/${f}?v=${VERSION}"></
 /* ---------------- Team (data/team.js + Admin edits) ---------------- */
 const teamSrc = p => (/^(\/|data:|https?:)/.test(p) ? p : '../' + p);
 const teamInitials = n => n.replace(/\(.*?\)/g, '').split(/[\s,]+/).filter(w => /^[A-Za-z]/.test(w) && !/^(MD|PA-C|MPAS|Jr\.?)$/i.test(w)).slice(0, 2).map(w => w[0].toUpperCase()).join('');
-function teamCard(m) {
-  const pic = m.photo
+function teamPic(m) {
+  return m.photo
     ? `<img class="fit" src="${esc(teamSrc(m.photo))}" alt="${esc(m.name)}" ${m.w && m.h ? `width="${+m.w}" height="${+m.h}" ` : ''}loading="lazy" style="--fx:${+m.fx || 50}%;--fy:${+m.fy || 30}%;--zoom:${+m.zoom || 1};--fit:cover">`
     : `<span class="mono" aria-hidden="true">${esc(teamInitials(m.name))}</span>`;
-  return `<article class="tcard"><div class="tpic frame">${pic}</div><h3>${esc(m.name)}</h3><p class="role">${esc(m.role || '')}</p>${m.bio ? `<p class="tbio">${esc(m.bio)}</p>` : ''}</article>`;
+}
+function teamCard(m) {
+  return `<article class="tcard"><div class="tpic frame">${teamPic(m)}</div><h3>${esc(m.name)}</h3><p class="role">${esc(m.role || '')}</p>${m.bio ? `<p class="tbio">${esc(m.bio)}</p>` : ''}</article>`;
 }
 function principalCards(rel) {
-  return NPS.team.principals.map(pr => {
-    const img = pr.slot === 'dzi' ? 'dzi-newman.png' : 'dr-newman.png';
-    return `<a class="tcard tprin" href="${rel}${pr.href}"><div class="tpic frame"><img class="fit" src="../assets/img/${img}" alt="${esc(pr.name)}" width="341" height="341" loading="lazy" style="--fx:50%;--fy:46%;--zoom:1.16;--fit:cover"></div><h3>${esc(pr.name)}</h3><p class="role">${esc(pr.role)}</p><span class="tmore">Read more</span></a>`;
-  }).join('');
+  return NPS.team.principals.map(pr => `<a class="tcard tprin" href="${rel}${pr.href}"><div class="tpic frame">${teamPic(pr)}</div><h3>${esc(pr.name)}</h3><p class="role">${esc(pr.role)}</p><span class="tmore">Read more</span></a>`).join('');
 }
 function teamCards(withPrincipals) { return (withPrincipals ? principalCards('../') : '') + NPS.team.members.map(teamCard).join(''); }
 

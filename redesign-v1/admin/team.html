@@ -56,18 +56,19 @@
   var cur=null, dirty=false;
   function mark(){dirty=true;$('#st').textContent='Unsaved changes';}
   function src(p){ return /^(\/|data:|https?:)/.test(p)?p:'../'+p; }
+  function pr(id){ return T.principals.filter(function(x){return x.id===id;})[0]; }
   function all(){
     var list=T.members.map(function(m){return Object.assign({},m,ed.members[m.id]||{});});
     Object.keys(ed.members).forEach(function(id){ var e=ed.members[id]; if(e.custom&&!T.members.some(function(m){return m.id===id;})) list.push(Object.assign({id:id},e)); });
     var pos=function(id){var i=ed.order.indexOf(id);return i<0?1e6:i;};
     return list.map(function(m,i){m.__i=i;return m;}).sort(function(a,b){return pos(a.id)-pos(b.id)||a.__i-b.__i;}).filter(function(m){return !m.deleted;});
   }
-  function get(id){ return all().filter(function(m){return m.id===id;})[0]; }
+  function get(id){ var b=pr(id); if(b) return Object.assign({principal:true},b,ed.members[id]||{}); return all().filter(function(m){return m.id===id;})[0]; }
   function patch(id,o){ ed.members[id]=Object.assign(ed.members[id]||{},o); mark(); }
   function initials(n){ return n.split(/\s+/).filter(function(w){return /^[A-Za-z]/.test(w);}).slice(0,2).map(function(w){return w[0].toUpperCase();}).join(''); }
   function th(m){ return m.photo?'<img alt="" src="'+esc(src(m.photo))+'" style="object-position:'+(+m.fx||50)+'% '+(+m.fy||30)+'%">':esc(initials(m.name)); }
   function list(){
-    var h='<h3>Your doctors</h3>'+T.principals.map(function(p){return '<div class="row" style="grid-template-columns:44px 1fr"><div class="th"><img alt="" src="../assets/img/'+(p.slot==='dzi'?'dzi-newman.png':'dr-newman.png')+'" style="object-fit:contain"></div><span style="display:flex;flex-direction:column"><b>'+esc(p.name)+'</b><small>Edit on <a class="link" href="pages.html#'+p.slot+'">Pages &amp; images</a></small></span></div>';}).join('');
+    var h='<h3>Your doctors</h3>'+T.principals.map(function(b){var m=get(b.id);return '<div class="row" style="grid-template-columns:44px 1fr"'+(b.id===cur?' aria-current="true"':'')+'><div class="th">'+th(m)+'</div><button type="button" class="pick" data-pick="'+esc(b.id)+'"><b>'+esc(m.name)+'</b><small>'+esc(m.role||'')+'</small></button></div>';}).join('');
     h+='<h3>Staff</h3>'+all().map(function(m,i,a){
       return '<div class="row" data-id="'+esc(m.id)+'"'+(m.id===cur?' aria-current="true"':'')+'><div class="th">'+th(m)+'</div><button type="button" class="pick" data-pick="'+esc(m.id)+'"><b>'+esc(m.name)+(m.hidden?'<span class="tg">HIDDEN</span>':'')+'</b><small>'+esc(m.role||'')+'</small></button><span class="mv"><button type="button" data-up="'+esc(m.id)+'" aria-label="Move up"'+(i?'':' disabled')+'>↑</button><button type="button" data-down="'+esc(m.id)+'" aria-label="Move down"'+(i<a.length-1?'':' disabled')+'>↓</button></span></div>';
     }).join('');
@@ -83,7 +84,7 @@
       '<div class="pbtn" style="margin:0"><label class="btn btn--ink btn--sm" style="cursor:pointer">'+(m.photo?'Replace photo':'Add photo')+'<input type="file" id="up" accept="image/jpeg,image/png,image/webp" hidden></label>'+(m.photo?'<button class="btn btn--line btn--sm" data-nophoto type="button">Remove photo</button>':'')+'</div>'+
       (m.photo?'<label class="field-a" style="margin-top:14px">Zoom <span class="hint" id="zv">'+(+m.zoom||1).toFixed(2)+'×</span><input type="range" id="zoom" min="1" max="2.5" step="0.05" value="'+(+m.zoom||1)+'"></label>'+(m.w&&m.h&&Math.min(m.w,m.h)<500?'<p class="pv" style="color:var(--clay-ink)">This photo is small ('+m.w+' × '+m.h+'). It may look soft on large screens. A larger photo will look sharper.</p>':''):'')+
       '<p class="pv" id="upst" role="status"></p></div></div>'+
-      '<div class="pbtn" style="margin-top:18px"><label class="sw" title="Show on the site"><input type="checkbox" data-vis'+(!m.hidden?' checked':'')+' aria-label="Show on the site"><i></i></label><span class="pv" style="margin:0">'+(m.hidden?'Hidden from the site':'Visible on the site')+'</span><button class="btn btn--line btn--sm" data-del type="button" style="margin-left:auto">Delete</button></div></div>';
+      (m.principal?'<p class="pv" style="margin-top:16px">This is the photo used on the Our team page and the team strip. The larger portraits on <b>Meet Dr. Newman</b> are set in <a class="link" href="pages.html">Pages &amp; images</a>.</p>':'<div class="pbtn" style="margin-top:18px"><label class="sw" title="Show on the site"><input type="checkbox" data-vis'+(!m.hidden?' checked':'')+' aria-label="Show on the site"><i></i></label><span class="pv" style="margin:0">'+(m.hidden?'Hidden from the site':'Visible on the site')+'</span><button class="btn btn--line btn--sm" data-del type="button" style="margin-left:auto">Delete</button></div>')+'</div>';
   }
   /* resize in the browser, then store on the server (or in the browser when there is no server) */
   function prepare(file){
@@ -120,7 +121,7 @@
   $('#save').addEventListener('click',function(){ var out={order:ed.order,members:ed.members}; if(ed.intro.trim()) out.intro=ed.intro.trim(); if(A.ls.set('nps.team',out)){ dirty=false; A.log('Saved team changes'); A.refresh(); $('#st').textContent='Saved. Press Publish to show it on the site.'; } else $('#st').textContent='Could not save.'; });
   $('#discard').addEventListener('click',function(){ var s=A.ls.get('nps.team',{})||{}; ed={order:(s.order||[]).slice(),members:JSON.parse(JSON.stringify(s.members||{})),intro:s.intro||''}; $('#intro').value=ed.intro||T.intro; dirty=false; list(); render(); $('#st').textContent='Unsaved changes were discarded.'; });
   window.addEventListener('beforeunload',function(e){ if(dirty){ e.preventDefault(); e.returnValue=''; } });
-  $('#intro').value=ed.intro||T.intro; cur=(all()[0]||{}).id; list(); render();
+  $('#intro').value=ed.intro||T.intro; cur=T.principals[0].id; list(); render();
 })();
 </script>
 </body>
