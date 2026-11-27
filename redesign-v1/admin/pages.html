@@ -36,19 +36,25 @@
 .libg button[aria-pressed=true]{border-color:var(--clay)}
 .libg img{width:100%;height:100%;object-fit:cover;display:block}
 .fine2{color:var(--muted);font-size:14px;margin-top:10px}
+.pl .pg{min-height:54px;justify-content:space-between}.pl .pg b{font:600 16px var(--sans)}.pl .pg .tg{font:700 10px/1 var(--sans);letter-spacing:.08em;padding:3px 5px;border-radius:5px;background:#CDC3B3;color:#3a3128;margin-left:6px}
+.pl .pg[aria-current=true] small{opacity:.8}
+.pl .subs{margin:0 0 10px 14px;padding-left:10px;border-left:2px solid var(--line)}
+.pl .subs button{min-height:50px}
+.pgpanel .meta{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-top:12px}
+.pgpanel .addr{font:500 14px var(--sans);color:var(--muted);background:var(--sand);padding:6px 10px;border-radius:8px}
 </style>
 
 <h1>Pages <em>&amp; images.</em></h1>
-<p class="intro">Pick a page, pick a picture, and decide how it fits. Pictures are <b>never stretched or squished</b>. You choose the focus point and zoom, separately for desktop and phone, and your choice is saved with the picture.</p>
+<p class="intro">Every page of the website is listed on the left. Pick a page to see its pictures and settings, show or hide it, and jump to where its content is edited. Pictures are <b>never stretched or squished</b>: you choose the focus point and zoom, separately for desktop and phone.</p>
 <div class="layout">
   <aside>
-    <label class="field-a" style="margin-bottom:10px">Find a page<input type="search" id="q" placeholder="e.g. facelift, home"></label>
+    <label class="field-a" style="margin-bottom:10px">Find a page<input type="search" id="q" placeholder="Search all pages"></label>
     <div id="pl"></div>
   </aside>
   <section id="ed" aria-live="polite"></section>
 </div>
 <div class="bar"><div class="wrap"><button class="btn btn--ink btn--sm" id="save" type="button">Save image settings</button><button class="btn btn--line btn--sm" id="reset" type="button">Reset this picture</button><span class="st" id="st" role="status"></span></div></div>
-<div class="tip">Preview: settings are saved in this browser and shown on the public pages here. In the live Admin, Publish saves them for every visitor.</div>
+<div class="tip">Changes you save are drafts. They go live when you press <b>Publish</b>, the gold button at the top of the page (it stays in view as you scroll).</div>
 
 </main>
 <script src="../assets/js/admin-shell.js?v=20261127j" data-active="pages"></script>
@@ -70,26 +76,58 @@
     'surgeon':{d:'1',m:'1',n:'Home and Our doctors · portrait',arch:1},
     'dzi':{d:'1',m:'1',n:'Our doctors · Dzi Newman portrait',arch:1}
   };
-  var pages=[['Home',['hero','cat.face','cat.breast','cat.body','cat.skin','surgeon']],['Our doctors',['surgeon','dzi']]];
   var PN={'hero':'Top picture','cat.face':'Face card','cat.breast':'Breast card','cat.body':'Body card','cat.skin':'Skin card','surgeon':'Dr. Newman portrait','dzi':'Dzi Newman portrait'};
+  /* every page of the site. optional = can be switched off. edit = where its content is edited. */
+  var PAGES=[
+    {id:'home',n:'Home',path:'',slots:['hero','cat.face','cat.breast','cat.body','cat.skin','surgeon'],note:'The first page visitors see. The procedure cards, Discover feed and patient voices come from Procedures, Reviews and the Discover feed.'},
+    {id:'doctors',n:'Our doctors',path:'meet-dr-newman/',slots:['surgeon','dzi'],edit:['team.html','Team (staff photos and names)'],note:'Dr. Newman and Dzi, with their biographies and the team strip.'},
+    {id:'our-team',n:'Our team',path:'our-team/',slots:[],optional:true,edit:['team.html','Team'],note:'The staff page. Photos, names and order are set in Team.'},
+    {id:'procedures',n:'Procedure pages',path:'procedures/',slots:[],edit:['procedures.html','Procedures'],note:'One page for every procedure and treatment.'},
+    {id:'results',n:'Results',path:'results/',slots:[],edit:['gallery.html','Gallery'],note:'Before-and-after galleries. Photos, order and 18+ settings are in Gallery.'},
+    {id:'reviews',n:'Reviews',path:'reviews/',slots:[],optional:true,edit:['reviews.html','Reviews'],note:'Patient reviews. Add, edit and hide them in Reviews.'},
+    {id:'media',n:'Media & videos',path:'media/',slots:[],optional:true,edit:['media.html','Media'],note:'Magazine features and the video library.'},
+    {id:'your-visit',n:'Your visit',path:'your-visit/',slots:[],note:'What happens at a consultation, and common questions. The wording is edited by the web team for now.'},
+    {id:'insurance-financing',n:'Insurance & financing',path:'insurance-financing/',slots:[],optional:true,edit:['settings.html','Settings (practice details)'],note:'Cost and coverage answers.'},
+    {id:'location',n:'Location',path:'location/',slots:[],optional:true,edit:['settings.html','Settings (practice details)'],note:'Address, phone, map and directions. The address and phone come from Settings.'}
+  ];
+  var pagesCfg=A.ls.get('nps.pages',{})||{}; pagesCfg.hidden=pagesCfg.hidden||{};
+  var curPage='home';
+  function pageById(id){ return PAGES.filter(function(p){return p.id===id;})[0]; }
   P.forEach(function(p){ var k='proc.'+p.id; FR[k]={d:'4/3.3',m:'4/4.7',n:p.title+' page · top picture'}; NPS.slotDefaults[k]=NPS.slotDefaults[k]||{image:p.img,fx:50,fy:38,zoom:1,fit:'cover'}; });
   var cur='hero', draft={}, mobile=false;
   function base(slot){ var d=NPS.slotDefaults[slot]||{}; return Object.assign({fx:50,fy:40,zoom:1,fit:'cover'},d,store[slot]||{}); }
   function load(slot){ var s=base(slot); draft=JSON.parse(JSON.stringify({image:s.image,fx:s.fx,fy:s.fy,zoom:s.zoom,fit:s.fit,m:s.m||null})); mobile=false; }
   function eff(m){ var s={image:draft.image,fx:draft.fx,fy:draft.fy,zoom:draft.zoom,fit:draft.fit}; if(m&&draft.m) s=Object.assign(s,draft.m); return s; }
   function thumbOf(slot){ var s=base(slot), im=NPS.images[s.image]; return im?im.src:''; }
+  function slotBtn(sl,label){ return '<button data-s="'+sl+'"'+(sl===cur?' aria-current="true"':'')+'><span class="tn"><img src="'+thumbOf(sl)+'" alt=""></span><span>'+esc(label)+'<small>'+(store[sl]?'Edited':'Default')+'</small></span></button>'; }
   function list(q){
-    q=(q||'').toLowerCase(); var h='';
-    pages.forEach(function(pg){ if(q&&pg[0].toLowerCase().indexOf(q)<0) return; h+='<h3>'+esc(pg[0])+'</h3>'+pg[1].map(function(sl){return '<button data-s="'+sl+'"'+(sl===cur?' aria-current="true"':'')+'><span class="tn"><img src="'+thumbOf(sl)+'" alt=""></span><span>'+esc(PN[sl])+'<small>'+(store[sl]?'Edited':'Default')+'</small></span></button>';}).join(''); });
-    var pp=P.filter(function(p){return !q||p.title.toLowerCase().indexOf(q)>-1||'procedure'.indexOf(q)>-1;}); if(pp.length) h+='<h3>Procedure pages ('+pp.length+')</h3>'+pp.map(function(p){var sl='proc.'+p.id; return '<button data-s="'+sl+'"'+(sl===cur?' aria-current="true"':'')+'><span class="tn"><img src="'+thumbOf(sl)+'" alt=""></span><span>'+esc(p.title.replace(/\s*\(.*\)/,''))+'<small>'+(store[sl]?'Edited':'Default')+'</small></span></button>';}).join('');
+    q=(q||'').toLowerCase().trim(); var h='<h3>All pages</h3>';
+    PAGES.forEach(function(pg){
+      var isProc=pg.id==='procedures', pm=q&&isProc?P.filter(function(p){return p.title.toLowerCase().indexOf(q)>-1;}):[];
+      if(q&&pg.n.toLowerCase().indexOf(q)<0&&!pm.length) return;
+      var open=pg.id===curPage||(q&&pm.length), cnt=isProc?P.length+' pages':(pg.slots.length?pg.slots.length+' picture'+(pg.slots.length>1?'s':''):'No pictures');
+      h+='<button class="pg" data-pg="'+pg.id+'"'+(pg.id===curPage?' aria-current="true"':'')+'><span><b>'+esc(pg.n)+'</b>'+(pagesCfg.hidden[pg.id]?'<span class="tg">HIDDEN</span>':'')+'<small>'+cnt+'</small></span></button>';
+      if(open&&pg.slots.length) h+='<div class="subs">'+pg.slots.map(function(sl){return slotBtn(sl,PN[sl]);}).join('')+'</div>';
+      if(open&&isProc){ var pp=q?pm:P; h+='<div class="subs">'+pp.map(function(p){return slotBtn('proc.'+p.id,p.title.replace(/\s*\(.*\)/,''));}).join('')+'</div>'; }
+    });
     $('#pl').className='pl'; $('#pl').innerHTML=h;
   }
   function frameHtml(w,asp,s,arch){ var im=NPS.images[s.image]; if(!im) return ''; var rad=arch?'border-radius:50%;':'border-radius:18px;';
     return '<div class="frame" data-fr style="width:'+w+';aspect-ratio:'+asp+';'+rad+'"><img class="fit" src="'+im.src+'" alt="" width="'+im.w+'" height="'+im.h+'" style="'+NPS.fitStyle(s)+'"><span class="dot" style="left:'+s.fx+'%;top:'+s.fy+'%"></span></div>'; }
+  function pagePanel(){
+    var pg=pageById(curPage), hid=!!pagesCfg.hidden[pg.id];
+    var h='<div class="panel pgpanel"><h2>'+esc(pg.n)+'</h2><p class="intro" style="margin:0">'+esc(pg.note||'')+'</p><div class="meta"><span class="addr">/'+esc(pg.path)+'</span><a class="link" href="../'+esc(pg.path)+'" target="_blank" rel="noopener">View page</a>'+(pg.edit?'<a class="link" href="'+pg.edit[0]+'">Edit content: '+esc(pg.edit[1])+'</a>':'')+'</div>';
+    if(pg.optional) h+='<div class="pbtn" style="margin-top:16px"><label class="sw" title="Show this page on the site"><input type="checkbox" data-pgvis'+(!hid?' checked':'')+' aria-label="Show this page on the site"><i></i></label><span class="pv" style="margin:0">'+(hid?'<b>Hidden.</b> Visitors cannot open this page, and its menu and footer links are removed. Nothing is deleted.':'Visible on the site.')+'</span></div>';
+    if(!pg.slots.length&&curPage!=='procedures') h+='<p class="pv" style="margin-top:14px">This page has no pictures to adjust here. Its pictures are managed in its own editor.</p>';
+    if(curPage==='procedures') h+='<p class="pv" style="margin-top:14px">Choose a procedure on the left to adjust the picture at the top of its page.</p>';
+    return h+'</div>';
+  }
   function render(){
+    var inPage=cur&&((pageById(curPage).slots.indexOf(cur)>-1)||(curPage==='procedures'&&cur.indexOf('proc.')===0));
+    if(!cur||!inPage){ $('#ed').innerHTML=pagePanel(); return; }
     var f=FR[cur], libIds=Object.keys(NPS.images).filter(function(k){return !/^(facelift|breast|tummy|mommy|lipo|mwl|eyelid|nose|ear|male|inject|new)/.test(k);});
     var sd=eff(false), sm=eff(true), editing=mobile?sm:sd, im=NPS.images[draft.image];
-    var h='<div class="panel"><h2>'+esc(f.n)+'</h2><p class="intro" style="margin:0">Where it shows: '+(cur.indexOf('proc.')===0?'the top of that procedure’s page':'the home page'+(cur==='surgeon'||cur==='dzi'?' and the Our doctors page':''))+'.</p>'+
+    var h=pagePanel()+'<div class="panel" style="margin-top:14px"><h2>'+esc(f.n)+'</h2><p class="intro" style="margin:0">Where it shows: '+(cur.indexOf('proc.')===0?'the top of that procedure’s page':'the home page'+(cur==='surgeon'||cur==='dzi'?' and the Our doctors page':''))+'.</p>'+
       '<div class="pv2"><div class="box"><small>Desktop</small>'+frameHtml('min(100%,560px)',f.d,sd,f.arch)+'<p class="fine2">Click the picture to set the focus point.</p></div>'+
       '<div class="box"><small>Phone</small>'+frameHtml('190px',f.m,sm,f.arch)+'</div></div>'+
       '<div class="seg" style="margin-top:18px" role="group" aria-label="Which screen to adjust"><button type="button" data-m="0" aria-pressed="'+!mobile+'">Adjust desktop</button><button type="button" data-m="1" aria-pressed="'+mobile+'">Adjust phone</button></div>'+
@@ -106,6 +144,7 @@
   }
   function stuff(){ list($('#q').value); render(); }
   document.addEventListener('click',function(e){
+    var pgb=e.target.closest('[data-pg]'); if(pgb){ curPage=pgb.getAttribute('data-pg'); var pg=pageById(curPage); cur=pg.slots[0]||null; if(cur) load(cur); stuff(); return; }
     var b=e.target.closest('[data-s]'); if(b){ cur=b.getAttribute('data-s'); load(cur); stuff(); return; }
     var fr=e.target.closest('[data-fr]'); if(fr){ var r=fr.getBoundingClientRect(), x=Math.round(Math.max(0,Math.min(100,(e.clientX-r.left)/r.width*100))), y=Math.round(Math.max(0,Math.min(100,(e.clientY-r.top)/r.height*100))); upd({fx:x,fy:y}); return; }
     if(e.target.closest('[data-mstart]')){ draft.m={fx:draft.fx,fy:draft.fy,zoom:draft.zoom,fit:draft.fit}; render(); return; }
@@ -120,12 +159,14 @@
     var out=e.target.nextElementSibling; if(out) out.textContent=(k==='zoom'?v.toFixed(2)+'×':v+'%'); var sd=eff(false),sm=eff(true), frs=document.querySelectorAll('[data-fr]'); [sd,sm].forEach(function(s,i){ var img=frs[i]&&frs[i].querySelector('img'), dot=frs[i]&&frs[i].querySelector('.dot'); if(img) img.style.cssText=NPS.fitStyle(s); if(dot){dot.style.left=s.fx+'%';dot.style.top=s.fy+'%';} }); });
   document.addEventListener('change',function(e){ if(e.target.id==='up'&&e.target.files[0]){ var r=new FileReader(); r.onload=function(){ var im=new Image(); im.onload=function(){ var max=1800,k=Math.min(1,max/im.naturalWidth),w=Math.round(im.naturalWidth*k),h=Math.round(im.naturalHeight*k),c=document.createElement('canvas'); c.width=w;c.height=h;c.getContext('2d').drawImage(im,0,0,w,h); var id='up-'+Date.now().toString(36); custom[id]={src:c.toDataURL('image/jpeg',.86),w:w,h:h,alt:'Uploaded picture'}; NPS.images[id]=custom[id]; draft.image=id; if(draft.m) delete draft.m.image; mark(); render(); }; im.src=r.result; }; r.readAsDataURL(e.target.files[0]); }});
   $('#q').addEventListener('input',function(){ list(this.value); });
+  document.addEventListener('change',function(e){ if(!e.target.matches||!e.target.matches('[data-pgvis]')) return; var pg=pageById(curPage); if(e.target.checked) delete pagesCfg.hidden[pg.id]; else pagesCfg.hidden[pg.id]=true; if(A.ls.set('nps.pages',pagesCfg)){ A.log((e.target.checked?'Showed':'Hid')+' the '+pg.n+' page'); A.refresh(); A.toast(e.target.checked?'Page will be visible after you press Publish.':'Page will be hidden after you press Publish.'); } stuff(); });
   $('#save').addEventListener('click',function(){
+    if(!cur){ $('#st').textContent='Choose a picture first.'; return; }
     var s={image:draft.image,fx:draft.fx,fy:draft.fy,zoom:+draft.zoom,fit:draft.fit}; if(draft.m) s.m=draft.m; store[cur]=s;
     var used={}; Object.keys(store).forEach(function(k){used[store[k].image]=1; if(store[k].m&&store[k].m.image) used[store[k].m.image]=1;}); var keep={}; Object.keys(custom).forEach(function(k){ if(used[k]) keep[k]=custom[k]; });
     if(A.ls.set('nps.imageSettings',store)&&A.ls.set('nps.customImages',keep)){ A.log('Saved picture settings: '+FR[cur].n); A.refresh(); $('#st').textContent='Saved. Open the page to see it.'; list($('#q').value); } else $('#st').textContent='Could not save: this browser is out of room (large photos).';
   });
-  $('#reset').addEventListener('click',function(){ delete store[cur]; A.ls.set('nps.imageSettings',store); A.refresh(); load(cur); stuff(); $('#st').textContent='Back to the default.'; });
+  $('#reset').addEventListener('click',function(){ if(!cur){ return; } delete store[cur]; A.ls.set('nps.imageSettings',store); A.refresh(); load(cur); stuff(); $('#st').textContent='Back to the default.'; });
   load(cur); stuff();
 })();
 

@@ -6,7 +6,7 @@
   var ADMIN = window.ADMIN = {};
   var ls = { get: function (k, d) { try { var v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }, set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } } };
   ADMIN.ls = ls;
-  var KEYS = [['nps.gallery2', 'Gallery'], ['nps.imageSettings', 'Images'], ['nps.customImages', 'Images'], ['nps.procEdits', 'Procedures'], ['nps.siteEdits', 'Settings'], ['nps.categories', 'Categories'], ['nps.team', 'Team'], ['nps.reviews', 'Reviews'], ['nps.media', 'Media']];
+  var KEYS = [['nps.gallery2', 'Gallery'], ['nps.imageSettings', 'Images'], ['nps.customImages', 'Images'], ['nps.procEdits', 'Procedures'], ['nps.siteEdits', 'Settings'], ['nps.categories', 'Categories'], ['nps.team', 'Team'], ['nps.reviews', 'Reviews'], ['nps.media', 'Media'], ['nps.pages', 'Pages']];
   function hash(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return h; }
   function raw(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
   ADMIN.pending = function () {

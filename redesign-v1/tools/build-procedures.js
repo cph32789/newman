@@ -439,13 +439,13 @@ function buildReviews() {
     <p class="note" style="margin-top:30px">Reviews are shared with each patient’s permission. Individual results vary.</p>
   </div>
 </section>
-<section class="section" aria-labelledby="rvT">
+${NPS.pagesHidden && NPS.pagesHidden.media ? '' : `<section class="section" aria-labelledby="rvT">
   <div class="wrap pgrid" style="align-items:center">
     <div class="pmain"><p class="eyebrow">Hear it from them</p><h2 id="rvT" class="h2">Patient videos <em>and stories.</em></h2>
       <p>Watch patients and Dr. Newman talk about what to expect, in our video library.</p></div>
     <div><a class="btn btn--ink" href="../media/#videos">Watch the videos <svg><use href="#i-arrow"/></svg></a></div>
   </div>
-</section>`;
+</section>`}`;
   return shell({ title: 'Patient reviews', desc: 'Patient reviews and testimonials for Newman Plastic Surgery in Orlando, Florida, shared with permission.', dir: 'reviews', body,
     ld: { '@context': 'https://schema.org', '@type': 'MedicalBusiness', name: 'Newman Plastic Surgery', url: SITE_URL + 'reviews/' } });
 }
@@ -572,7 +572,7 @@ function buildMeet() {
   <div class="wrap">
     <div class="head"><p class="eyebrow">Our team</p><h2 id="tmT" class="h2" style="margin-top:14px">The people you will <em>meet.</em></h2><p class="lead" style="margin-top:14px">${esc(NPS.team.intro)}</p></div>
     <div class="tgrid">${teamCards(false)}</div>
-    <p style="margin-top:30px"><a class="btn btn--ink" href="../our-team/">Meet everyone <svg><use href="#i-arrow"/></svg></a></p>
+    ${NPS.pagesHidden && NPS.pagesHidden['our-team'] ? '' : `<p style="margin-top:30px"><a class="btn btn--ink" href="../our-team/">Meet everyone <svg><use href="#i-arrow"/></svg></a></p>`}
   </div>
 </section>`;
   return shell({ title: 'Our doctors', desc: 'Meet Charles Newman, Jr., M.D., a board certified Orlando plastic and reconstructive surgeon, his wife and partner Dzi Newman, PA-C, and the Newman Plastic Surgery team.', dir: 'meet-dr-newman', body,

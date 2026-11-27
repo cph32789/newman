@@ -41,7 +41,7 @@ const PORT = +process.env.PORT || 8080;
 fs.mkdirSync(DATA, { recursive: true });
 
 /* ------------------------------------------------------------------ saved state */
-const PUB_KEYS = ['nps.gallery2', 'nps.imageSettings', 'nps.customImages', 'nps.procEdits', 'nps.siteEdits', 'nps.categories', 'nps.team', 'nps.reviews', 'nps.media'];
+const PUB_KEYS = ['nps.gallery2', 'nps.imageSettings', 'nps.customImages', 'nps.procEdits', 'nps.siteEdits', 'nps.categories', 'nps.team', 'nps.reviews', 'nps.media', 'nps.pages'];
 const SHARED_KEYS = ['nps.inbox', 'nps.users', 'nps.sendTo', 'nps.activity', 'nps.pubSnap'];
 const ALL_KEYS = PUB_KEYS.concat(SHARED_KEYS);
 const STATE_FILE = path.join(DATA, 'state.json');
@@ -147,6 +147,17 @@ function rebuild(origin) {
   return building;
 }
 
+/* ------------------------------------------------------------------ pages switched off in Admin > Pages & images */
+const OPTIONAL_PAGES = { 'our-team': 'our-team', reviews: 'reviews', media: 'media', 'insurance-financing': 'insurance-financing', location: 'location' };
+function hiddenPages() {                      // visitors only; the Admin always sees every page
+  let c; try { c = JSON.parse(state.published['nps.pages'] || '{}'); } catch (e) { c = {}; }
+  return Object.keys((c && c.hidden) || {}).filter(id => c.hidden[id] && OPTIONAL_PAGES[id]).map(id => OPTIONAL_PAGES[id]);
+}
+function stripLinks(html, dirs) {
+  dirs.forEach(d => { html = html.replace(new RegExp('<a\\b[^>]*\\bhref="(?:\\.\\./|\\./)*' + d + '/?(?:#[^"]*)?"[^>]*>[\\s\\S]*?</a>\\s*', 'gi'), ''); });
+  return html;
+}
+
 /* ------------------------------------------------------------------ HTML transform */
 const ORIGINAL = { phone: '407.481.9505', fax: '407.481.9506', street: '444 North Mills Avenue', city: 'Orlando, Florida 32803' };
 function siteText(html, siteEdits) {
@@ -165,6 +176,7 @@ function transform(html, req, isAdmin, urlPath) {
   const view = {}; PUB_KEYS.forEach(k => { const src = isAdmin ? state.draft : state.published; if (k in src) view[k] = src[k]; });
   if (isAdmin) SHARED_KEYS.forEach(k => { if (k in state.shared) view[k] = state.shared[k]; });
   html = siteText(html, view['nps.siteEdits']);
+  if (!isAdmin) html = stripLinks(html, hiddenPages());
   html = html.split('https://cph32789.github.io/newman/redesign-v1/').join(origin + '/');
   const cfg = { endpoint: '/api/contact' }; if (process.env.TURNSTILE_SITE_KEY) cfg.turnstileSiteKey = process.env.TURNSTILE_SITE_KEY;
   const j = o => JSON.stringify(o).replace(/</g, '\\u003c').split('\u2028').join('').split('\u2029').join('');
@@ -298,6 +310,7 @@ const server = http.createServer(async (req, res) => {
 
     /* files */
     if (req.method !== 'GET' && req.method !== 'HEAD') return send(res, 405, 'Method not allowed', { 'Content-Type': 'text/plain' });
+    if (!isAdmin) { const seg = p.split('/')[1]; if (seg && hiddenPages().includes(seg)) { return send(res, 404, 'Not found', { 'Content-Type': 'text/plain' }); } }
     let file = findFile(p === '/admin' ? '/admin/' : p);
     if (!file) { const nf = findFile('/404.html'); return send(res, 404, nf ? fs.readFileSync(nf) : 'Not found', { 'Content-Type': nf ? MIME['.html'] : 'text/plain' }); }
     const ext = path.extname(file).toLowerCase();

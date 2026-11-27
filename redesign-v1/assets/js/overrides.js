@@ -31,6 +31,7 @@
     return list.map(function (m, i) { m.__i = i; return m; }).sort(function (a, b) { return pos(a.id) - pos(b.id) || a.__i - b.__i; }).filter(function (m) { return !m.hidden && !m.deleted; });
   }
   NPS.mergeList = mergeList;
+  NPS.pagesHidden = (read('nps.pages') || {}).hidden || {};
   if (NPS.reviews && NPS.reviews.items) {
     NPS.reviewsBase = JSON.parse(JSON.stringify(NPS.reviews));
     var rs = read('nps.reviews');
