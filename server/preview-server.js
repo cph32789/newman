@@ -27,7 +27,13 @@ const http = require('http'), fs = require('fs'), path = require('path'), crypto
 const { execFile } = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..', 'redesign-v1');
-const DATA = path.resolve(process.env.DATA_DIR || path.join(__dirname, '..', '.data'));
+let DATA = path.resolve(process.env.DATA_DIR || path.join(__dirname, '..', '.data'));
+try { fs.mkdirSync(DATA, { recursive: true }); fs.accessSync(DATA, fs.constants.W_OK); }
+catch (e) {   // no disk attached (e.g. the free plan): keep working, but saved edits vanish on restart
+  const fallback = path.join(require('os').tmpdir(), 'newman-data');
+  console.warn('WARNING: cannot write to ' + DATA + ' (' + e.code + '). Using ' + fallback + '. Admin edits will be LOST when the service restarts. Attach a disk and set DATA_DIR to its mount path.');
+  DATA = fallback;
+}
 const PASS = process.env.PREVIEW_PASSWORD || '';
 const ADMIN_PASS = process.env.ADMIN_PASSWORD || PASS;
 const SECRET = process.env.SESSION_SECRET || crypto.createHash('sha256').update('nps|' + PASS + '|' + ADMIN_PASS).digest('hex');
