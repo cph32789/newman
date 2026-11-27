@@ -141,3 +141,11 @@ disappears without a republish. Both pages can be switched off in Admin > Pages 
 `data/feed.js` (feed cards + social posts) is managed in Admin > **Discover**: add, edit, reorder, hide and delete cards (procedure,
 insight, guide, patient voice, social post) and the Follow-along posts. Applied in the browser by `assets/js/overrides.js`, so it
 needs no page rebuild. Cards with a missing procedure or post are skipped instead of breaking the home page.
+
+## Page editor (Admin > Pages & images > Edit this page)
+Any page can be edited visually: click wording to change it, change a button's words and address, replace pictures,
+move sections up/down and hide them. Edits are stored per page in `nps.pageEdits` and applied in the visitor's browser by
+`assets/js/pagekit.js` + `assets/js/pageedits.js` (injected by the preview server). An edit is found by
+(section key, kind, number) and applied only while the original text still matches, so rebuilds do not break it.
+Lists the site builds itself (feed, galleries, reviews) are skipped and have their own Admin screens.
+Launch note: edits are applied in the browser. For search engines, bake them into the HTML when the page is built (same `pagekit` logic).

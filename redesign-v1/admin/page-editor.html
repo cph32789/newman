@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Page editor | Admin preview | Newman Plastic Surgery</title>
+<link rel="icon" href="../assets/img/favicon.png">
+<link rel="stylesheet" href="../assets/css/fonts.css?v=20261127j">
+<link rel="stylesheet" href="../assets/css/styles.css?v=20261127j">
+<link rel="stylesheet" href="../assets/css/admin.css?v=20261127j">
+</head>
+<body class="adm">
+<header id="ah"></header>
+<main class="wrap" style="padding-bottom:40px;max-width:1700px">
+<nav class="side" id="an" aria-label="Admin sections"></nav>
+<style>
+.pe-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 0 14px}
+.pe-bar select{min-height:46px;padding:0 12px;border:1px solid var(--line);border-radius:12px;background:var(--paper);font:500 16px var(--sans);max-width:320px}
+.pe-bar .sp{flex:1}
+.pe-lay{display:grid;gap:16px}@media(min-width:1000px){.pe-lay{grid-template-columns:300px minmax(0,1fr);align-items:start}}
+.pe-side{display:grid;gap:14px;max-height:calc(100vh - 150px);overflow:auto;position:sticky;top:84px}
+.pe-secs{display:grid;gap:6px}
+.pe-sec{display:grid;grid-template-columns:1fr auto auto auto;gap:6px;align-items:center;padding:6px 8px;border:1px solid var(--line);border-radius:12px;background:var(--paper);min-height:50px}
+.pe-sec[aria-current=true]{border-color:var(--clay);box-shadow:0 0 0 2px rgba(154,91,60,.18)}
+.pe-sec .nm{all:unset;cursor:pointer;font:600 14px/1.25 var(--sans);padding:4px 6px;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.pe-sec .nm small{display:block;font:400 12px var(--sans);color:var(--muted)}
+.pe-sec button.ic{width:34px;height:34px;border:1px solid var(--line);border-radius:9px;background:var(--paper);font:600 15px var(--sans);cursor:pointer}
+.pe-sec button.ic[disabled]{opacity:.35;cursor:default}.pe-sec.off .nm{opacity:.5;text-decoration:line-through}
+.pe-stage{border:1px solid var(--line);border-radius:var(--r-lg);background:#ddd4c5;padding:10px;display:flex;justify-content:center;min-height:600px;overflow:hidden;position:relative}
+.pe-stage iframe{border:0;background:#fff;border-radius:10px;transform-origin:top left;flex:none}
+.pe-hint{font-size:14px;color:var(--muted);line-height:1.45}
+.pe-hint b{color:var(--ink)}
+.pe-key{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+</style>
+<h1>Edit <em>page.</em></h1>
+<div class="pe-bar">
+  <select id="pg" aria-label="Choose a page"></select>
+  <div class="seg" role="group" aria-label="Preview size"><button type="button" data-dev="d" aria-pressed="true">Desktop</button><button type="button" data-dev="p" aria-pressed="false">Phone</button></div>
+  <span class="sp"></span>
+  <a class="btn btn--line btn--sm" id="viewp" target="_blank" rel="noopener" href="#">View page</a>
+  <button class="btn btn--line btn--sm" id="reset" type="button">Reset page to original</button>
+  <button class="btn btn--line btn--sm" id="discard" type="button">Discard changes</button>
+  <button class="btn btn--ink btn--sm" id="save" type="button">Save changes</button>
+  <span class="st" id="st" role="status" style="margin:0"></span>
+</div>
+<div class="pe-lay">
+  <aside class="pe-side">
+    <div class="panel" style="padding:18px"><h2 style="font-size:22px">Sections</h2>
+      <p class="pe-hint">Move sections up or down, or hide one. Click a name to jump to it.</p>
+      <div class="pe-secs" id="secs"></div></div>
+    <div class="panel" style="padding:18px"><h2 style="font-size:22px">Pictures</h2><p class="pe-hint">Every picture on the page. Click one to replace it.</p><div id="pics" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"></div></div>
+    <div class="panel" style="padding:18px" id="tool"><h2 style="font-size:22px">How to edit</h2>
+      <p class="pe-hint"><span class="pe-key" style="background:#b9784f"></span><b>Click any text</b> on the page to change it, then click away to keep it.<br><span class="pe-key" style="background:#3a8f63"></span><b>Click a button or link</b> to change its words and where it goes.<br><span class="pe-key" style="background:#3b64c9"></span><b>Click a picture</b> to replace it.<br>Press <b>Save changes</b>, then <b>Publish</b> at the top.</p></div>
+  </aside>
+  <section class="pe-stage" id="stage"><iframe id="fr" title="Page being edited"></iframe></section>
+</div>
+<div class="tip">Wording, pictures, links and the order of sections are saved as drafts and go live when you press <b>Publish</b>, the gold button at the top of the page. Lists that the site builds itself (the Discover feed, galleries, reviews) are edited in their own Admin screens.</div>
+</main>
+<script src="../assets/js/admin-shell.js?v=20261127j" data-active="pages"></script>
+<script src="../data/site.js?v=20261127j"></script>
+<script>window.NPS_BASE='../';</script>
+<script src="../data/procedures.js?v=20261127j"></script>
+<script src="../data/images.js?v=20261127j"></script>
+<script src="../assets/js/pagekit.js?v=20261127j"></script>
+<script>
+(function(){
+  var NPS=window.NPS, A=window.ADMIN, PK=window.PAGEKIT, $=function(s){return document.querySelector(s);}, esc=A.esc;
+  var q=new URLSearchParams(location.search), KEY=PK.pageKey(q.get('p')||'');
+  var PAGES=[['','Home'],['meet-dr-newman','Our doctors'],['our-team','Our team'],['results','Results'],['reviews','Reviews'],['media','Media & videos'],['skin-care','Skin care products'],['special-offers','Special offers'],['your-visit','Your visit'],['insurance-financing','Insurance & financing'],['location','Location']];
+  var sel='<optgroup label="Pages">'+PAGES.map(function(p){return '<option value="'+p[0]+'">'+esc(p[1])+'</option>';}).join('')+'</optgroup><optgroup label="Procedure pages">'+NPS.procedures.map(function(p){return '<option value="procedures/'+p.id+'">'+esc(p.title.replace(/\s*\(.*\)/,''))+'</option>';}).join('')+'</optgroup>';
+  $('#pg').innerHTML=sel; $('#pg').value=KEY;
+  var url='/'+(KEY?KEY+'/':'');
+  $('#viewp').href=url;
+  var store=A.ls.get('nps.pageEdits',{})||{}, E, dirty=false, fr=$('#fr'), doc, main, secs=[], editing=null, selKey=null;
+  function fresh(){ E=JSON.parse(JSON.stringify(store[KEY]||{})); ['hidden','text','link','img'].forEach(function(k){E[k]=E[k]||{};}); E.order=E.order||[]; }
+  function mark(){dirty=true;$('#st').textContent='Unsaved changes';}
+  fresh(); fr.src=url+(url.indexOf('?')<0?'?':'&')+'pe=1';
+  function toast(m){A.toast(m);}
+
+  /* ---- sections panel ---- */
+  function order(){ return PK.sections(main).map(function(s){return s.key;}); }
+  function renderSecs(){
+    secs=PK.sections(main);
+    $('#secs').innerHTML=secs.map(function(s,i){ var off=!!E.hidden[s.key];
+      return '<div class="pe-sec'+(off?' off':'')+'" data-k="'+esc(s.key)+'"'+(s.key===selKey?' aria-current="true"':'')+'><button class="nm" type="button" data-go="'+esc(s.key)+'">'+esc(PK.sectionName(s))+'<small>'+(off?'Hidden':'Shown')+'</small></button>'+
+        '<button class="ic" type="button" data-up="'+esc(s.key)+'" aria-label="Move up"'+(i?'':' disabled')+'>↑</button><button class="ic" type="button" data-down="'+esc(s.key)+'" aria-label="Move down"'+(i<secs.length-1?'':' disabled')+'>↓</button>'+
+        '<button class="ic" type="button" data-eye="'+esc(s.key)+'" aria-label="'+(off?'Show':'Hide')+' this section" title="'+(off?'Show':'Hide')+'">'+(off?'◌':'●')+'</button></div>'; }).join('');
+  }
+  function secEl(k){ var f=null; PK.sections(main).forEach(function(s){ if(s.key===k) f=s.el; }); return f; }
+  document.addEventListener('click',function(e){
+    var b;
+    if((b=e.target.closest('[data-go]'))){ var el=secEl(b.getAttribute('data-go')); if(el){ selKey=b.getAttribute('data-go'); fr.contentWindow.scrollTo({top:el.getBoundingClientRect().top+fr.contentWindow.scrollY-90,behavior:'smooth'}); doc.querySelectorAll('.pk-sel').forEach(function(x){x.classList.remove('pk-sel');}); el.classList.add('pk-sel'); renderSecs(); } return; }
+    if((b=e.target.closest('[data-up],[data-down]'))){ var k=b.getAttribute('data-up')||b.getAttribute('data-down'), o=order(), i=o.indexOf(k), j=b.hasAttribute('data-up')?i-1:i+1; if(j<0||j>=o.length) return; o.splice(j,0,o.splice(i,1)[0]); PK.reorder(main,o); E.order=order(); mark(); renderSecs(); var el2=secEl(k); if(el2) el2.scrollIntoView({block:'center'}); return; }
+    if((b=e.target.closest('[data-eye]'))){ var k2=b.getAttribute('data-eye'); if(E.hidden[k2]) delete E.hidden[k2]; else E.hidden[k2]=true; var el3=secEl(k2); if(el3) el3.classList.toggle('pk-hidden',!!E.hidden[k2]); mark(); renderSecs(); return; }
+    if((b=e.target.closest('[data-dev]'))){ dev=b.getAttribute('data-dev'); document.querySelectorAll('[data-dev]').forEach(function(x){x.setAttribute('aria-pressed',x===b);}); fit(); return; }
+  });
+
+  /* the page is shown at a real desktop (1280) or phone (390) width, scaled to fit the space */
+  var dev='d';
+  function fit(){
+    var st=$('#stage'), avail=st.clientWidth-20, W=dev==='p'?390:1280, k=Math.min(1,avail/W), H=Math.max(600,window.innerHeight-170);
+    fr.style.width=W+'px'; fr.style.height=Math.round(H/k)+'px'; fr.style.transform='scale('+k+')';
+    st.style.height=(H+20)+'px'; fr.style.marginRight=(-(W-W*k))+'px'; if(dev==='p'){ fr.style.marginRight='0'; }
+  }
+  window.addEventListener('resize',fit); setTimeout(fit,0);
+  /* ---- inside the page ---- */
+  fr.addEventListener('load',function(){
+    doc=fr.contentDocument; main=doc.querySelector('main'); if(!main){ $('#st').textContent='This page cannot be edited here.'; return; }
+    var st=doc.createElement('style'); st.textContent='.pk-t:hover{outline:2px dashed #b9784f;outline-offset:2px;cursor:text}.pk-l:hover{outline:2px dashed #3a8f63;outline-offset:2px;cursor:pointer}.pk-i:hover{outline:3px solid #3b64c9;outline-offset:-3px;cursor:pointer}.pk-hidden{opacity:.35;outline:3px dotted #c33;outline-offset:-3px}.pk-hidden::before{content:"Hidden: visitors will not see this section";display:block;background:#c33;color:#fff;font:600 13px sans-serif;padding:6px 12px;position:relative;z-index:5}.pk-sel{outline:3px solid #b9784f;outline-offset:-3px}[contenteditable=true]{outline:2px solid #b9784f!important;outline-offset:2px;background:rgba(185,120,79,.08);cursor:text}.rv,.rv *{opacity:1!important;transform:none!important}html{scroll-behavior:auto!important}';
+    doc.head.appendChild(st);
+    secs=PK.sections(main);
+    secs.forEach(function(s){ s.el.hidden=false; s.el.classList.toggle('pk-hidden',!!E.hidden[s.key]);
+      var p=PK.parts(s.el);
+      p.text.forEach(function(el,i){ el.classList.add('pk-t'); el.setAttribute('data-pk-id',s.key+'|t|'+i); });
+      p.link.forEach(function(el,i){ el.classList.add('pk-l'); el.setAttribute('data-pk-id',s.key+'|l|'+i); });
+      p.img.forEach(function(el,i){ el.classList.add('pk-i'); el.setAttribute('data-pk-id',s.key+'|i|'+i); }); });
+    renderSecs(); renderPics();
+    doc.addEventListener('click',onClick,true);
+    doc.addEventListener('keydown',function(e){ if(editing&&e.key==='Enter'){ e.preventDefault(); editing.blur(); } if(editing&&e.key==='Escape'){ editing.blur(); } },true);
+    doc.addEventListener('paste',function(e){ if(!editing) return; e.preventDefault(); var t=(e.clipboardData||fr.contentWindow.clipboardData).getData('text/plain').replace(/\s+/g,' '); doc.execCommand('insertText',false,t); },true);
+    doc.addEventListener('focusout',function(e){ if(editing&&e.target===editing) commit(); },true);
+    doc.addEventListener('submit',function(e){ e.preventDefault(); },true);
+  });
+  function renderPics(){
+    var imgs=doc.querySelectorAll('main .pk-i'); $('#pics').innerHTML=imgs.length?'':'<span class="pe-hint">No pictures on this page.</span>';
+    Array.prototype.forEach.call(imgs,function(im,i){ var b=document.createElement('button'); b.type='button'; b.title=im.getAttribute('alt')||'Picture '+(i+1); b.style.cssText='width:64px;height:64px;border:2px solid var(--line);border-radius:10px;overflow:hidden;padding:0;background:var(--sand-2);cursor:pointer';
+      b.innerHTML='<img alt="" src="'+esc(im.src)+'" style="width:100%;height:100%;object-fit:cover;display:block">'; b.onclick=function(){ im.scrollIntoView({block:'center'}); imgPanel(im); }; $('#pics').appendChild(b); });
+  }
+  function onClick(e){
+    var el=e.target.closest('.pk-t,.pk-l,.pk-i');
+    if(el&&el.classList.contains('pk-t')){
+      if(editing===el) return;                // normal caret movement inside the text
+      e.preventDefault(); e.stopPropagation(); startEdit(el); return;
+    }
+    if(editing) { commit(); }
+    if(el){ e.preventDefault(); e.stopPropagation(); if(el.classList.contains('pk-l')) linkPanel(el); else imgPanel(el); return; }
+    var a=e.target.closest('a,button,summary'); if(a&&!e.target.closest('.pk-t')){ e.preventDefault(); }
+  }
+  function startEdit(el){ if(editing) commit(); editing=el; if(el.__from==null) el.__from=el.getAttribute('data-pk-from')!=null?el.getAttribute('data-pk-from'):el.innerHTML; el.__before=el.innerHTML; el.contentEditable='true'; el.focus(); }
+  function commit(){
+    var el=editing; if(!el) return; editing=null; el.contentEditable='false'; el.removeAttribute('contenteditable');
+    var html=PK.sanitize(el.innerHTML), plain=html.replace(/<[^>]*>/g,'').trim();
+    if(!plain){ el.innerHTML=el.__before; toast('Text cannot be left empty. Use the eye button to hide the whole section instead.'); return; }
+    el.innerHTML=html; var id=el.getAttribute('data-pk-id'), from=el.__from;
+    if(PK.norm(html)===PK.norm(from)){ delete E.text[id]; el.removeAttribute('data-pk-from'); if(Object.keys(E.text).length||true) { /* keep */ } }
+    else { E.text[id]={from:from,to:html}; el.setAttribute('data-pk-from',from); }
+    if(el.__before!==el.innerHTML) mark();
+  }
+
+  /* ---- link / button panel ---- */
+  function linkPanel(el){
+    var id=el.getAttribute('data-pk-id'), tn=PK.firstTextNode(el), cur=tn?tn.nodeValue.trim():'', href=el.tagName==='A'?(el.getAttribute('href')||''):null;
+    var f0=el.getAttribute('data-pk-from'); var from=f0?JSON.parse(f0):{t:cur,h:href};
+    $('#tool').innerHTML='<h2 style="font-size:22px">'+(el.tagName==='A'?'Link / button':'Button')+'</h2><label class="field-a">Words<input type="text" id="lt" value="'+esc(cur)+'"></label>'+(href!=null?'<label class="field-a" style="margin-top:10px">Goes to<input type="text" id="lh" value="'+esc(href)+'" placeholder="https://, tel:, or a page like our-team/"></label><p class="pe-hint">Use <b>#consult</b> for the consultation form, a web address, <b>tel:+14074819505</b> for a phone number, or a page such as <b>skin-care/</b>.</p>':'<p class="pe-hint">This button does something on the page, so only its words can change.</p>')+'<div class="pbtn"><button class="btn btn--ink btn--sm" id="lok" type="button">Apply</button><button class="btn btn--line btn--sm" id="lrs" type="button">Restore original</button></div>';
+    $('#lok').onclick=function(){ var t=$('#lt').value.trim(), h=href!=null?$('#lh').value.trim():null; if(!t){ toast('The words cannot be empty.'); return; }
+      var n=PK.firstTextNode(el); if(n) n.nodeValue=n.nodeValue.replace(n.nodeValue.trim(),t); if(h!=null) el.setAttribute('href',h);
+      if(t===from.t&&(h==null||h===from.h)){ delete E.link[id]; el.removeAttribute('data-pk-from'); } else { E.link[id]={from:from,to:{t:t,h:h}}; el.setAttribute('data-pk-from',JSON.stringify(from)); }
+      mark(); toast('Applied. Press Save changes to keep it.'); };
+    $('#lrs').onclick=function(){ var n=PK.firstTextNode(el); if(n) n.nodeValue=n.nodeValue.replace(n.nodeValue.trim(),from.t); if(from.h!=null) el.setAttribute('href',from.h); delete E.link[id]; el.removeAttribute('data-pk-from'); mark(); linkPanel(el); };
+  }
+
+  /* ---- picture panel ---- */
+  function prepare(file,max){ return new Promise(function(res,rej){ var fr2=new FileReader(); fr2.onerror=rej; fr2.onload=function(){ var im=new Image(); im.onerror=rej; im.onload=function(){ var k=Math.min(1,max/Math.max(im.naturalWidth,im.naturalHeight)),w=Math.round(im.naturalWidth*k),h=Math.round(im.naturalHeight*k),c=document.createElement('canvas'); c.width=w;c.height=h;c.getContext('2d').drawImage(im,0,0,w,h); c.toBlob(function(b){res({blob:b,w:w,h:h,url:c.toDataURL('image/jpeg',.88)});},'image/jpeg',.88); }; im.src=fr2.result; }; fr2.readAsDataURL(file); }); }
+  function imgPanel(el){
+    var id=el.getAttribute('data-pk-id'), from=el.getAttribute('data-pk-from')!=null?el.getAttribute('data-pk-from'):el.getAttribute('src'), managed=el.getAttribute('data-slot');
+    var libs=Object.keys(NPS.images).filter(function(k){return !/^(dr-newman|dzi-newman)/.test(k);});
+    var h='<h2 style="font-size:22px">Picture</h2><img src="'+esc(el.src)+'" alt="" style="width:100%;max-height:170px;object-fit:contain;border-radius:10px;background:var(--sand-2)">';
+    if(managed) h+='<p class="pe-hint" style="margin-top:10px">This picture has its own focus and zoom settings. Change it in <a class="link" href="pages.html">Pages &amp; images</a> so it is never stretched or cropped badly.</p>';
+    else h+='<label class="field-a" style="margin-top:10px">Describe the picture <span class="hint">(for screen readers and search)</span><input type="text" id="ia" value="'+esc(el.getAttribute('alt')||'')+'"></label>'+
+      '<div class="pbtn"><label class="btn btn--ink btn--sm" style="cursor:pointer">Upload a picture<input type="file" id="iu" accept="image/jpeg,image/png,image/webp" hidden></label><button class="btn btn--line btn--sm" id="ir" type="button">Restore original</button></div>'+
+      '<label class="field-a" style="margin-top:10px">Or choose one from the site<select id="il"><option value="">Choose…</option>'+libs.map(function(k){return '<option value="'+k+'">'+esc(k+' · '+(NPS.images[k].alt||'').slice(0,34))+'</option>';}).join('')+'</select></label><p class="pe-hint" id="ist" role="status"></p>';
+    $('#tool').innerHTML=h; if(managed) return;
+    function setImg(src,w,hh){ el.removeAttribute('srcset'); var pic=el.closest('picture'); if(pic) pic.querySelectorAll('source').forEach(function(s){s.remove();}); el.setAttribute('src',src); if(w&&hh){ el.setAttribute('width',w); el.setAttribute('height',hh); } var alt=$('#ia').value; el.setAttribute('alt',alt);
+      E.img[id]={from:from,src:src,w:w||0,h:hh||0,alt:alt}; el.setAttribute('data-pk-from',from); mark(); imgPanel(el); }
+    $('#ia').addEventListener('input',function(){ el.setAttribute('alt',this.value); if(E.img[id]){ E.img[id].alt=this.value; mark(); } });
+    $('#iu').addEventListener('change',function(){ var f=this.files[0]; if(!f) return; $('#ist').textContent='Preparing the picture…';
+      prepare(f,1600).then(function(p){ if(window.NPSSYNC) return fetch('/api/upload',{method:'POST',headers:{'Content-Type':'image/jpeg'},body:p.blob}).then(function(r){return r.json();}).then(function(j){ if(!j.ok) throw new Error(j.error||'Upload failed'); return {u:j.url,w:p.w,h:p.h}; }); return {u:p.url,w:p.w,h:p.h}; })
+      .then(function(r){ setImg(r.u,r.w,r.h); }).catch(function(err){ $('#ist').textContent='Could not add that picture: '+(err.message||'please try another.'); }); });
+    $('#il').addEventListener('change',function(){ var k=this.value; if(!k) return; var im=NPS.images[k]; setImg(im.src.replace(/^(\.\.\/)+/,'/').replace(/^assets\//,'/assets/'),im.w,im.h); });
+    $('#ir').onclick=function(){ el.setAttribute('src',from); delete E.img[id]; el.removeAttribute('data-pk-from'); mark(); imgPanel(el); };
+  }
+
+  /* ---- save / discard / reset ---- */
+  function clean(){ var o={}; ['hidden','text','link','img'].forEach(function(k){ if(Object.keys(E[k]).length) o[k]=E[k]; }); if(E.order&&E.order.length) o.order=E.order; return Object.keys(o).length?o:null; }
+  $('#save').addEventListener('click',function(){ if(editing) commit(); var c=clean(); if(c) store[KEY]=c; else delete store[KEY]; if(A.ls.set('nps.pageEdits',store)){ dirty=false; A.log('Edited the '+($('#pg').selectedOptions[0].textContent)+' page'); A.refresh(); $('#st').textContent='Saved. Press Publish to show it on the site.'; } else $('#st').textContent='Could not save.'; });
+  $('#discard').addEventListener('click',function(){ if(dirty&&!confirm('Throw away the changes you have not saved?')) return; fresh(); dirty=false; $('#st').textContent=''; fr.contentWindow.location.reload(); });
+  $('#reset').addEventListener('click',function(){ if(!confirm('Put this page back exactly as it was originally? Your edits to this page will be removed.')) return; delete store[KEY]; A.ls.set('nps.pageEdits',store); A.log('Reset a page to its original'); A.refresh(); fresh(); dirty=false; $('#st').textContent='This page is back to the original.'; fr.contentWindow.location.reload(); });
+  $('#pg').addEventListener('change',function(){ if(dirty&&!confirm('Leave without saving your changes?')){ this.value=KEY; return; } dirty=false; location.search='?p='+encodeURIComponent(this.value); });
+  window.addEventListener('beforeunload',function(e){ if(dirty){ e.preventDefault(); e.returnValue=''; } });
+})();
+</script>
+</body>
+</html>

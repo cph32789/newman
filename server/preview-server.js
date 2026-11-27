@@ -41,7 +41,7 @@ const PORT = +process.env.PORT || 8080;
 fs.mkdirSync(DATA, { recursive: true });
 
 /* ------------------------------------------------------------------ saved state */
-const PUB_KEYS = ['nps.gallery2', 'nps.imageSettings', 'nps.customImages', 'nps.procEdits', 'nps.siteEdits', 'nps.categories', 'nps.team', 'nps.reviews', 'nps.media', 'nps.pages', 'nps.products', 'nps.offers', 'nps.feed'];
+const PUB_KEYS = ['nps.gallery2', 'nps.imageSettings', 'nps.customImages', 'nps.procEdits', 'nps.siteEdits', 'nps.categories', 'nps.team', 'nps.reviews', 'nps.media', 'nps.pages', 'nps.products', 'nps.offers', 'nps.feed', 'nps.pageEdits'];
 const SHARED_KEYS = ['nps.inbox', 'nps.users', 'nps.sendTo', 'nps.activity', 'nps.pubSnap'];
 const ALL_KEYS = PUB_KEYS.concat(SHARED_KEYS);
 const STATE_FILE = path.join(DATA, 'state.json');
@@ -183,7 +183,7 @@ function transform(html, req, isAdmin, urlPath) {
   const head = `<script>window.__NPS_STATE__=${j(view)};window.__NPS_KEYS__=${j(ALL_KEYS)};window.__NPS_ADMIN__=${isAdmin};window.__NPS_CFG__=${j(cfg)};</script><script src="/assets/js/sync.js"></script>`;
   html = /<head[^>]*>/i.test(html) ? html.replace(/<head[^>]*>/i, m => m + head) : head + html;
   if (!/^\/admin\//.test(urlPath)) {   // public pages: apply saved edits to the data before the first page script runs
-    html = html.replace(/<script[^>]*src="[^"]*assets\/js\/(?!sync)[^"]*"/i, m => '<script src="/assets/js/overrides.js"></script>' + m);
+    html = html.replace(/<script[^>]*src="[^"]*assets\/js\/(?!sync)[^"]*"/i, m => '<script src="/assets/js/overrides.js"></script><script src="/assets/js/pagekit.js"></script><script src="/assets/js/pageedits.js"></script>' + m);
   }
   return html;
 }
@@ -319,7 +319,7 @@ const server = http.createServer(async (req, res) => {
       return send(res, 200, req.method === 'HEAD' ? '' : html, { 'Content-Type': MIME['.html'], 'Cache-Control': 'no-store' });
     }
     const st = fs.statSync(file), etag = '"' + st.size.toString(36) + '-' + Math.round(st.mtimeMs).toString(36) + '"';
-    const cache = file.startsWith(UPLOADS) ? 'public, max-age=31536000, immutable' : /\/(sync|overrides|admin-shell)\.js$/.test(file) ? 'no-cache' : /\.(webp|jpe?g|png|svg|woff2?)$/.test(ext) ? 'public, max-age=86400' : 'public, max-age=300';
+    const cache = file.startsWith(UPLOADS) ? 'public, max-age=31536000, immutable' : /\/(sync|overrides|admin-shell|pagekit|pageedits|admin-list)\.js$/.test(file) ? 'no-cache' : /\.(webp|jpe?g|png|svg|woff2?)$/.test(ext) ? 'public, max-age=86400' : 'public, max-age=300';
     if (req.headers['if-none-match'] === etag) return send(res, 304, '', { ETag: etag, 'Cache-Control': cache });
     res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream', 'Content-Length': st.size, ETag: etag, 'Cache-Control': cache, 'X-Robots-Tag': 'noindex, nofollow', 'X-Content-Type-Options': 'nosniff' });
     if (req.method === 'HEAD') return res.end();
