@@ -804,8 +804,6 @@ html.pp{scroll-padding-top:calc(var(--hdr) + 76px)}
 .tpic{aspect-ratio:1;border-radius:50%;width:min(100%,260px);background:linear-gradient(160deg,#e7dfd1,#cfc6b5);display:grid;place-items:center;overflow:hidden}
 .tpic .fit{position:absolute;inset:0;--fit:cover}
 .tpic .mono{font:400 clamp(40px,7vw,64px)/1 var(--serif);font-style:italic;color:var(--clay-ink);letter-spacing:.02em}
-.tpic.round{background:radial-gradient(ellipse at 50% 28%,#d9d3c8 0%,#bdb6a9 48%,#8d8c82 100%)}
-.tpic.round .fit{--fit:contain}
 .tcard h3{font:400 clamp(20px,2.2vw,26px)/1.12 var(--sans);letter-spacing:-.03em;margin:16px 0 4px}
 .tcard .role{margin:0;color:var(--muted);font-size:16px;line-height:1.35}
 .tcard .tbio{margin:10px 0 0;color:var(--muted);font-size:15px;line-height:1.5}

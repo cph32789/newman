@@ -388,7 +388,7 @@ function teamCard(m) {
 function principalCards(rel) {
   return NPS.team.principals.map(pr => {
     const img = pr.slot === 'dzi' ? 'dzi-newman.png' : 'dr-newman.png';
-    return `<a class="tcard tprin" href="${rel}${pr.href}"><div class="tpic frame round"><img class="fit" data-slot="${pr.slot}" src="../assets/img/${img}" alt="${esc(pr.name)}" width="341" height="341" loading="lazy"></div><h3>${esc(pr.name)}</h3><p class="role">${esc(pr.role)}</p><span class="tmore">Read more</span></a>`;
+    return `<a class="tcard tprin" href="${rel}${pr.href}"><div class="tpic frame"><img class="fit" src="../assets/img/${img}" alt="${esc(pr.name)}" width="341" height="341" loading="lazy" style="--fx:50%;--fy:46%;--zoom:1.16;--fit:cover"></div><h3>${esc(pr.name)}</h3><p class="role">${esc(pr.role)}</p><span class="tmore">Read more</span></a>`;
   }).join('');
 }
 function teamCards(withPrincipals) { return (withPrincipals ? principalCards('../') : '') + NPS.team.members.map(teamCard).join(''); }
