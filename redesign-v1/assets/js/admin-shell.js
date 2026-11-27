@@ -1,6 +1,6 @@
 /* Admin preview shell: header, section nav, Publish dialog, activity log, toasts.
-   Everything is saved in THIS browser (localStorage). In the live Admin the same
-   screens save to the practice's account and Publish updates the public site. */
+   Everything is kept in localStorage. On the preview server, assets/js/sync.js copies it to and from
+   the server so every person sees the same saved data, and Publish updates the public site. */
 (function () {
   'use strict';
   var ADMIN = window.ADMIN = {};
@@ -29,7 +29,7 @@
     if (h) {
       var p = ADMIN.pending(), total = Object.keys(p).length;
       h.innerHTML = '<div class="wrap"><a class="brand" href="index.html"><img src="../assets/img/logo.png" alt="Newman Plastic Surgery"><span class="tag">Admin preview</span></a>' +
-        '<div class="who"><button class="btn btn--sm pubbtn" id="pubOpen" type="button">Publish' + (total ? ' · ' + total + ' section' + (total > 1 ? 's' : '') : '') + '</button><a class="btn btn--line btn--sm" style="color:var(--paper);border-color:rgba(255,251,244,.4)" href="../" target="_blank" rel="noopener">View site</a><i title="Dr. Newman (preview sign-in)">CN</i></div></div>';
+        '<div class="who"><button class="btn btn--sm pubbtn" id="pubOpen" type="button">Publish' + (total ? ' · ' + total + ' section' + (total > 1 ? 's' : '') : '') + '</button><a class="btn btn--line btn--sm" style="color:var(--paper);border-color:rgba(255,251,244,.4)" href="../" target="_blank" rel="noopener">View site</a>' + (window.NPSSYNC ? '<button class="btn btn--line btn--sm" id="signOut" type="button" style="color:var(--paper);border-color:rgba(255,251,244,.4)">Sign out</button>' : '<i title="Dr. Newman (preview sign-in)">CN</i>') + '</div></div>';
     }
     if (n) n.innerHTML = NAV.map(function (x) { var c = x[1] === 'inbox' && newCount ? '<span class="cnt">' + newCount + '</span>' : ''; return x[1] === active ? '<a class="on" href="' + x[0] + '" aria-current="page">' + x[2] + c + '</a>' : '<a href="' + x[0] + '">' + x[2] + c + '</a>'; }).join('');
     if (!document.getElementById('dPub')) {
@@ -38,16 +38,30 @@
       document.body.appendChild(d);
       d.addEventListener('click', function (e) {
         if (e.target.id === 'pubNo') d.close();
-        if (e.target.id === 'pubGo') { var snap = {}; KEYS.forEach(function (k) { var c = raw(k[0]); snap[k[0]] = c ? hash(c) : 0; }); ls.set('nps.pubSnap', snap); ADMIN.log('Published changes'); d.close(); build(); ADMIN.toast('Preview: the live Admin would now update the public site and rebuild the share cards.'); }
-        if (e.target.id === 'pubDisc') { if (confirm('Throw away every unpublished draft change in this preview?')) { KEYS.forEach(function (k) { try { localStorage.removeItem(k[0]); } catch (x) {} }); ADMIN.log('Discarded drafts'); d.close(); location.reload(); } }
+        if (e.target.id === 'pubGo') {
+          if (window.NPSSYNC) {
+            var go = e.target; go.disabled = true; go.textContent = 'Publishing…';
+            NPSSYNC.flush().then(function () { var snap = {}; KEYS.forEach(function (k) { var c = raw(k[0]); snap[k[0]] = c ? hash(c) : 0; }); ls.set('nps.pubSnap', snap); ADMIN.log('Published changes'); return NPSSYNC.post('/api/publish'); })
+              .then(function (r) { go.disabled = false; go.textContent = 'Publish now'; d.close(); build(); ADMIN.toast(r && r.ok ? 'Published. Visitors can now see your changes.' : 'Publishing did not finish: ' + ((r && r.error) || 'please try again.')); })
+              .catch(function () { go.disabled = false; go.textContent = 'Publish now'; ADMIN.toast('Publishing did not finish. Please try again.'); });
+            return;
+          }
+          var snap = {}; KEYS.forEach(function (k) { var c = raw(k[0]); snap[k[0]] = c ? hash(c) : 0; }); ls.set('nps.pubSnap', snap); ADMIN.log('Published changes'); d.close(); build(); ADMIN.toast('Preview: the live Admin would now update the public site and rebuild the share cards.');
+        }
+        if (e.target.id === 'pubDisc') {
+          if (!confirm('Throw away every unpublished draft change?')) return;
+          if (window.NPSSYNC) { NPSSYNC.flush().then(function () { return NPSSYNC.post('/api/discard'); }).then(function () { ADMIN.log('Discarded drafts'); location.reload(); }); return; }
+          KEYS.forEach(function (k) { try { localStorage.removeItem(k[0]); } catch (x) {} }); ADMIN.log('Discarded drafts'); d.close(); location.reload();
+        }
       });
     }
   }
   document.addEventListener('click', function (e) {
+    if (e.target.closest('#signOut')) { fetch('/api/admin/logout', { method: 'POST' }).then(function () { location.href = 'signin.html'; }); return; }
     if (e.target.closest('#pubOpen')) {
       var p = ADMIN.pending(), ks = Object.keys(p), b = document.getElementById('pubBody');
       b.innerHTML = ks.length ? '<p class="intro" style="margin:6px 0 10px">These sections have changes that visitors can’t see yet:</p><ul class="dotsl">' + ks.map(function (k) { return '<li>' + k + '</li>'; }).join('') + '</ul><p class="pv">Publishing also rebuilds each affected page, its search entry and its share card (the picture shown when a link is shared).</p>' : '<p class="intro" style="margin:6px 0 10px">Everything is published. There are no unpublished changes.</p>';
-      document.getElementById('pubGo').disabled = !ks.length; document.getElementById('dPub').showModal();
+      document.getElementById('pubGo').disabled = !ks.length; if (window.NPSSYNC && document.getElementById('pubBody').querySelector('.pv')) document.getElementById('pubBody').querySelector('.pv').textContent = 'Publishing makes these changes visible to everyone and rebuilds each affected procedure page. (Search cards and share pictures are refreshed in the final launch step.)'; document.getElementById('dPub').showModal();
     }
   });
   build();

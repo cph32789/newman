@@ -1,23 +1,33 @@
-# Render Blueprint: free static preview of Redesign v1 for client review.
-# No build step: the pages are already generated and committed.
+# Render Blueprint: password-protected client preview with a working Admin.
+# One small Node web service serves the site, the Admin and the contact form.
+# Saved Admin work lives on the attached disk (so it survives restarts and redeploys).
 services:
   - type: web
-    runtime: static
+    runtime: node
     name: newman-preview
     repo: https://github.com/cph32789/newman
     branch: main
-    rootDir: redesign-v1
-    buildCommand: echo "static site, nothing to build"
-    staticPublishPath: .
+    plan: starter
+    buildCommand: echo "nothing to build"
+    startCommand: node server/preview-server.js
+    healthCheckPath: /healthz
     autoDeployTrigger: commit
-    headers:
-      - path: /*
-        name: X-Robots-Tag
-        value: noindex, nofollow
-      - path: /assets/*
-        name: Cache-Control
-        value: public, max-age=3600
-    routes:
-      - type: rewrite
-        source: /procedures/:id
-        destination: /procedures/:id/index.html
+    disk:
+      name: newman-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: DATA_DIR
+        value: /var/data
+      - key: NODE_VERSION
+        value: "22"
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: PREVIEW_PASSWORD     # the password for the whole preview (enter it in Render)
+        sync: false
+      - key: ADMIN_PASSWORD       # optional: a separate password for /admin (defaults to the preview password)
+        sync: false
+      - key: NOTIFY_TO            # optional: email address that receives new requests
+        sync: false
+      - key: RESEND_API_KEY       # optional: lets the server email new requests (free at resend.com)
+        sync: false

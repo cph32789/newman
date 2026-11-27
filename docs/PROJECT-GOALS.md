@@ -110,3 +110,12 @@ supporting goal 6.
 - Earlier concepts (1, 2, 3) remain online for comparison.
 - All content on pages is sample/draft until approved by the client and (for
   anything medical) reviewed by Dr. Newman.
+
+## Client preview server (Render)
+`server/preview-server.js` (no dependencies) serves `redesign-v1/` behind a password and makes the
+Admin real: edits save on the server as drafts, **Publish** shows them to visitors and rebuilds the
+procedure pages, and the contact form lands in the Admin Inbox with server-side spam checks.
+Environment: `PREVIEW_PASSWORD`, `ADMIN_PASSWORD`, `SESSION_SECRET`, `DATA_DIR`, and optionally
+`NOTIFY_TO` + `RESEND_API_KEY` (email), `TURNSTILE_SITE_KEY` + `TURNSTILE_SECRET` (human check).
+Run locally: `PREVIEW_PASSWORD=x node server/preview-server.js`.
+Not on GitHub Pages: there the Admin stays a one-browser demo (sync.js and the server are absent).

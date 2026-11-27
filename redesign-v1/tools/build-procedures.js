@@ -14,12 +14,19 @@
  */
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const ROOT = path.resolve(__dirname, '..');
-const SITE_URL = 'https://cph32789.github.io/newman/redesign-v1/';   // change when the real domain is connected
+const OUT = process.env.NPS_OUT ? path.resolve(process.env.NPS_OUT) : ROOT;   // the server builds into its own folder
+const SITE_URL = process.env.SITE_URL || 'https://cph32789.github.io/newman/redesign-v1/';   // change when the real domain is connected
 const VERSION = (fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8').match(/\?v=([0-9a-z]+)/) || [])[1] || '1';
 
 /* ---- load the data files exactly as the browser does ---- */
 const ctx = { console }; ctx.window = ctx; vm.createContext(ctx);
+/* When the preview server rebuilds after "Publish", it passes the published Admin edits (the same
+   localStorage keys the browser uses). assets/js/overrides.js applies them exactly as the browser does. */
+const STATE = process.env.NPS_STATE ? JSON.parse(fs.readFileSync(process.env.NPS_STATE, 'utf8')) : {};
+ctx.localStorage = { getItem: k => (k in STATE ? STATE[k] : null), setItem() {}, removeItem() {} };
 ['data/site.js', 'data/procedures.js', 'data/images.js', 'data/library.js', 'data/feed.js', 'data/procedure-content.js'].forEach(f => vm.runInContext(fs.readFileSync(path.join(ROOT, f), 'utf8'), ctx));
+const baseIds = ctx.NPS.procedures.map(p => p.id);
+vm.runInContext(fs.readFileSync(path.join(ROOT, 'assets/js/overrides.js'), 'utf8'), ctx);
 const NPS = ctx.NPS, P = NPS.procedures, byId = Object.fromEntries(P.map(p => [p.id, p]));
 
 /* ---- shared chunks copied from the home page, so every page is identical in chrome ---- */
@@ -566,12 +573,13 @@ function buildLocation() {
 
 let n = 0;
 P.forEach(p => {
-  const dir = path.join(ROOT, 'procedures', p.id);
+  const dir = path.join(OUT, 'procedures', p.id);
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, 'index.html'), build(p));
   n++;
 });
-fs.mkdirSync(path.join(ROOT, 'your-visit'), { recursive: true });
-fs.writeFileSync(path.join(ROOT, 'your-visit', 'index.html'), buildVisit());
-[['meet-dr-newman', buildMeet], ['results', buildResults], ['insurance-financing', buildInsurance], ['location', buildLocation]].forEach(([d, fn]) => { fs.mkdirSync(path.join(ROOT, d), { recursive: true }); fs.writeFileSync(path.join(ROOT, d, 'index.html'), fn()); });
+fs.mkdirSync(path.join(OUT, 'your-visit'), { recursive: true });
+fs.writeFileSync(path.join(OUT, 'your-visit', 'index.html'), buildVisit());
+[['meet-dr-newman', buildMeet], ['results', buildResults], ['insurance-financing', buildInsurance], ['location', buildLocation]].forEach(([d, fn]) => { fs.mkdirSync(path.join(OUT, d), { recursive: true }); fs.writeFileSync(path.join(OUT, d, 'index.html'), fn()); });
 console.log('built', n, 'procedure pages + your-visit + meet-dr-newman + results');
+if (OUT !== ROOT) fs.writeFileSync(path.join(OUT, '_removed.json'), JSON.stringify(baseIds.filter(id => !byId[id])));

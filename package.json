@@ -1,0 +1,7 @@
+{
+  "name": "newman-preview",
+  "private": true,
+  "description": "Password-protected client preview server for the Newman Plastic Surgery redesign",
+  "engines": { "node": ">=18" },
+  "scripts": { "start": "node server/preview-server.js" }
+}

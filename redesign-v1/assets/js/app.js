@@ -342,7 +342,7 @@
     var btn = formEl.querySelector('button[type=submit]'); btn.disabled = true;
     function done() { sends.push(Date.now()); try { localStorage.setItem('nps.sends', JSON.stringify(sends)); } catch (x) {} btn.disabled = false; thank(); }
     if (!FC.endpoint) { done(); return; }                      // design preview: nothing is sent
-    fetch(FC.endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'omit',
+    fetch(FC.endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: FC.endpoint.charAt(0) === '/' ? 'same-origin' : 'omit',
       body: JSON.stringify({ data: data, saved: saved, turnstile: tsToken, elapsed: Math.round(elapsed), signals: signals, hp: $('#nps_hp_url').value }) })
       .then(function (r) { if (!r.ok) throw new Error(r.status); done(); })
       .catch(function () { btn.disabled = false; toast('Something went wrong. Please call us at 407.481.9505.'); });

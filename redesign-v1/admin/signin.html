@@ -4,18 +4,22 @@
 <link rel="stylesheet" href="../assets/css/fonts.css?v=20261127j"><link rel="stylesheet" href="../assets/css/styles.css?v=20261127j"><link rel="stylesheet" href="../assets/css/admin.css?v=20261127j">
 <style>.si{min-height:100vh;display:grid;place-items:center;padding:24px;background:var(--teal-950)}.card{width:100%;max-width:440px;background:var(--ivory);border-radius:var(--r-xl);padding:34px 30px}.card img{height:40px;margin-bottom:22px}.card h1{font:400 38px/1.05 var(--sans);letter-spacing:-.04em;margin:0 0 8px}.card h1 em{font-family:var(--serif);color:var(--clay-ink)}.code{display:flex;gap:8px;margin:18px 0}.code input{width:100%;min-height:58px;text-align:center;font:500 26px var(--sans);border:1px solid var(--line);border-radius:12px;background:var(--paper);padding:0}</style></head>
 <body class="adm si"><main class="card">
-<img src="../assets/img/logo.png" alt="Newman Plastic Surgery"><p class="eyebrow" style="font:600 12px var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--clay-ink)">Admin preview <span class="demo">SIGN-IN DEMO</span></p>
-<div id="s1"><h1>Sign <em>in.</em></h1><p class="intro">Enter your email and we’ll send a 6-digit code. No password to remember.</p>
-<label class="field-a" style="margin-top:16px">Email<input type="email" id="em" autocomplete="email" placeholder="you@practice.com"></label>
-<button class="btn btn--ink" id="go" type="button" style="margin-top:18px;width:100%">Send my code</button></div>
-<div id="s2" hidden><h1>Check your <em>email.</em></h1><p class="intro">We sent a 6-digit code to <b id="to"></b>. It works for 10 minutes.</p>
-<div class="code" id="code" role="group" aria-label="6-digit code"></div><button class="btn btn--ink" id="ok" type="button" style="width:100%">Sign in</button><p class="pv" id="msg" role="status">Preview: any 6 digits will work.</p></div>
-<p class="pv" style="margin-top:22px">The live Admin also signs you out after a period of inactivity and emails you when someone signs in from a new device.</p>
+<img src="../assets/img/logo.png" alt="Newman Plastic Surgery"><p class="eyebrow" style="font:600 12px var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--clay-ink)">Admin preview </p>
+<div id="s1"><h1>Sign <em>in.</em></h1><p class="intro">Enter the Admin password to manage the website.</p>
+<label class="field-a" style="margin-top:16px">Password<input type="password" id="pw" autocomplete="current-password"></label>
+<p class="pv" id="msg" role="alert" style="color:var(--clay-ink);min-height:22px"></p>
+<button class="btn btn--ink" id="go" type="button" style="margin-top:6px;width:100%">Sign in</button></div>
+<p class="pv" style="margin-top:22px">At launch, the Admin also asks for a 6-digit code sent to each person’s email, signs you out after a period of inactivity and emails you when someone signs in from a new device.</p>
 </main>
 <script>
 var $=function(s){return document.querySelector(s);};
-$('#code').innerHTML=[0,1,2,3,4,5].map(function(i){return '<input inputmode="numeric" maxlength="1" aria-label="Digit '+(i+1)+'">';}).join('');
-$('#go').onclick=function(){var e=$('#em').value.trim(); if(!/^\S+@\S+\.\S+$/.test(e)){$('#em').focus();return;} $('#to').textContent=e; $('#s1').hidden=true; $('#s2').hidden=false; $('#code input').focus();};
-document.querySelectorAll('#code input').forEach(function(i,n,all){i.oninput=function(){i.value=i.value.replace(/\D/g,''); if(i.value&&all[n+1]) all[n+1].focus();}; i.onkeydown=function(e){if(e.key==='Backspace'&&!i.value&&all[n-1]) all[n-1].focus();};});
-$('#ok').onclick=function(){var c=[].map.call(document.querySelectorAll('#code input'),function(i){return i.value;}).join(''); if(c.length<6){$('#msg').textContent='Please enter all 6 digits.';return;} location.href='index.html';};
+function go(){
+  var pw=$('#pw').value; if(!pw){$('#pw').focus();return;}
+  $('#go').disabled=true; $('#msg').textContent='';
+  fetch('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pw})})
+    .then(function(r){ if(r.status===404||r.status===405){ location.href='index.html'; return null; } return r.json().then(function(j){return {ok:r.ok,j:j};}); })
+    .then(function(x){ if(!x) return; if(x.ok){ location.href='index.html'; } else { $('#go').disabled=false; $('#msg').textContent=(x.j&&x.j.error)||'That password was not right.'; $('#pw').select(); } })
+    .catch(function(){ $('#go').disabled=false; $('#msg').textContent='Could not reach the server. Please try again.'; });
+}
+$('#go').onclick=go; $('#pw').addEventListener('keydown',function(e){if(e.key==='Enter')go();});
 </script></body></html>
