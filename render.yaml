@@ -1,0 +1,23 @@
+# Render Blueprint: free static preview of Redesign v1 for client review.
+# No build step: the pages are already generated and committed.
+services:
+  - type: web
+    runtime: static
+    name: newman-preview
+    repo: https://github.com/cph32789/newman
+    branch: main
+    rootDir: redesign-v1
+    buildCommand: echo "static site, nothing to build"
+    staticPublishPath: .
+    autoDeployTrigger: commit
+    headers:
+      - path: /*
+        name: X-Robots-Tag
+        value: noindex, nofollow
+      - path: /assets/*
+        name: Cache-Control
+        value: public, max-age=3600
+    routes:
+      - type: rewrite
+        source: /procedures/:id
+        destination: /procedures/:id/index.html
