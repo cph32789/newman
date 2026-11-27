@@ -406,7 +406,7 @@ function buildTeam() {
 
 <section class="section on-sand" aria-labelledby="pnT">
   <div class="wrap">
-    <div class="head"><p class="eyebrow">Your doctors</p><h2 id="pnT" class="h2" style="margin-top:14px">Dr. Newman <em>and Dzi.</em></h2></div>
+    <div class="head"><p class="eyebrow">Your providers</p><h2 id="pnT" class="h2" style="margin-top:14px">Dr. Newman <em>and Dzi.</em></h2></div>
     <div class="tgrid tgrid--two">${principalCards('../')}</div>
   </div>
 </section>

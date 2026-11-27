@@ -68,7 +68,7 @@
   function initials(n){ return n.split(/\s+/).filter(function(w){return /^[A-Za-z]/.test(w);}).slice(0,2).map(function(w){return w[0].toUpperCase();}).join(''); }
   function th(m){ return m.photo?'<img alt="" src="'+esc(src(m.photo))+'" style="object-position:'+(+m.fx||50)+'% '+(+m.fy||30)+'%">':esc(initials(m.name)); }
   function list(){
-    var h='<h3>Your doctors</h3>'+T.principals.map(function(b){var m=get(b.id);return '<div class="row" style="grid-template-columns:44px 1fr"'+(b.id===cur?' aria-current="true"':'')+'><div class="th">'+th(m)+'</div><button type="button" class="pick" data-pick="'+esc(b.id)+'"><b>'+esc(m.name)+'</b><small>'+esc(m.role||'')+'</small></button></div>';}).join('');
+    var h='<h3>Your providers</h3>'+T.principals.map(function(b){var m=get(b.id);return '<div class="row" style="grid-template-columns:44px 1fr"'+(b.id===cur?' aria-current="true"':'')+'><div class="th">'+th(m)+'</div><button type="button" class="pick" data-pick="'+esc(b.id)+'"><b>'+esc(m.name)+'</b><small>'+esc(m.role||'')+'</small></button></div>';}).join('');
     h+='<h3>Staff</h3>'+all().map(function(m,i,a){
       return '<div class="row" data-id="'+esc(m.id)+'"'+(m.id===cur?' aria-current="true"':'')+'><div class="th">'+th(m)+'</div><button type="button" class="pick" data-pick="'+esc(m.id)+'"><b>'+esc(m.name)+(m.hidden?'<span class="tg">HIDDEN</span>':'')+'</b><small>'+esc(m.role||'')+'</small></button><span class="mv"><button type="button" data-up="'+esc(m.id)+'" aria-label="Move up"'+(i?'':' disabled')+'>↑</button><button type="button" data-down="'+esc(m.id)+'" aria-label="Move down"'+(i<a.length-1?'':' disabled')+'>↓</button></span></div>';
     }).join('');
