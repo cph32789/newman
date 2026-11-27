@@ -878,3 +878,5 @@ dialog.artview .afull{display:block;width:100%;height:auto;border-radius:12px;ma
 .ofc p{color:var(--muted);line-height:1.55}.ofc .fine{font-size:14px}
 .ofempty{margin-top:26px;padding:clamp(28px,5vw,56px);border:1px dashed var(--line);border-radius:var(--r-lg);background:var(--paper);text-align:center;font:italic 400 clamp(24px,3vw,34px)/1.25 var(--serif);color:var(--clay-ink)}
 .ofempty .btn{font-style:normal}
+/* journey steps: numbers and headings sit on one line across the row, text starts at the same height beneath */
+@media(min-width:900px){.steps .step{grid-template-rows:auto 1fr;align-content:start;align-items:start}.steps .step>div{display:grid;grid-template-rows:auto 1fr;align-content:start}.steps .step h3{align-self:center;min-height:1.1em}.steps .step p{align-self:start}}
