@@ -49,7 +49,7 @@ NPS.feed = [
   { id:'d20', type:'procedure', ref:'botox',       tags:['face','nonsurgical'], eyebrow:'Face', title:'A considered approach to expression', img:'f-eyes2' },
   { id:'d21', type:'procedure', ref:'breast-augmentation', tags:['breast','surgical'], eyebrow:'Breast', title:'Balance and proportion, chosen by you', img:'f-silk' },
   { id:'d22', type:'insight',   tags:['learn','skin'], eyebrow:'Protect your results', title:'The five-minute routine that does the most',
-    text:'Daily sunscreen and a simple, clinical-grade routine help extend the results of skin treatments. Our aesthetician can build one around your skin.', cta:'Explore skin care', ref:'skin-care', tone:'ivory' },
+    text:'Daily sunscreen and a simple, clinical-grade routine help extend the results of skin treatments. Our aesthetician can build one around your skin.', cta:'Explore skin care', href:'skin-care/', tone:'ivory' },
   { id:'d23', type:'social',    soc:'s6', tags:['face','nonsurgical'] },
   { id:'d24', type:'guide',     ref:'glow',        tags:['learn','skin'], eyebrow:'Guide', title:'Glow and skin renewal', img:'f-glow' }
 ];

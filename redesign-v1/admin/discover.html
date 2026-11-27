@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Discover | Admin preview | Newman Plastic Surgery</title>
+<link rel="icon" href="../assets/img/favicon.png">
+<link rel="stylesheet" href="../assets/css/fonts.css?v=20261127j">
+<link rel="stylesheet" href="../assets/css/styles.css?v=20261127j">
+<link rel="stylesheet" href="../assets/css/admin.css?v=20261127j">
+</head>
+<body class="adm">
+<header id="ah"></header>
+<main class="wrap" style="padding-bottom:70px">
+<nav class="side" id="an" aria-label="Admin sections"></nav>
+<h1>Discover <em>feed.</em></h1>
+<p class="intro">The scrolling cards on the home page, and the posts in <b>Follow along</b>. Add, edit, reorder, hide or delete them. Keep it useful and calm: no promises and no medical claims.</p>
+<div class="seg" style="margin-top:22px" role="group"><button type="button" data-tab="c" aria-pressed="true">Feed cards</button><button type="button" data-tab="s" aria-pressed="false">Social posts</button></div>
+<div id="tabC"><div id="listC"></div>
+  <p class="pv"><b>Card types.</b> <b>Procedure</b> spotlights one procedure. <b>Insight</b> is a short helpful read. <b>Guide</b> starts from a goal. <b>Patient voice</b> is a quote shared with permission. <b>Social post</b> shows one of the posts from the other tab. “Show under” picks the filter chips the card appears under on the home page.</p></div>
+<div id="tabS" hidden><div id="listS"></div>
+  <p class="pv">These posts appear in <b>Follow along</b> and can also be used as feed cards. Each links to a procedure page. The Instagram, Facebook, YouTube and Pinterest addresses are in Settings.</p></div>
+<div class="tip">Changes you save are drafts. They go live when you press <b>Publish</b>, the gold button at the top of the page (it stays in view as you scroll).</div>
+<div class="bar"><div class="wrap"><button class="btn btn--ink btn--sm" id="save" type="button">Save changes</button><button class="btn btn--line btn--sm" id="discard" type="button">Discard</button><span class="st" id="st" role="status"></span></div></div>
+</main>
+<script src="../assets/js/admin-shell.js?v=20261127j" data-active="discover"></script>
+<script src="../data/site.js?v=20261127j"></script>
+<script>window.NPS_BASE='../';</script>
+<script src="../data/procedures.js?v=20261127j"></script>
+<script src="../data/images.js?v=20261127j"></script>
+<script src="../data/feed.js?v=20261127j"></script>
+<script src="../assets/js/admin-list.js?v=20261127j"></script>
+<script>
+(function(){
+  var NPS=window.NPS, A=window.ADMIN, $=function(s){return document.querySelector(s);};
+  var ed=JSON.parse(JSON.stringify(A.ls.get('nps.feed',{})||{})), dirty=false;
+  ed.cards=ed.cards||{order:[],items:{}}; ed.social=ed.social||{order:[],items:{}};
+  function mark(){dirty=true;$('#st').textContent='Unsaved changes';}
+  var short=function(t){return t.replace(/\s*\(.*\)/,'');};
+  var PROCS=NPS.procedures.map(function(p){return [p.id,short(p.title)];}).sort(function(a,b){return a[1].localeCompare(b[1]);});
+  var TOPICS=NPS.topics.map(function(t){return [t.id,t.title];});
+  var IMGS=Object.keys(NPS.images).filter(function(k){return !/^(hero|dr-newman|dzi-newman|practice)/.test(k);}).map(function(k){return [k,k+' · '+(NPS.images[k].alt||'').slice(0,40)];});
+  var PAGES=[['','The consultation form (default)'],['skin-care/','Skin care products'],['special-offers/','Special offers'],['reviews/','Reviews'],['our-team/','Our team'],['meet-dr-newman/','Our doctors'],['results/','Results'],['your-visit/','Your visit'],['insurance-financing/','Insurance & financing'],['location/','Location'],['media/','Media & videos']];
+  var TYPES=[['procedure','Procedure spotlight'],['insight','Insight (short read)'],['guide','Guide (starting from a goal)'],['quote','Patient voice'],['social','Social post']];
+  var TAGS=[['face','Face'],['breast','Breast'],['body','Body'],['skin','Skin & glow'],['nonsurgical','Non-surgical'],['surgical','Surgical'],['learn','Learn']];
+  var TONES=[['ivory','Ivory'],['sand','Sand'],['teal','Teal'],['clay','Clay']];
+  var typeName={}; TYPES.forEach(function(t){typeName[t[0]]=t[1];});
+  var socById=function(id){ var all=[]; return NPS.social.concat(Object.keys(ed.social.items).map(function(k){return Object.assign({id:k},ed.social.items[k]);})).filter(function(x){return x.id===id;})[0]; };
+  function socOpts(){ var base=NPS.social.map(function(s){return [s.id,s.caption];}); Object.keys(ed.social.items).forEach(function(k){ var it=ed.social.items[k]; if(it.custom&&!it.deleted) base.push([k,it.caption||'(new post)']); }); return base.map(function(o){return [o[0],o[1].slice(0,60)];}); }
+  var is=function(t){return function(m){return m.type===t;};};
+  var cardFields=[
+    {k:'type',label:'Card type',type:'select',opts:TYPES},
+    {k:'tags',label:'Show under',type:'multi',opts:TAGS,wide:true,hint:'which filter chips include it'},
+    {k:'ref',label:'Procedure',type:'select',opts:PROCS,show:is('procedure')},
+    {k:'ref',label:'Goal guide',type:'select',opts:TOPICS,show:is('guide')},
+    {k:'soc',label:'Social post',type:'select',opts:null,show:is('social'),wide:true},
+    {k:'eyebrow',label:'Small label',hint:'e.g. Face',show:function(m){return m.type==='procedure'||m.type==='insight'||m.type==='guide';}},
+    {k:'title',label:'Headline',wide:true,show:function(m){return m.type==='procedure'||m.type==='insight'||m.type==='guide';}},
+    {k:'text',label:'Text',type:'textarea',wide:true,show:function(m){return m.type==='insight'||m.type==='quote';}},
+    {k:'list',label:'Or a short list',type:'lines',hint:'one per line; optional',wide:true,show:is('insight')},
+    {k:'who',label:'Who said it',hint:'e.g. Ilka Z. V. or Patient review',show:is('quote')},
+    {k:'tone',label:'Card color',type:'select',opts:TONES,show:function(m){return m.type==='insight'||m.type==='quote';}},
+    {k:'cta',label:'Button text',show:is('insight')},
+    {k:'ref',label:'Button opens a procedure',type:'select',opts:[['','No, use the link below']].concat(PROCS),show:is('insight')},
+    {k:'href',label:'Or link to a page',type:'select',opts:PAGES,show:is('insight')},
+    {k:'img',label:'Picture from the site',type:'select',opts:[['','Use the procedure’s own picture']].concat(IMGS),show:function(m){return m.type==='procedure'||m.type==='guide';},wide:true},
+    {k:'image',label:'Or upload your own picture',type:'image',wide:true,show:function(m){return m.type==='procedure'||m.type==='guide';}}
+  ];
+  // two fields share the key "ref" for different card types: keep one per type
+  function fieldsFor(){ var f=cardFields.slice(); var soc=f.filter(function(x){return x.k==='soc';})[0]; soc.opts=socOpts(); return f; }
+  var LC=ADMINLIST.mount({ el:$('#listC'), noun:'card', addPrompt:'Headline for the new card?',
+    getBase:function(){return NPS.feed;}, getSaved:function(){return ed.cards;}, setSaved:function(s){ed.cards=s;}, onChange:mark,
+    title:function(m){ if(m.type==='quote') return '“'+(m.text||'').slice(0,50)+'”'; if(m.type==='social'){var s=socById(m.soc);return s?s.caption.slice(0,50):'Social post';} return m.title||'(no headline)'; },
+    sub:function(m){ return typeName[m.type]||m.type; }, thumb:function(m){ if(m.type==='social'){ var so=socById(m.soc); m=so||m; } if(m.image) return m.image; var im=m.img&&NPS.images[m.img]; return im?im.src:''; },
+    newItem:function(n){ return {type:'insight',title:n,eyebrow:'A gentle guide',text:'',cta:'Begin your conversation',tone:'ivory',tags:['learn']}; },
+    get fields(){ return fieldsFor(); } });
+  var LS=ADMINLIST.mount({ el:$('#listS'), noun:'post', addPrompt:'Caption for the new post?',
+    getBase:function(){return NPS.social;}, getSaved:function(){return ed.social;}, setSaved:function(s){ed.social=s;}, onChange:function(){mark();LC.refresh();},
+    title:function(m){return m.caption;}, sub:function(m){return (m.platform||'')+' · '+(m.ref||'');}, thumb:function(m){ if(m.image) return m.image; var im=m.img&&NPS.images[m.img]; return im?im.src:''; },
+    newItem:function(n){ return {platform:'instagram',caption:n,ref:'botox',img:'f-glow'}; },
+    fields:[{k:'platform',label:'Where it was posted',type:'select',opts:[['instagram','Instagram'],['facebook','Facebook'],['youtube','YouTube'],['pinterest','Pinterest']]},
+      {k:'ref',label:'Procedure it links to',type:'select',opts:PROCS},{k:'caption',label:'Caption',type:'textarea',wide:true},
+      {k:'img',label:'Picture from the site',type:'select',opts:IMGS,wide:true},{k:'image',label:'Or upload your own picture',type:'image',wide:true}] });
+  document.addEventListener('click',function(e){ var t=e.target.closest('[data-tab]'); if(!t) return; var c=t.getAttribute('data-tab')==='c'; $('#tabC').hidden=!c; $('#tabS').hidden=c; document.querySelectorAll('[data-tab]').forEach(function(b){b.setAttribute('aria-pressed',b===t);}); if(c) LC.refresh(); });
+  $('#save').addEventListener('click',function(){ if(A.ls.set('nps.feed',{cards:ed.cards,social:ed.social})){ dirty=false; A.log('Saved the Discover feed'); A.refresh(); $('#st').textContent='Saved. Press Publish to show it on the site.'; } else $('#st').textContent='Could not save.'; });
+  $('#discard').addEventListener('click',function(){ ed=JSON.parse(JSON.stringify(A.ls.get('nps.feed',{})||{})); ed.cards=ed.cards||{order:[],items:{}}; ed.social=ed.social||{order:[],items:{}}; dirty=false; LC.refresh(); LS.refresh(); $('#st').textContent='Unsaved changes were discarded.'; });
+  window.addEventListener('beforeunload',function(e){ if(dirty){ e.preventDefault(); e.returnValue=''; } });
+})();
+</script>
+</body>
+</html>

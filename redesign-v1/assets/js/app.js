@@ -219,7 +219,7 @@
     }
     if (c.type === 'insight') {
       return '<article class="fc text t-' + (c.tone || 'sand') + '"' + delay + '><p class="eyebrow">' + esc(c.eyebrow) + '</p><h3>' + esc(c.title) + '</h3>' + (c.text ? '<p>' + esc(c.text) + '</p>' : '') + (c.list ? '<ul>' + c.list.map(function (l) { return '<li>' + esc(l) + '</li>'; }).join('') + '</ul>' : '') +
-        (c.ref ? '<button class="link" data-detail="' + c.ref + '" style="align-self:flex-start">' + esc(c.cta) + ' ' + ic('arrow') + '</button>' : '<button class="link" data-toconsult style="align-self:flex-start">' + esc(c.cta) + ' ' + ic('arrow') + '</button>') + '</article>';
+        (c.href ? '<a class="link" href="' + esc(c.href) + '" style="align-self:flex-start">' + esc(c.cta) + ' ' + ic('arrow') + '</a>' : c.ref && byId[c.ref] ? '<button class="link" data-detail="' + c.ref + '" style="align-self:flex-start">' + esc(c.cta) + ' ' + ic('arrow') + '</button>' : '<button class="link" data-toconsult style="align-self:flex-start">' + esc(c.cta) + ' ' + ic('arrow') + '</button>') + '</article>';
     }
     if (c.type === 'quote') {
       return '<article class="fc quote text t-' + (c.tone || 'sand') + '"' + delay + '><div class="stars" aria-label="Five stars">' + '<svg><use href="#i-star"/></svg>'.repeat(5) + '</div><blockquote>“' + esc(c.text) + '”</blockquote><cite>' + esc(c.who) + '</cite></article>';

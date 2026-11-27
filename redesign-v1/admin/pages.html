@@ -79,7 +79,7 @@
   var PN={'hero':'Top picture','cat.face':'Face card','cat.breast':'Breast card','cat.body':'Body card','cat.skin':'Skin card','surgeon':'Dr. Newman portrait','dzi':'Dzi Newman portrait'};
   /* every page of the site. optional = can be switched off. edit = where its content is edited. */
   var PAGES=[
-    {id:'home',n:'Home',path:'',slots:['hero','cat.face','cat.breast','cat.body','cat.skin','surgeon'],note:'The first page visitors see. The procedure cards, Discover feed and patient voices come from Procedures, Reviews and the Discover feed.'},
+    {id:'home',n:'Home',path:'',slots:['hero','cat.face','cat.breast','cat.body','cat.skin','surgeon'],edit:['discover.html','Discover feed'],note:'The first page visitors see. The procedure cards, Discover feed and patient voices come from Procedures, Reviews and the Discover feed.'},
     {id:'doctors',n:'Our doctors',path:'meet-dr-newman/',slots:['surgeon','dzi'],edit:['team.html','Team (staff photos and names)'],note:'Dr. Newman and Dzi, with their biographies and the team strip.'},
     {id:'our-team',n:'Our team',path:'our-team/',slots:[],optional:true,edit:['team.html','Team'],note:'The staff page. Photos, names and order are set in Team.'},
     {id:'procedures',n:'Procedure pages',path:'procedures/',slots:[],edit:['procedures.html','Procedures'],note:'One page for every procedure and treatment.'},

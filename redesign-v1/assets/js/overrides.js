@@ -53,6 +53,23 @@
     var os = read('nps.offers');
     if (os) { NPS.offers.items = mergeList(NPS.offers.items, os); if (os.intro) NPS.offers.intro = os.intro; if (os.empty) NPS.offers.empty = os.empty; }
   }
+  /* Discover feed + social posts: Admin saves { cards:{order,items}, social:{order,items} } */
+  if (NPS.feed && NPS.feed.length && NPS.social) {
+    NPS.feedBase = JSON.parse(JSON.stringify({ feed: NPS.feed, social: NPS.social }));
+    var fsv = read('nps.feed'), procOk = {}, topicOk = {};
+    if (fsv) { NPS.feed = mergeList(NPS.feed, fsv.cards); NPS.social = mergeList(NPS.social, fsv.social); }
+    (NPS.procedures || []).forEach(function (p) { procOk[p.id] = 1; }); (NPS.topics || []).forEach(function (t) { topicOk[t.id] = 1; });
+    function pic(o, key) { if (o.image) { NPS.images[key] = { src: o.image, w: o.w || 800, h: o.h || 800, alt: '' }; o.img = key; } }
+    NPS.social = NPS.social.filter(function (x) { pic(x, 'soc-' + x.id); return procOk[x.ref] && (!x.img || NPS.images[x.img]); });
+    NPS.feed = NPS.feed.filter(function (c) {
+      c.tags = Array.isArray(c.tags) ? c.tags : []; pic(c, 'feed-' + c.id);
+      if (c.type === 'procedure') return procOk[c.ref];
+      if (c.type === 'guide') return topicOk[c.ref] && c.img && NPS.images[c.img];
+      if (c.type === 'social') return NPS.social.some(function (x) { return x.id === c.soc; });
+      if (c.list && !c.list.length) delete c.list;
+      return true;
+    });
+  }
   var ed = read('nps.procEdits') || {}, ids = Object.keys(ed); if (!ids.length) return;
   var P = NPS.procedures, byId = {}; P.forEach(function (p) { byId[p.id] = p; });
   var BASE = ['title', 'cat', 'kind', 'blurb', 'detail', 'aka', 'concerns', 'img', 'related'];

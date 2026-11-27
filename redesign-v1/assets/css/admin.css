@@ -159,3 +159,4 @@ dialog.dlg2 h2{font:500 24px/1.2 var(--sans);margin:0 0 6px}
 
 .alwrap .pl{padding-top:4px}
 @media(max-width:640px){.adm header .wrap{min-height:60px;padding-block:8px;gap:10px}.adm header .tag{display:none}.adm header img{height:28px}}
+.mchk{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:8px}.mchk label{display:flex;gap:8px;align-items:center;font:500 15px var(--sans)}.mchk input{width:20px;height:20px}

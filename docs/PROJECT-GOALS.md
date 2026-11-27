@@ -136,3 +136,8 @@ three small files in `assets/video/`. Publication names were not recorded on the
 `data/products.js` (brands + online-ordering box) and `data/offers.js` (offers with optional start/end dates) are managed in
 Admin > **Skin care** and **Offers**. `assets/js/offers.js` shows an offer only between its dates, so an expired offer
 disappears without a republish. Both pages can be switched off in Admin > Pages & images.
+
+## Discover feed
+`data/feed.js` (feed cards + social posts) is managed in Admin > **Discover**: add, edit, reorder, hide and delete cards (procedure,
+insight, guide, patient voice, social post) and the Follow-along posts. Applied in the browser by `assets/js/overrides.js`, so it
+needs no page rebuild. Cards with a missing procedure or post are skipped instead of breaking the home page.

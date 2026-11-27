@@ -34,6 +34,11 @@
       return list.map(function (m, i) { m.__i = i; return m; }).sort(function (a, b) { return pos(a.id) - pos(b.id) || a.__i - b.__i; }).filter(function (m) { return !m.deleted; });
     }
     function get(id) { return all().filter(function (m) { return m.id === id; })[0]; }
+    function fillDefaults(id) {                // a select that has just become visible should hold its first option
+      var m = get(id); if (!m) return; var o = {}, any = false;
+      cfg.fields.forEach(function (f) { if (f.type === 'select' && (!f.show || f.show(m)) && m[f.k] == null && f.opts && f.opts.length) { o[f.k] = f.opts[0][0]; any = true; } });
+      if (any) patch(id, o);
+    }
     function patch(id, o) { var s = saved(); s.items[id] = Object.assign(s.items[id] || {}, o); cfg.setSaved(s); cfg.onChange(); }
 
     el.innerHTML = '<div class="alwrap"><aside><div class="pbtn" style="margin:0 0 10px"><button class="btn btn--ink btn--sm" data-add type="button">+ Add ' + esc(cfg.noun) + '</button></div><div class="pl" data-list></div></aside><section data-ed aria-live="polite"></section></div>';
@@ -56,6 +61,8 @@
       if (f.type === 'select') return '<label class="field-a"' + wide + '>' + esc(f.label) + hint + '<select data-f="' + f.k + '">' + f.opts.map(function (o) { return '<option value="' + o[0] + '"' + (v === o[0] ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join('') + '</select></label>';
       if (f.type === 'check') return '<label class="chk1"' + wide + '><input type="checkbox" data-f="' + f.k + '"' + (v ? ' checked' : '') + '> ' + esc(f.label) + hint + '</label>';
       if (f.type === 'image') return '<div class="field-a imgf"' + wide + '><span>' + esc(f.label) + hint + '</span><div class="imgrow">' + (v ? '<img alt="" src="' + esc(src(v)) + '">' : '<div class="noimg">No picture</div>') + '<div><label class="btn btn--ink btn--sm" style="cursor:pointer">' + (v ? 'Replace' : 'Add') + ' picture<input type="file" accept="image/jpeg,image/png,image/webp" data-img="' + f.k + '" hidden></label>' + (v ? ' <button class="btn btn--line btn--sm" data-noimg="' + f.k + '" type="button">Remove</button>' : '') + '<p class="pv" data-st="' + f.k + '" role="status"></p></div></div></div>';
+      if (f.type === 'lines') return '<label class="field-a"' + wide + '>' + esc(f.label) + hint + '<textarea data-lines="' + f.k + '">' + esc((v || []).join('\n')) + '</textarea></label>';
+      if (f.type === 'multi') { var cur2 = v || []; return '<div class="field-a"' + wide + '><span>' + esc(f.label) + hint + '</span><div class="mchk">' + f.opts.map(function (o) { return '<label><input type="checkbox" data-multi="' + f.k + '" value="' + o[0] + '"' + (cur2.indexOf(o[0]) > -1 ? ' checked' : '') + '> ' + esc(o[1]) + '</label>'; }).join('') + '</div></div>'; }
       if (f.type === 'date') return '<label class="field-a"' + wide + '>' + esc(f.label) + hint + '<input type="date" data-f="' + f.k + '" value="' + esc(v || '') + '"></label>';
       return '<label class="field-a"' + wide + '>' + esc(f.label) + hint + '<input type="text" data-f="' + f.k + '" value="' + esc(v || '') + '"' + (f.ph ? ' placeholder="' + esc(f.ph) + '"' : '') + (f.readonly ? ' readonly' : '') + '></label>';
     }
@@ -77,12 +84,13 @@
       if (e.target.closest('[data-add]')) {
         var n = prompt(cfg.addPrompt || ('Name of the new ' + cfg.noun + '?')); if (!n || !n.trim()) return;
         var id2 = 'n' + Date.now().toString(36), s2 = saved(); s2.order = all().map(function (m) { return m.id; }); s2.order.push(id2);
-        s2.items[id2] = Object.assign({ custom: true }, cfg.newItem(n.trim())); cfg.setSaved(s2); cfg.onChange(); cur = id2; refresh(); return;
+        s2.items[id2] = Object.assign({ custom: true }, cfg.newItem(n.trim())); cfg.setSaved(s2); cfg.onChange(); cur = id2; fillDefaults(id2); refresh(); return;
       }
       if ((b = e.target.closest('[data-noimg]'))) { var o = {}; o[b.getAttribute('data-noimg')] = ''; if (b.getAttribute('data-noimg') === 'image') { o.w = 0; o.h = 0; } patch(cur, o); refresh(); return; }
       if (e.target.closest('[data-del]')) { var m2 = get(cur); if (confirm('Delete “' + (cfg.title(m2) || cfg.noun) + '”? It disappears from the site.')) { patch(cur, { deleted: true }); cur = null; refresh(); } return; }
     });
     el.addEventListener('input', function (e) {
+      var tl = e.target; if (cur && tl.matches && tl.matches('[data-lines]')) { var ol = {}; ol[tl.getAttribute('data-lines')] = tl.value.split('\n').map(function (x) { return x.trim(); }).filter(Boolean); patch(cur, ol); renderList(); return; }
       var t = e.target; if (!cur || !t.matches || !t.matches('[data-f]') || t.type === 'checkbox') return;
       var k = t.getAttribute('data-f'), v = t.value, f = cfg.fields.filter(function (x) { return x.k === k; })[0], o = {};
       if (f && f.clean) v = f.clean(v);
@@ -90,8 +98,9 @@
     });
     el.addEventListener('change', function (e) {
       var t = e.target; if (!cur) return;
+      if (t.matches('[data-multi]')) { var mk = t.getAttribute('data-multi'), arr = []; el.querySelectorAll('[data-multi="' + mk + '"]').forEach(function (c) { if (c.checked) arr.push(c.value); }); var om = {}; om[mk] = arr; patch(cur, om); return; }
       if (t.matches('[data-vis]')) { patch(cur, { hidden: !t.checked }); refresh(); return; }
-      if (t.matches('[data-f]') && (t.type === 'checkbox' || t.tagName === 'SELECT')) { var o = {}; o[t.getAttribute('data-f')] = t.type === 'checkbox' ? t.checked : t.value; patch(cur, o); refresh(); return; }
+      if (t.matches('[data-f]') && (t.type === 'checkbox' || t.tagName === 'SELECT')) { var o = {}; o[t.getAttribute('data-f')] = t.type === 'checkbox' ? t.checked : t.value; patch(cur, o); fillDefaults(cur); refresh(); return; }
       if (t.matches('[data-img]') && t.files[0]) {
         var k = t.getAttribute('data-img'), id = cur, st = el.querySelector('[data-st="' + k + '"]'); if (st) st.textContent = 'Preparing the picture…';
         prepare(t.files[0], 1400).then(function (p) {
