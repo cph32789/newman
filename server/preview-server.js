@@ -55,6 +55,8 @@ function save() {
     fs.writeFileSync(tmp, JSON.stringify(state)); fs.renameSync(tmp, STATE_FILE);
   }, 150);
 }
+process.on('uncaughtException', e => console.error('uncaught', e));
+process.on('unhandledRejection', e => console.error('unhandled', e));
 process.on('SIGTERM', () => { try { fs.writeFileSync(STATE_FILE, JSON.stringify(state)); } catch (e) {} process.exit(0); });
 
 /* ------------------------------------------------------------------ cookies */
@@ -251,7 +253,7 @@ const server = http.createServer(async (req, res) => {
       return json(res, 401, { ok: false, error: 'That password was not right.' });
     }
     if (p === '/api/admin/logout') { res.setHeader('Set-Cookie', clearCookie('nps_admin')); return json(res, 200, { ok: true }); }
-    if (p === '/api/contact' && req.method === 'POST') return handleContact(req, res);
+    if (p === '/api/contact' && req.method === 'POST') return await handleContact(req, res);
 
     /* admin API */
     if (p.startsWith('/api/')) {
