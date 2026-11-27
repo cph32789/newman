@@ -67,10 +67,11 @@
   var FR={ // aspect ratios of the real frames: [desktop, phone], shape
     'hero':{d:'16/9',m:'4/5',n:'Home · big picture at the top'},
     'cat.face':{d:'4/3.5',m:'3/4.6',n:'Home · Face card'},'cat.breast':{d:'4/3.5',m:'3/4.6',n:'Home · Breast card'},'cat.body':{d:'4/3.5',m:'3/4.6',n:'Home · Body card'},'cat.skin':{d:'4/3.5',m:'3/4.6',n:'Home · Skin card'},
-    'surgeon':{d:'.86',m:'.86',n:'Home and Meet Dr. Newman · portrait',arch:1}
+    'surgeon':{d:'.86',m:'.86',n:'Home and Meet Dr. Newman · portrait',arch:1},
+    'dzi':{d:'.86',m:'.86',n:'Meet Dr. Newman · Dzi Newman portrait',arch:1}
   };
-  var pages=[['Home',['hero','cat.face','cat.breast','cat.body','cat.skin','surgeon']],['Meet Dr. Newman',['surgeon']]];
-  var PN={'hero':'Top picture','cat.face':'Face card','cat.breast':'Breast card','cat.body':'Body card','cat.skin':'Skin card','surgeon':'Dr. Newman portrait'};
+  var pages=[['Home',['hero','cat.face','cat.breast','cat.body','cat.skin','surgeon']],['Meet Dr. Newman',['surgeon','dzi']]];
+  var PN={'hero':'Top picture','cat.face':'Face card','cat.breast':'Breast card','cat.body':'Body card','cat.skin':'Skin card','surgeon':'Dr. Newman portrait','dzi':'Dzi Newman portrait'};
   P.forEach(function(p){ var k='proc.'+p.id; FR[k]={d:'4/3.3',m:'4/4.7',n:p.title+' page · top picture'}; NPS.slotDefaults[k]=NPS.slotDefaults[k]||{image:p.img,fx:50,fy:38,zoom:1,fit:'cover'}; });
   var cur='hero', draft={}, mobile=false;
   function base(slot){ var d=NPS.slotDefaults[slot]||{}; return Object.assign({fx:50,fy:40,zoom:1,fit:'cover'},d,store[slot]||{}); }

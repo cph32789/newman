@@ -434,12 +434,15 @@ function buildMeet() {
 </section>
 
 <section class="section" id="dzi" aria-labelledby="dzT">
-  <div class="wrap pgrid" style="align-items:start">
-    <div class="pmain"><p class="eyebrow">Physician assistant</p><h2 id="dzT" class="h2">Dzi-Long Newman, <em>MPAS, PA-C.</em></h2>
+  <div class="wrap pgrid dzgrid" style="align-items:start">
+    <div class="portrait dzp">
+      <div class="arch frame"><img class="fit" data-slot="dzi" src="../assets/img/dzi-newman.png" alt="Dzi-Long Newman, MPAS, PA-C" width="341" height="341" loading="lazy"></div>
+    </div>
+    <div class="dztext"><div class="pmain"><p class="eyebrow">Physician assistant</p><h2 id="dzT" class="h2">Dzi-Long Newman, <em>MPAS, PA-C.</em></h2>
       <p>Dzi is a board certified physician assistant. She earned her Bachelor of Science in Microbiology and Cell Science and her Master’s degree in Physician Assistant Sciences (2000) at the University of Florida.</p>
       <p>She began her career at Tampa General Hospital on the Hand and Microsurgery Team, training in hand injuries and disorders, microsurgery, flaps and wound repair. She later worked in a respected North Carolina dermatology practice focused on skin care, medical and surgical dermatology and skin cancer treatment.</p></div>
     <div class="pmain"><p style="margin-top:0">Dzi keeps current through continuing education in plastic and reconstructive surgery, dermatologic surgery and cosmetic medicine. She is enthusiastic about the options available to people of all ages and skin types, and helps you achieve and maintain the best outcomes for your skin and decide what is right for you.</p>
-      <p>Her experience in hand surgery and dermatology complements the care offered in our practice. As a mother of four, she has particular insight into the modern woman’s balance of personal and professional life.</p></div>
+      <p>Her experience in hand surgery and dermatology complements the care offered in our practice. As a mother of four, she has particular insight into the modern woman’s balance of personal and professional life.</p></div></div>
   </div>
 </section>
 

@@ -37,6 +37,7 @@ NPS.images = {
   'f-silk':   { src:A+'f-silk.webp',    w:640,  h:556, alt:'Illustrative detail of an ivory silk camisole' },
   'f-poise':  { src:A+'f-poise.webp',   w:640,  h:480, alt:'Illustrative model standing with quiet confidence' },
   'dr-newman':{ src:A+'dr-newman.png',  w:341,  h:341, alt:'Charles E. Newman, Jr., MD' },
+  'dzi-newman':{ src:A+'dzi-newman.png', w:341, h:341, alt:'Dzi-Long Newman, MPAS, PA-C' },
   'practice': { src:A+'practice.webp',  w:1348, h:717, alt:'The Newman Plastic Surgery office entrance on North Mills Avenue' }
 };
 
@@ -48,6 +49,7 @@ NPS.slotDefaults = {
   'cat.body':        { image:'cat-body',   fx:50, fy:30, zoom:1, fit:'cover' },
   'cat.skin':        { image:'cat-skin',   fx:50, fy:30, zoom:1, fit:'cover' },
   'surgeon':         { image:'dr-newman',  fx:50, fy:50, zoom:1, fit:'contain' },
+  'dzi':             { image:'dzi-newman', fx:50, fy:50, zoom:1, fit:'contain' },
   'visit':           { image:'practice',   fx:50, fy:50, zoom:1, fit:'cover' }
 };
 NPS.imageSettings = NPS.imageSettings || {};   /* Admin writes here (saved per slot) */
