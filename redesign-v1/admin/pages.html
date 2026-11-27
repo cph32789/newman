@@ -63,6 +63,7 @@
 <script src="../data/procedures.js?v=20261127j"></script>
 <script src="../data/images.js?v=20261127j"></script>
 <script src="../data/procedure-content.js?v=20261127j"></script>
+<script src="../data/team.js?v=20261127j"></script>
 <script>
 
 (function(){
@@ -80,8 +81,8 @@
   /* every page of the site. optional = can be switched off. edit = where its content is edited. */
   var PAGES=[
     {id:'home',n:'Home',path:'',slots:['hero','cat.face','cat.breast','cat.body','cat.skin','surgeon'],edit:['discover.html','Discover feed'],note:'The first page visitors see. The procedure cards, Discover feed and patient voices come from Procedures, Reviews and the Discover feed.'},
-    {id:'doctors',n:'Our doctors',path:'meet-dr-newman/',slots:['surgeon','dzi'],edit:['team.html','Team (staff photos and names)'],note:'Dr. Newman and Dzi, with their biographies and the team strip.'},
-    {id:'our-team',n:'Our team',path:'our-team/',slots:[],optional:true,edit:['team.html','Team'],note:'The staff page. Photos, names and order are set in Team.'},
+    {id:'doctors',n:'Our doctors',path:'meet-dr-newman/',slots:['surgeon','dzi'],team:true,edit:['team.html','Team (staff photos and names)'],note:'Dr. Newman and Dzi, with their biographies and the team strip.'},
+    {id:'our-team',n:'Our team',path:'our-team/',slots:[],team:true,optional:true,edit:['team.html','Team'],note:'The staff page. Photos, names and order are set in Team.'},
     {id:'procedures',n:'Procedure pages',path:'procedures/',slots:[],edit:['procedures.html','Procedures'],note:'One page for every procedure and treatment.'},
     {id:'results',n:'Results',path:'results/',slots:[],edit:['gallery.html','Gallery'],note:'Before-and-after galleries. Photos, order and 18+ settings are in Gallery.'},
     {id:'reviews',n:'Reviews',path:'reviews/',slots:[],optional:true,edit:['reviews.html','Reviews'],note:'Patient reviews. Add, edit and hide them in Reviews.'},
@@ -101,15 +102,39 @@
   function load(slot){ var s=base(slot); draft=JSON.parse(JSON.stringify({image:s.image,fx:s.fx,fy:s.fy,zoom:s.zoom,fit:s.fit,m:s.m||null})); mobile=false; }
   function eff(m){ var s={image:draft.image,fx:draft.fx,fy:draft.fy,zoom:draft.zoom,fit:draft.fit}; if(m&&draft.m) s=Object.assign(s,draft.m); return s; }
   function thumbOf(slot){ var s=base(slot), im=NPS.images[s.image]; return im?im.src:''; }
+  /* ---- team photos (the same data as Admin > Team) ---- */
+  var T=NPS.team, curTm=null;
+  function tmSaved(){ var s=A.ls.get('nps.team',{})||{}; s.order=s.order||[]; s.members=s.members||{}; return s; }
+  function tmList(){ var sv=tmSaved(), base=T.principals.map(function(p){return Object.assign({principal:true},p);}).concat(T.members);
+    var list=base.map(function(m){return Object.assign({},m,sv.members[m.id]||{});});
+    Object.keys(sv.members).forEach(function(id){ var e=sv.members[id]; if(e.custom&&!base.some(function(b){return b.id===id;})) list.push(Object.assign({id:id},e)); });
+    var staff=list.filter(function(m){return !m.principal&&!m.deleted;}), pos=function(id){var i=sv.order.indexOf(id);return i<0?1e6:i;};
+    staff=staff.map(function(m,i){m.__i=i;return m;}).sort(function(a,b){return pos(a.id)-pos(b.id)||a.__i-b.__i;});
+    return list.filter(function(m){return m.principal;}).concat(staff); }
+  function tmGet(id){ return tmList().filter(function(m){return m.id===id;})[0]; }
+  function tmPatch(id,o){ var sv=tmSaved(); sv.members[id]=Object.assign(sv.members[id]||{},o); if(A.ls.set('nps.team',sv)){ A.log('Changed a team photo'); A.refresh(); $('#st').textContent='Saved. Press Publish to show it on the site.'; } }
+  function tmSrc(p){ return /^(\/|data:|https?:)/.test(p)?p:'../'+p; }
+  function tmInit(n){ return n.split(/\s+/).filter(function(w){return /^[A-Za-z]/.test(w);}).slice(0,2).map(function(w){return w[0].toUpperCase();}).join(''); }
+  function tmBtn(m){ return '<button data-tm="'+esc(m.id)+'"'+(m.id===curTm?' aria-current="true"':'')+'><span class="tn">'+(m.photo?'<img src="'+esc(tmSrc(m.photo))+'" alt="" style="object-position:'+(+m.fx||50)+'% '+(+m.fy||30)+'%">':'<span style="display:grid;place-items:center;height:100%;font:italic 17px var(--serif)">'+esc(tmInit(m.name))+'</span>')+'</span><span>'+esc(m.name.replace(/,.*$/,''))+'<small>'+(m.photo?'Photo':'No photo')+'</small></span></button>'; }
+  function tmPanel(){
+    var m=tmGet(curTm); if(!m) return '';
+    return '<div class="panel" style="margin-top:14px"><h2>'+esc(m.name)+' · photo</h2><p class="intro" style="margin:0">'+esc(m.role||'')+'. The photo is a square on the Our team page'+(m.principal?'.':' and the team strip on Our doctors.')+'</p>'+
+      '<div class="pv2"><div class="box"><small>How it shows</small><div class="frame" id="tmf" style="width:min(100%,300px);aspect-ratio:1;border-radius:18px;cursor:crosshair">'+(m.photo?'<img class="fit" src="'+esc(tmSrc(m.photo))+'" alt="" style="--fx:'+(+m.fx||50)+'%;--fy:'+(+m.fy||30)+'%;--zoom:'+(+m.zoom||1)+';--fit:cover"><span class="dot" style="left:'+(+m.fx||50)+'%;top:'+(+m.fy||30)+'%"></span>':'<span style="display:grid;place-items:center;height:100%;font:italic 64px var(--serif);color:var(--clay-ink)">'+esc(tmInit(m.name))+'</span>')+'</div><p class="fine2">'+(m.photo?'Click the photo to set the focus point.':'No photo yet. Their initials show until you add one.')+'</p></div>'+
+      '<div><div class="pbtn" style="margin:0"><label class="btn btn--ink btn--sm" style="cursor:pointer">'+(m.photo?'Replace photo':'Add photo')+'<input type="file" id="tmup" accept="image/jpeg,image/png,image/webp" hidden></label>'+(m.photo?'<button class="btn btn--line btn--sm" data-tmno type="button">Remove photo</button>':'')+'</div>'+
+      (m.photo?'<div class="sl"><label>Zoom<input type="range" id="tmz" min="1" max="2.5" step="0.05" value="'+(+m.zoom||1)+'"><output>'+(+m.zoom||1).toFixed(2)+'×</output></label></div>'+(m.w&&m.h&&Math.min(m.w,m.h)<500?'<p class="pv" style="color:var(--clay-ink)">This photo is small ('+m.w+' × '+m.h+'). It may look soft on large screens.</p>':''):'')+
+      '<p class="pv" id="tmst" role="status"></p><p class="pv">Name, title and order are in <a class="link" href="team.html">Team</a>.</p></div></div></div>';
+  }
+  function tmPrepare(file){ return new Promise(function(res,rej){ var fr=new FileReader(); fr.onerror=rej; fr.onload=function(){ var im=new Image(); im.onerror=rej; im.onload=function(){ var max=1000,k=Math.min(1,max/Math.max(im.naturalWidth,im.naturalHeight)),w=Math.round(im.naturalWidth*k),h=Math.round(im.naturalHeight*k),c=document.createElement('canvas'); c.width=w;c.height=h;c.getContext('2d').drawImage(im,0,0,w,h); c.toBlob(function(b){res({blob:b,w:w,h:h,url:c.toDataURL('image/jpeg',.88)});},'image/jpeg',.88); }; im.src=fr.result; }; fr.readAsDataURL(file); }); }
   function slotBtn(sl,label){ return '<button data-s="'+sl+'"'+(sl===cur?' aria-current="true"':'')+'><span class="tn"><img src="'+thumbOf(sl)+'" alt=""></span><span>'+esc(label)+'<small>'+(store[sl]?'Edited':'Default')+'</small></span></button>'; }
   function list(q){
     q=(q||'').toLowerCase().trim(); var h='<h3>All pages</h3>';
     PAGES.forEach(function(pg){
       var isProc=pg.id==='procedures', pm=q&&isProc?P.filter(function(p){return p.title.toLowerCase().indexOf(q)>-1;}):[];
       if(q&&pg.n.toLowerCase().indexOf(q)<0&&!pm.length) return;
-      var open=pg.id===curPage||(q&&pm.length), cnt=isProc?P.length+' pages':(pg.slots.length?pg.slots.length+' picture'+(pg.slots.length>1?'s':''):'No pictures');
+      var open=pg.id===curPage||(q&&pm.length), cnt=isProc?P.length+' pages':(pg.team?tmList().length-(pg.id==='doctors'?2:0)+' team photos'+(pg.slots.length?' + '+pg.slots.length+' portraits':''):(pg.slots.length?pg.slots.length+' picture'+(pg.slots.length>1?'s':''):'No pictures'));
       h+='<button class="pg" data-pg="'+pg.id+'"'+(pg.id===curPage?' aria-current="true"':'')+'><span><b>'+esc(pg.n)+'</b>'+(pagesCfg.hidden[pg.id]?'<span class="tg">HIDDEN</span>':'')+'<small>'+cnt+'</small></span></button>';
       if(open&&pg.slots.length) h+='<div class="subs">'+pg.slots.map(function(sl){return slotBtn(sl,PN[sl]);}).join('')+'</div>';
+      if(open&&pg.team) h+='<div class="subs"><h3 style="margin:6px 2px 6px">Team photos</h3>'+tmList().filter(function(m){return pg.id==='our-team'||!m.principal?true:false;}).filter(function(m){return pg.id!=='doctors'||!m.principal;}).map(tmBtn).join('')+'</div>';
       if(open&&isProc){ var pp=q?pm:P; h+='<div class="subs">'+pp.map(function(p){return slotBtn('proc.'+p.id,p.title.replace(/\s*\(.*\)/,''));}).join('')+'</div>'; }
     });
     $('#pl').className='pl'; $('#pl').innerHTML=h;
@@ -120,11 +145,13 @@
     var pg=pageById(curPage), hid=!!pagesCfg.hidden[pg.id];
     var h='<div class="panel pgpanel"><h2>'+esc(pg.n)+'</h2><p class="intro" style="margin:0">'+esc(pg.note||'')+'</p><div class="meta"><span class="addr">/'+esc(pg.path)+'</span><a class="link" href="../'+esc(pg.path)+'" target="_blank" rel="noopener">View page</a>'+(pg.edit?'<a class="link" href="'+pg.edit[0]+'">Edit content: '+esc(pg.edit[1])+'</a>':'')+'</div>';
     if(pg.optional) h+='<div class="pbtn" style="margin-top:16px"><label class="sw" title="Show this page on the site"><input type="checkbox" data-pgvis'+(!hid?' checked':'')+' aria-label="Show this page on the site"><i></i></label><span class="pv" style="margin:0">'+(hid?'<b>Hidden.</b> Visitors cannot open this page, and its menu and footer links are removed. Nothing is deleted.':'Visible on the site.')+'</span></div>';
-    if(!pg.slots.length&&curPage!=='procedures') h+='<p class="pv" style="margin-top:14px">This page has no pictures to adjust here. Its pictures are managed in its own editor.</p>';
+    if(!pg.slots.length&&!pg.team&&curPage!=='procedures') h+='<p class="pv" style="margin-top:14px">This page has no pictures to adjust here. Its pictures are managed in its own editor.</p>';
+    if(pg.team&&!curTm) h+='<p class="pv" style="margin-top:14px">Choose a person under <b>Team photos</b> on the left to change their photo.</p>';
     if(curPage==='procedures') h+='<p class="pv" style="margin-top:14px">Choose a procedure on the left to adjust the picture at the top of its page.</p>';
     return h+'</div>';
   }
   function render(){
+    if(curTm&&pageById(curPage).team){ $('#ed').innerHTML=pagePanel()+tmPanel(); return; }
     var inPage=cur&&((pageById(curPage).slots.indexOf(cur)>-1)||(curPage==='procedures'&&cur.indexOf('proc.')===0));
     if(!cur||!inPage){ $('#ed').innerHTML=pagePanel(); return; }
     var f=FR[cur], libIds=Object.keys(NPS.images).filter(function(k){return !/^(facelift|breast|tummy|mommy|lipo|mwl|eyelid|nose|ear|male|inject|new)/.test(k);});
@@ -144,10 +171,13 @@
       '<div class="libg" role="group" aria-label="Pictures already on the site">'+libIds.map(function(k){var m=NPS.images[k]; return '<button type="button" data-img="'+esc(k)+'" aria-pressed="'+(k===draft.image)+'" aria-label="'+esc(m.alt||k)+'"><img src="'+m.src+'" alt=""></button>';}).join('')+'</div></div>';
     $('#ed').innerHTML=h;
   }
-  function stuff(){ list($('#q').value); render(); }
+  function stuff(){ list($('#q').value); render(); var bar=document.querySelector('.bar'); if(bar) bar.style.display=(curTm&&pageById(curPage).team)?'none':''; }
   document.addEventListener('click',function(e){
-    var pgb=e.target.closest('[data-pg]'); if(pgb){ curPage=pgb.getAttribute('data-pg'); var pg=pageById(curPage); cur=pg.slots[0]||null; if(cur) load(cur); stuff(); return; }
-    var b=e.target.closest('[data-s]'); if(b){ cur=b.getAttribute('data-s'); load(cur); stuff(); return; }
+    var pgb=e.target.closest('[data-pg]'); if(pgb){ curPage=pgb.getAttribute('data-pg'); var pg=pageById(curPage); curTm=null; cur=pg.slots[0]||null; if(cur) load(cur); stuff(); return; }
+    var tmb=e.target.closest('[data-tm]'); if(tmb){ curTm=tmb.getAttribute('data-tm'); stuff(); return; }
+    if(e.target.closest('#tmf')&&curTm){ var m0=tmGet(curTm); if(m0&&m0.photo){ var rr=$('#tmf').getBoundingClientRect(), fx=Math.round((e.clientX-rr.left)/rr.width*100), fy=Math.round((e.clientY-rr.top)/rr.height*100); tmPatch(curTm,{fx:fx,fy:fy}); stuff(); } return; }
+    if(e.target.closest('[data-tmno]')){ tmPatch(curTm,{photo:'',w:0,h:0}); stuff(); return; }
+    var b=e.target.closest('[data-s]'); if(b){ cur=b.getAttribute('data-s'); curTm=null; load(cur); stuff(); return; }
     var fr=e.target.closest('[data-fr]'); if(fr){ var r=fr.getBoundingClientRect(), x=Math.round(Math.max(0,Math.min(100,(e.clientX-r.left)/r.width*100))), y=Math.round(Math.max(0,Math.min(100,(e.clientY-r.top)/r.height*100))); upd({fx:x,fy:y}); return; }
     if(e.target.closest('[data-mstart]')){ draft.m={fx:draft.fx,fy:draft.fy,zoom:draft.zoom,fit:draft.fit}; render(); return; }
     if(e.target.closest('[data-mclear]')){ draft.m=null; mobile=false; render(); mark(); return; }
@@ -161,6 +191,12 @@
     var out=e.target.nextElementSibling; if(out) out.textContent=(k==='zoom'?v.toFixed(2)+'×':v+'%'); var sd=eff(false),sm=eff(true), frs=document.querySelectorAll('[data-fr]'); [sd,sm].forEach(function(s,i){ var img=frs[i]&&frs[i].querySelector('img'), dot=frs[i]&&frs[i].querySelector('.dot'); if(img) img.style.cssText=NPS.fitStyle(s); if(dot){dot.style.left=s.fx+'%';dot.style.top=s.fy+'%';} }); });
   document.addEventListener('change',function(e){ if(e.target.id==='up'&&e.target.files[0]){ var r=new FileReader(); r.onload=function(){ var im=new Image(); im.onload=function(){ var max=1800,k=Math.min(1,max/im.naturalWidth),w=Math.round(im.naturalWidth*k),h=Math.round(im.naturalHeight*k),c=document.createElement('canvas'); c.width=w;c.height=h;c.getContext('2d').drawImage(im,0,0,w,h); var id='up-'+Date.now().toString(36); custom[id]={src:c.toDataURL('image/jpeg',.86),w:w,h:h,alt:'Uploaded picture'}; NPS.images[id]=custom[id]; draft.image=id; if(draft.m) delete draft.m.image; mark(); render(); }; im.src=r.result; }; r.readAsDataURL(e.target.files[0]); }});
   $('#q').addEventListener('input',function(){ list(this.value); });
+  document.addEventListener('input',function(e){ if(e.target.id==='tmz'&&curTm){ tmPatch(curTm,{zoom:+e.target.value}); var o=e.target.nextElementSibling; if(o) o.textContent=(+e.target.value).toFixed(2)+'×'; var im=document.querySelector('#tmf .fit'); if(im) im.style.setProperty('--zoom',e.target.value); } });
+  document.addEventListener('change',function(e){ if(e.target.id!=='tmup'||!e.target.files[0]||!curTm) return; var id=curTm, st=$('#tmst'); if(st) st.textContent='Preparing the photo…';
+    tmPrepare(e.target.files[0]).then(function(p){ if(window.NPSSYNC) return fetch('/api/upload',{method:'POST',headers:{'Content-Type':'image/jpeg'},body:p.blob}).then(function(r){return r.json();}).then(function(j){ if(!j.ok) throw new Error(j.error||'Upload failed'); return {u:j.url,w:p.w,h:p.h}; }); return {u:p.url,w:p.w,h:p.h}; })
+    .then(function(r){ tmPatch(id,{photo:r.u,w:r.w,h:r.h,fx:50,fy:m_fy(id),zoom:1}); stuff(); })
+    .catch(function(err){ var s2=$('#tmst'); if(s2) s2.textContent='Could not add that photo: '+(err.message||'please try another.'); }); });
+  function m_fy(id){ var m=tmGet(id); return m&&m.principal?50:30; }
   document.addEventListener('change',function(e){ if(!e.target.matches||!e.target.matches('[data-pgvis]')) return; var pg=pageById(curPage); if(e.target.checked) delete pagesCfg.hidden[pg.id]; else pagesCfg.hidden[pg.id]=true; if(A.ls.set('nps.pages',pagesCfg)){ A.log((e.target.checked?'Showed':'Hid')+' the '+pg.n+' page'); A.refresh(); A.toast(e.target.checked?'Page will be visible after you press Publish.':'Page will be hidden after you press Publish.'); } stuff(); });
   $('#save').addEventListener('click',function(){
     if(!cur){ $('#st').textContent='Choose a picture first.'; return; }
