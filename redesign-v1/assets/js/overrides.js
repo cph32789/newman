@@ -8,6 +8,19 @@
   function read(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } }
   var cfg = window.__NPS_CFG__;
   if (cfg && NPS.site) { NPS.site.form = Object.assign({}, NPS.site.form, cfg); }
+  /* Team: Admin ("Team") saves { order:[ids], members:{ id:{...fields, hidden, deleted, custom} } } */
+  if (NPS.team && NPS.team.members) {
+    NPS.teamBase = JSON.parse(JSON.stringify(NPS.team));
+    var te = read('nps.team');
+    if (te && te.members) {
+      var list = NPS.team.members.map(function (m) { return Object.assign({}, m, te.members[m.id] || {}); });
+      Object.keys(te.members).forEach(function (id) { var e = te.members[id]; if (e && e.custom && !NPS.team.members.some(function (m) { return m.id === id; })) list.push(Object.assign({ id: id }, e)); });
+      var ord = te.order || [], pos = function (id) { var i = ord.indexOf(id); return i < 0 ? 1e6 : i; };
+      list = list.map(function (m, i) { m.__i = i; return m; }).sort(function (a, b) { return pos(a.id) - pos(b.id) || a.__i - b.__i; });
+      NPS.team.members = list.filter(function (m) { return !m.hidden && !m.deleted; });
+      if (te.intro != null && te.intro !== '') NPS.team.intro = te.intro;
+    }
+  }
   var ed = read('nps.procEdits') || {}, ids = Object.keys(ed); if (!ids.length) return;
   var P = NPS.procedures, byId = {}; P.forEach(function (p) { byId[p.id] = p; });
   var BASE = ['title', 'cat', 'kind', 'blurb', 'detail', 'aka', 'concerns', 'img', 'related'];

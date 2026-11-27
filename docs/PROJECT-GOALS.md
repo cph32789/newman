@@ -119,3 +119,9 @@ Environment: `PREVIEW_PASSWORD`, `ADMIN_PASSWORD`, `SESSION_SECRET`, `DATA_DIR`,
 `NOTIFY_TO` + `RESEND_API_KEY` (email), `TURNSTILE_SITE_KEY` + `TURNSTILE_SECRET` (human check).
 Run locally: `PREVIEW_PASSWORD=x node server/preview-server.js`.
 Not on GitHub Pages: there the Admin stays a one-browser demo (sync.js and the server are absent).
+
+## Team page and Team admin
+`data/team.js` holds the staff (name, title, photo, focus point). Admin > **Team** adds, edits, reorders,
+hides and deletes people and replaces photos (resized in the browser, stored on the server at `/uploads/`).
+The two principals (Dr. Newman and Dzi Newman) are shown first and use the portrait slots in Pages & images.
+`our-team/` and the "Our team" strip on Meet Dr. Newman are built from the saved edits when Publish runs.

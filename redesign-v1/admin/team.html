@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Team | Admin preview | Newman Plastic Surgery</title>
+<link rel="icon" href="../assets/img/favicon.png">
+<link rel="stylesheet" href="../assets/css/fonts.css?v=20261127j">
+<link rel="stylesheet" href="../assets/css/styles.css?v=20261127j">
+<link rel="stylesheet" href="../assets/css/admin.css?v=20261127j">
+</head>
+<body class="adm">
+<header id="ah"></header>
+<main class="wrap" style="padding-bottom:70px">
+<nav class="side" id="an" aria-label="Admin sections"></nav>
+<style>
+.layout{display:grid;gap:26px;margin-top:22px}@media(min-width:960px){.layout{grid-template-columns:320px 1fr;align-items:start}}
+.pl{max-height:72vh;overflow:auto;padding-right:4px}
+.pl h3{font:600 11px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:16px 2px 6px}
+.pl .row{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:14px;background:var(--paper);margin-bottom:6px;min-height:60px}
+.pl .row[aria-current=true]{border-color:var(--clay);box-shadow:0 0 0 2px rgba(154,91,60,.18)}
+.pl .row .th{width:44px;height:44px;border-radius:50%;background:var(--sand-2);overflow:hidden;display:grid;place-items:center;font:italic 400 18px var(--serif);color:var(--clay-ink)}
+.pl .row .th img{width:100%;height:100%;object-fit:cover;display:block}
+.pl .row button.pick{all:unset;cursor:pointer;display:flex;flex-direction:column;gap:2px;min-width:0}
+.pl .row b{font:600 15px/1.2 var(--sans)}.pl .row small{color:var(--muted);font-size:13px}
+.pl .row .mv{display:flex;gap:4px}.pl .row .mv button{width:36px;height:36px;border:1px solid var(--line);border-radius:10px;background:var(--paper);font:600 16px var(--sans)}
+.tg{font:700 10px/1 var(--sans);letter-spacing:.08em;padding:3px 5px;border-radius:5px;background:#CDC3B3;color:#3a3128;margin-left:6px}
+.ph2{display:grid;gap:18px}@media(min-width:760px){.ph2{grid-template-columns:240px 1fr}}
+.pbox{position:relative;aspect-ratio:4/5;border-radius:var(--r-lg);overflow:hidden;background:linear-gradient(160deg,#e7dfd1,#cfc6b5);display:grid;place-items:center;cursor:crosshair;max-width:260px;width:100%}
+.pbox .fit{position:absolute;inset:0}.pbox .none{font:italic 400 54px var(--serif);color:var(--clay-ink)}
+.pbox .dot{position:absolute;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px var(--clay),0 2px 8px rgba(0,0,0,.4);pointer-events:none}
+</style>
+<h1>Our <em>team.</em></h1>
+<p class="intro">The staff shown on the <b>Our team</b> page and at the bottom of <b>Meet Dr. Newman</b>. Add people, change names, titles and photos, put them in the order you want, or hide someone.</p>
+<div class="layout">
+  <aside>
+    <div class="pbtn" style="margin:0 0 10px"><button class="btn btn--ink btn--sm" id="add" type="button">+ Add team member</button></div>
+    <div id="pl" class="pl"></div>
+    <div class="panel" style="margin-top:16px"><h2 style="font-size:22px">Page introduction</h2><label class="field-a">Shown at the top of Our team<textarea id="intro" style="min-height:130px"></textarea></label></div>
+  </aside>
+  <section id="ed" aria-live="polite"></section>
+</div>
+<div class="bar"><div class="wrap"><button class="btn btn--ink btn--sm" id="save" type="button">Save changes</button><button class="btn btn--line btn--sm" id="discard" type="button">Discard</button><span class="st" id="st" role="status"></span></div></div>
+<div class="tip"><b>Photos:</b> choose a picture of the person from the shoulders up. Click the photo to choose what stays in view when it is cropped, and use the zoom slider. Pictures are never stretched. Changes go live when you press <b>Publish</b>.</div>
+</main>
+<script src="../assets/js/admin-shell.js?v=20261127j" data-active="team"></script>
+<script src="../data/site.js?v=20261127j"></script>
+<script>window.NPS_BASE='../';</script>
+<script src="../data/team.js?v=20261127j"></script>
+<script>
+(function(){
+  var NPS=window.NPS, A=window.ADMIN, T=NPS.team, $=function(s){return document.querySelector(s);}, esc=A.esc;
+  var saved=A.ls.get('nps.team',{})||{};
+  var ed={ order:(saved.order||[]).slice(), members:JSON.parse(JSON.stringify(saved.members||{})), intro:saved.intro||'' };
+  var cur=null, dirty=false;
+  function mark(){dirty=true;$('#st').textContent='Unsaved changes';}
+  function src(p){ return /^(\/|data:|https?:)/.test(p)?p:'../'+p; }
+  function all(){
+    var list=T.members.map(function(m){return Object.assign({},m,ed.members[m.id]||{});});
+    Object.keys(ed.members).forEach(function(id){ var e=ed.members[id]; if(e.custom&&!T.members.some(function(m){return m.id===id;})) list.push(Object.assign({id:id},e)); });
+    var pos=function(id){var i=ed.order.indexOf(id);return i<0?1e6:i;};
+    return list.map(function(m,i){m.__i=i;return m;}).sort(function(a,b){return pos(a.id)-pos(b.id)||a.__i-b.__i;}).filter(function(m){return !m.deleted;});
+  }
+  function get(id){ return all().filter(function(m){return m.id===id;})[0]; }
+  function patch(id,o){ ed.members[id]=Object.assign(ed.members[id]||{},o); mark(); }
+  function initials(n){ return n.split(/\s+/).filter(function(w){return /^[A-Za-z]/.test(w);}).slice(0,2).map(function(w){return w[0].toUpperCase();}).join(''); }
+  function th(m){ return m.photo?'<img alt="" src="'+esc(src(m.photo))+'" style="object-position:'+(+m.fx||50)+'% '+(+m.fy||30)+'%">':esc(initials(m.name)); }
+  function list(){
+    var h='<h3>Your doctors</h3>'+T.principals.map(function(p){return '<div class="row" style="grid-template-columns:44px 1fr"><div class="th"><img alt="" src="../assets/img/'+(p.slot==='dzi'?'dzi-newman.png':'dr-newman.png')+'" style="object-fit:contain"></div><span style="display:flex;flex-direction:column"><b>'+esc(p.name)+'</b><small>Edit on <a class="link" href="pages.html#'+p.slot+'">Pages &amp; images</a></small></span></div>';}).join('');
+    h+='<h3>Staff</h3>'+all().map(function(m,i,a){
+      return '<div class="row" data-id="'+esc(m.id)+'"'+(m.id===cur?' aria-current="true"':'')+'><div class="th">'+th(m)+'</div><button type="button" class="pick" data-pick="'+esc(m.id)+'"><b>'+esc(m.name)+(m.hidden?'<span class="tg">HIDDEN</span>':'')+'</b><small>'+esc(m.role||'')+'</small></button><span class="mv"><button type="button" data-up="'+esc(m.id)+'" aria-label="Move up"'+(i?'':' disabled')+'>↑</button><button type="button" data-down="'+esc(m.id)+'" aria-label="Move down"'+(i<a.length-1?'':' disabled')+'>↓</button></span></div>';
+    }).join('');
+    $('#pl').innerHTML=h;
+  }
+  function render(){
+    var m=cur&&get(cur); if(!m){ $('#ed').innerHTML='<div class="panel"><h2>Choose a team member</h2><p class="intro" style="margin:0">Pick someone on the left to edit their name, title and photo, or add a new person.</p></div>'; return; }
+    $('#ed').innerHTML='<div class="panel"><h2>'+esc(m.name)+'</h2>'+
+      '<div class="two-col" style="margin-top:14px"><label class="field-a">Name<input type="text" data-f="name" value="'+esc(m.name)+'"></label><label class="field-a">Title<input type="text" data-f="role" value="'+esc(m.role||'')+'" placeholder="e.g. Patient Care Coordinator"></label>'+
+      '<label class="field-a" style="grid-column:1/-1">A line about them <span class="hint">(optional; shown under the title)</span><textarea data-f="bio">'+esc(m.bio||'')+'</textarea></label></div>'+
+      '<div class="field-a" style="margin-top:16px">Photo</div><div class="ph2"><div><div class="pbox" id="pbox">'+(m.photo?'<img class="fit" alt="" src="'+esc(src(m.photo))+'" style="--fx:'+(+m.fx||50)+'%;--fy:'+(+m.fy||30)+'%;--zoom:'+(+m.zoom||1)+';--fit:cover"><span class="dot" style="left:'+(+m.fx||50)+'%;top:'+(+m.fy||30)+'%"></span>':'<span class="none">'+esc(initials(m.name))+'</span>')+'</div></div>'+
+      '<div><p class="intro" style="margin:0 0 10px">'+(m.photo?'Click the photo to choose which part stays in view.':'No photo yet. Their initials are shown until you add one.')+'</p>'+
+      '<div class="pbtn" style="margin:0"><label class="btn btn--ink btn--sm" style="cursor:pointer">'+(m.photo?'Replace photo':'Add photo')+'<input type="file" id="up" accept="image/jpeg,image/png,image/webp" hidden></label>'+(m.photo?'<button class="btn btn--line btn--sm" data-nophoto type="button">Remove photo</button>':'')+'</div>'+
+      (m.photo?'<label class="field-a" style="margin-top:14px">Zoom <span class="hint" id="zv">'+(+m.zoom||1).toFixed(2)+'×</span><input type="range" id="zoom" min="1" max="2.5" step="0.05" value="'+(+m.zoom||1)+'"></label>'+(m.w&&m.h&&Math.min(m.w,m.h)<500?'<p class="pv" style="color:var(--clay-ink)">This photo is small ('+m.w+' × '+m.h+'). It may look soft on large screens. A larger photo will look sharper.</p>':''):'')+
+      '<p class="pv" id="upst" role="status"></p></div></div>'+
+      '<div class="pbtn" style="margin-top:18px"><label class="sw" title="Show on the site"><input type="checkbox" data-vis'+(!m.hidden?' checked':'')+' aria-label="Show on the site"><i></i></label><span class="pv" style="margin:0">'+(m.hidden?'Hidden from the site':'Visible on the site')+'</span><button class="btn btn--line btn--sm" data-del type="button" style="margin-left:auto">Delete</button></div></div>';
+  }
+  /* resize in the browser, then store on the server (or in the browser when there is no server) */
+  function prepare(file){
+    return new Promise(function(res,rej){ var fr=new FileReader(); fr.onerror=rej; fr.onload=function(){ var im=new Image(); im.onerror=rej; im.onload=function(){
+      var max=1000,k=Math.min(1,max/Math.max(im.naturalWidth,im.naturalHeight)),w=Math.round(im.naturalWidth*k),h=Math.round(im.naturalHeight*k),c=document.createElement('canvas'); c.width=w;c.height=h; c.getContext('2d').drawImage(im,0,0,w,h);
+      c.toBlob(function(b){ res({blob:b,w:w,h:h,url:c.toDataURL('image/jpeg',.88)}); },'image/jpeg',.88); }; im.src=fr.result; }; fr.readAsDataURL(file); });
+  }
+  document.addEventListener('change',function(e){
+    var t=e.target;
+    if(t.id==='up'&&t.files[0]){ var id=cur; $('#upst').textContent='Preparing the photo…';
+      prepare(t.files[0]).then(function(p){
+        if(window.NPSSYNC){ return fetch('/api/upload',{method:'POST',headers:{'Content-Type':'image/jpeg'},body:p.blob}).then(function(r){return r.json();}).then(function(j){ if(!j.ok) throw new Error(j.error||'Upload failed'); return {u:j.url,w:p.w,h:p.h}; }); }
+        return {u:p.url,w:p.w,h:p.h}; })
+      .then(function(r){ patch(id,{photo:r.u,w:r.w,h:r.h,fx:50,fy:30,zoom:1}); list(); render(); $('#upst').textContent='Photo added. Click it to set what stays in view, then Save.'; })
+      .catch(function(err){ $('#upst').textContent='Could not add that photo: '+(err.message||'please try another picture.'); });
+    }
+    if(t.matches&&t.matches('[data-vis]')){ patch(cur,{hidden:!t.checked}); list(); render(); }
+  });
+  document.addEventListener('input',function(e){
+    var t=e.target; if(!cur) return;
+    if(t.matches&&t.matches('[data-f]')){ patch(cur,(function(o){o[t.getAttribute('data-f')]=t.value;return o;})({})); if(t.getAttribute('data-f')==='name'){ list(); } if(t.getAttribute('data-f')!=='bio') list(); }
+    if(t.id==='zoom'){ patch(cur,{zoom:+t.value}); $('#zv').textContent=(+t.value).toFixed(2)+'×'; var im=document.querySelector('#pbox .fit'); if(im) im.style.setProperty('--zoom',t.value); }
+    if(t.id==='intro'){ ed.intro=t.value; mark(); }
+  });
+  document.addEventListener('click',function(e){
+    var b;
+    if((b=e.target.closest('[data-pick]'))){ cur=b.getAttribute('data-pick'); list(); render(); return; }
+    if((b=e.target.closest('[data-up],[data-down]'))){ var id=b.getAttribute('data-up')||b.getAttribute('data-down'), ids=all().map(function(m){return m.id;}), i=ids.indexOf(id), j=b.hasAttribute('data-up')?i-1:i+1; if(j<0||j>=ids.length) return; ids.splice(j,0,ids.splice(i,1)[0]); ed.order=ids; mark(); list(); return; }
+    if(e.target.closest('#pbox')&&cur){ var m=get(cur); if(!m||!m.photo) return; var r=$('#pbox').getBoundingClientRect(), fx=Math.round((e.clientX-r.left)/r.width*100), fy=Math.round((e.clientY-r.top)/r.height*100); patch(cur,{fx:fx,fy:fy}); var im=$('#pbox .fit'); im.style.setProperty('--fx',fx+'%'); im.style.setProperty('--fy',fy+'%'); var d=$('#pbox .dot'); d.style.left=fx+'%'; d.style.top=fy+'%'; list(); return; }
+    if(e.target.closest('[data-nophoto]')){ patch(cur,{photo:'',w:0,h:0}); list(); render(); return; }
+    if(e.target.closest('[data-del]')){ var m2=get(cur); if(confirm('Delete '+m2.name+'? They disappear from the site. You can add them again later.')){ patch(cur,{deleted:true}); cur=null; list(); render(); } return; }
+    if(e.target.closest('#add')){ var n=prompt('Name of the new team member?'); if(!n||!n.trim()) return; var id2=n.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')+'-'+Date.now().toString(36).slice(-3); ed.members[id2]={custom:true,name:n.trim(),role:''}; ed.order=all().map(function(m){return m.id;}); if(ed.order.indexOf(id2)<0) ed.order.push(id2); cur=id2; mark(); list(); render(); return; }
+  });
+  $('#save').addEventListener('click',function(){ var out={order:ed.order,members:ed.members}; if(ed.intro.trim()) out.intro=ed.intro.trim(); if(A.ls.set('nps.team',out)){ dirty=false; A.log('Saved team changes'); A.refresh(); $('#st').textContent='Saved. Press Publish to show it on the site.'; } else $('#st').textContent='Could not save.'; });
+  $('#discard').addEventListener('click',function(){ var s=A.ls.get('nps.team',{})||{}; ed={order:(s.order||[]).slice(),members:JSON.parse(JSON.stringify(s.members||{})),intro:s.intro||''}; $('#intro').value=ed.intro||T.intro; dirty=false; list(); render(); $('#st').textContent='Unsaved changes were discarded.'; });
+  window.addEventListener('beforeunload',function(e){ if(dirty){ e.preventDefault(); e.returnValue=''; } });
+  $('#intro').value=ed.intro||T.intro; cur=(all()[0]||{}).id; list(); render();
+})();
+</script>
+</body>
+</html>

@@ -67,8 +67,8 @@
   var FR={ // aspect ratios of the real frames: [desktop, phone], shape
     'hero':{d:'16/9',m:'4/5',n:'Home · big picture at the top'},
     'cat.face':{d:'4/3.5',m:'3/4.6',n:'Home · Face card'},'cat.breast':{d:'4/3.5',m:'3/4.6',n:'Home · Breast card'},'cat.body':{d:'4/3.5',m:'3/4.6',n:'Home · Body card'},'cat.skin':{d:'4/3.5',m:'3/4.6',n:'Home · Skin card'},
-    'surgeon':{d:'.86',m:'.86',n:'Home and Meet Dr. Newman · portrait',arch:1},
-    'dzi':{d:'.86',m:'.86',n:'Meet Dr. Newman · Dzi Newman portrait',arch:1}
+    'surgeon':{d:'1',m:'1',n:'Home and Meet Dr. Newman · portrait',arch:1},
+    'dzi':{d:'1',m:'1',n:'Meet Dr. Newman · Dzi Newman portrait',arch:1}
   };
   var pages=[['Home',['hero','cat.face','cat.breast','cat.body','cat.skin','surgeon']],['Meet Dr. Newman',['surgeon','dzi']]];
   var PN={'hero':'Top picture','cat.face':'Face card','cat.breast':'Breast card','cat.body':'Body card','cat.skin':'Skin card','surgeon':'Dr. Newman portrait','dzi':'Dzi Newman portrait'};
@@ -84,7 +84,7 @@
     var pp=P.filter(function(p){return !q||p.title.toLowerCase().indexOf(q)>-1||'procedure'.indexOf(q)>-1;}); if(pp.length) h+='<h3>Procedure pages ('+pp.length+')</h3>'+pp.map(function(p){var sl='proc.'+p.id; return '<button data-s="'+sl+'"'+(sl===cur?' aria-current="true"':'')+'><span class="tn"><img src="'+thumbOf(sl)+'" alt=""></span><span>'+esc(p.title.replace(/\s*\(.*\)/,''))+'<small>'+(store[sl]?'Edited':'Default')+'</small></span></button>';}).join('');
     $('#pl').className='pl'; $('#pl').innerHTML=h;
   }
-  function frameHtml(w,asp,s,arch){ var im=NPS.images[s.image]; if(!im) return ''; var rad=arch?'border-radius:999px 999px 20px 20px;':'border-radius:18px;';
+  function frameHtml(w,asp,s,arch){ var im=NPS.images[s.image]; if(!im) return ''; var rad=arch?'border-radius:50%;':'border-radius:18px;';
     return '<div class="frame" data-fr style="width:'+w+';aspect-ratio:'+asp+';'+rad+'"><img class="fit" src="'+im.src+'" alt="" width="'+im.w+'" height="'+im.h+'" style="'+NPS.fitStyle(s)+'"><span class="dot" style="left:'+s.fx+'%;top:'+s.fy+'%"></span></div>'; }
   function render(){
     var f=FR[cur], libIds=Object.keys(NPS.images).filter(function(k){return !/^(facelift|breast|tummy|mommy|lipo|mwl|eyelid|nose|ear|male|inject|new)/.test(k);});

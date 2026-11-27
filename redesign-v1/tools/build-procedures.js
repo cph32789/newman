@@ -24,7 +24,7 @@ const ctx = { console }; ctx.window = ctx; vm.createContext(ctx);
    localStorage keys the browser uses). assets/js/overrides.js applies them exactly as the browser does. */
 const STATE = process.env.NPS_STATE ? JSON.parse(fs.readFileSync(process.env.NPS_STATE, 'utf8')) : {};
 ctx.localStorage = { getItem: k => (k in STATE ? STATE[k] : null), setItem() {}, removeItem() {} };
-['data/site.js', 'data/procedures.js', 'data/images.js', 'data/library.js', 'data/feed.js', 'data/procedure-content.js'].forEach(f => vm.runInContext(fs.readFileSync(path.join(ROOT, f), 'utf8'), ctx));
+['data/site.js', 'data/procedures.js', 'data/images.js', 'data/library.js', 'data/feed.js', 'data/procedure-content.js', 'data/team.js'].forEach(f => vm.runInContext(fs.readFileSync(path.join(ROOT, f), 'utf8'), ctx));
 const baseIds = ctx.NPS.procedures.map(p => p.id);
 vm.runInContext(fs.readFileSync(path.join(ROOT, 'assets/js/overrides.js'), 'utf8'), ctx);
 const NPS = ctx.NPS, P = NPS.procedures, byId = Object.fromEntries(P.map(p => [p.id, p]));
@@ -43,7 +43,7 @@ const rebase = (h, up) => h
   .replace(/href="#visit"/g, 'href="' + up + 'your-visit/"')
   .replace(/href="#surgeon"/g, 'href="' + up + 'meet-dr-newman/"')
   .replace(/href="#results"/g, 'href="' + up + 'results/"')
-  .replace(/href="(your-visit|meet-dr-newman|results|insurance-financing|location)\//g, 'href="' + up + '$1/')
+  .replace(/href="(your-visit|meet-dr-newman|results|insurance-financing|location|our-team)\//g, 'href="' + up + '$1/')
   .replace(/href="#discover"/g, 'href="' + up + '#discover"')
   .replace(/(src|href)="assets\//g, '$1="' + up + 'assets/');
 const toBase = h => rebase(h, '../../');
@@ -375,8 +375,51 @@ ${(extraScripts || []).map(f => `<script src="../assets/js/${f}?v=${VERSION}"></
 }
 
 /* ---------------- Meet Dr. Newman ---------------- */
-const TEAM = [['Joanne Dyl', 'Financial Administrator'], ['Rena Pierpont', 'Patient Care Coordinator'], ['Beth Green', 'Patient Care Coordinator'], ['Alma Ortiz', 'Lead Medical Assistant'], ['Suzanna Suto', 'Medical Esthetician / Medical Assistant'], ['Cara Kravetz', 'Medical Assistant'], ['Georgia Walker', 'Medical Assistant']];
-const initials = n => n.split(/\s+/).filter(w => /^[A-Z]/.test(w)).slice(0, 2).map(w => w[0]).join('');
+
+/* ---------------- Team (data/team.js + Admin edits) ---------------- */
+const teamSrc = p => (/^(\/|data:|https?:)/.test(p) ? p : '../' + p);
+const teamInitials = n => n.replace(/\(.*?\)/g, '').split(/[\s,]+/).filter(w => /^[A-Za-z]/.test(w) && !/^(MD|PA-C|MPAS|Jr\.?)$/i.test(w)).slice(0, 2).map(w => w[0].toUpperCase()).join('');
+function teamCard(m) {
+  const pic = m.photo
+    ? `<img class="fit" src="${esc(teamSrc(m.photo))}" alt="${esc(m.name)}" ${m.w && m.h ? `width="${+m.w}" height="${+m.h}" ` : ''}loading="lazy" style="--fx:${+m.fx || 50}%;--fy:${+m.fy || 30}%;--zoom:${+m.zoom || 1};--fit:cover">`
+    : `<span class="mono" aria-hidden="true">${esc(teamInitials(m.name))}</span>`;
+  return `<article class="tcard"><div class="tpic frame">${pic}</div><h3>${esc(m.name)}</h3><p class="role">${esc(m.role || '')}</p>${m.bio ? `<p class="tbio">${esc(m.bio)}</p>` : ''}</article>`;
+}
+function principalCards(rel) {
+  return NPS.team.principals.map(pr => {
+    const img = pr.slot === 'dzi' ? 'dzi-newman.png' : 'dr-newman.png';
+    return `<a class="tcard tprin" href="${rel}${pr.href}"><div class="tpic frame round"><img class="fit" data-slot="${pr.slot}" src="../assets/img/${img}" alt="${esc(pr.name)}" width="341" height="341" loading="lazy"></div><h3>${esc(pr.name)}</h3><p class="role">${esc(pr.role)}</p><span class="tmore">Read more</span></a>`;
+  }).join('');
+}
+function teamCards(withPrincipals) { return (withPrincipals ? principalCards('../') : '') + NPS.team.members.map(teamCard).join(''); }
+
+function buildTeam() {
+  const body = `
+<section class="vhero wrap" aria-labelledby="tT">
+  <p class="eyebrow">Our team</p>
+  <h1 id="tT" class="display" style="margin-top:14px">The people who <em>look after you.</em></h1>
+  <p class="dblurb">${esc(NPS.team.intro)}</p>
+  <div class="acts"><a class="btn btn--ink" href="#consult">Request a consultation</a><a class="btn btn--line" href="tel:+14074819505"><svg><use href="#i-phone"/></svg>Call 407.481.9505</a></div>
+</section>
+
+<section class="section on-sand" aria-labelledby="pnT">
+  <div class="wrap">
+    <div class="head"><p class="eyebrow">Your doctors</p><h2 id="pnT" class="h2" style="margin-top:14px">Dr. Newman <em>and Dzi.</em></h2></div>
+    <div class="tgrid tgrid--two">${principalCards('../')}</div>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="stT">
+  <div class="wrap">
+    <div class="head"><p class="eyebrow">The staff</p><h2 id="stT" class="h2" style="margin-top:14px">A team with a heart for <em>patient care.</em></h2></div>
+    <div class="tgrid">${NPS.team.members.map(teamCard).join('')}</div>
+    <p class="note" style="margin-top:34px">We look forward to working with each of you on your journey to your best you.</p>
+  </div>
+</section>`;
+  return shell({ title: 'Our team', desc: 'Meet the Newman Plastic Surgery team in Orlando, Florida: Dr. Newman, Dzi Newman, PA-C, and the staff who look after you.', dir: 'our-team', body,
+    ld: { '@context': 'https://schema.org', '@type': 'MedicalBusiness', name: 'Newman Plastic Surgery', url: SITE_URL + 'our-team/', employee: NPS.team.members.map(m => ({ '@type': 'Person', name: m.name, jobTitle: m.role })) } });
+}
+
 function buildMeet() {
   const body = `
 <section class="surgeon section on-dark" aria-labelledby="mT" style="padding-top:clamp(48px,7vw,110px)">
@@ -395,6 +438,30 @@ function buildMeet() {
         <div><strong>Trained at</strong>Wake Forest Baptist Medical Center</div>
         <div><strong>Cosmetic</strong>Face · Breast · Body</div>
         <div><strong>Reconstructive</strong>Including breast reconstruction</div>
+      </div>
+      <div class="actions"><a class="btn btn--champagne" href="#consult">Request a consultation <svg><use href="#i-arrow"/></svg></a><a class="link" href="#team">Meet the team</a></div>
+    </div>
+  </div>
+</section>
+
+<section class="surgeon section on-dark dzihero" id="dzi" aria-labelledby="dzT" style="padding-top:clamp(40px,6vw,90px)">
+  <div class="wrap grid">
+    <div class="portrait">
+      <div class="arch frame"><img class="fit" data-slot="dzi" src="../assets/img/dzi-newman.png" alt="Dzi-Long Newman, MPAS, PA-C" width="341" height="341"></div>
+      <div class="cap"><span>Dzi-Long Newman, MPAS, PA-C</span><span>Physician assistant</span></div>
+    </div>
+    <div class="copy">
+      <p class="eyebrow">Meet your physician assistant</p>
+      <h2 id="dzT" class="display" style="margin-top:14px">Dzi-Long Newman, <em>MPAS, PA-C.</em></h2>
+      <p>Dzi is a board certified physician assistant and a central part of the practice. She earned her Bachelor of Science in Microbiology and Cell Science and her Master’s degree in Physician Assistant Sciences (2000) at the University of Florida.</p>
+      <p>She began her career at Tampa General Hospital on the Hand and Microsurgery Team, training in hand injuries and disorders, microsurgery, flaps and wound repair. She later worked in a respected North Carolina dermatology practice focused on skin care, medical and surgical dermatology and skin cancer treatment.</p>
+      <p>Dzi keeps current through continuing education in plastic and reconstructive surgery, dermatologic surgery and cosmetic medicine. She is enthusiastic about the options available to people of all ages and skin types, and helps you achieve and maintain the best outcomes for your skin and decide what is right for you.</p>
+      <p>Her experience in hand surgery and dermatology complements the care offered in our practice. As a mother of four, she has particular insight into the modern woman’s balance of personal and professional life.</p>
+      <div class="creds">
+        <div><strong>Board certified</strong>Physician assistant</div>
+        <div><strong>Education</strong>University of Florida (BS, MPAS)</div>
+        <div><strong>Background</strong>Hand &amp; microsurgery · Dermatology</div>
+        <div><strong>Focus</strong>Skin health and your best outcomes</div>
       </div>
       <div class="actions"><a class="btn btn--champagne" href="#consult">Request a consultation <svg><use href="#i-arrow"/></svg></a><a class="link" href="#team">Meet the team</a></div>
     </div>
@@ -433,28 +500,14 @@ function buildMeet() {
   </div>
 </section>
 
-<section class="section" id="dzi" aria-labelledby="dzT">
-  <div class="wrap pgrid dzgrid" style="align-items:start">
-    <div class="portrait dzp">
-      <div class="arch frame"><img class="fit" data-slot="dzi" src="../assets/img/dzi-newman.png" alt="Dzi-Long Newman, MPAS, PA-C" width="341" height="341" loading="lazy"></div>
-    </div>
-    <div class="dztext"><div class="pmain"><p class="eyebrow">Physician assistant</p><h2 id="dzT" class="h2">Dzi-Long Newman, <em>MPAS, PA-C.</em></h2>
-      <p>Dzi is a board certified physician assistant. She earned her Bachelor of Science in Microbiology and Cell Science and her Master’s degree in Physician Assistant Sciences (2000) at the University of Florida.</p>
-      <p>She began her career at Tampa General Hospital on the Hand and Microsurgery Team, training in hand injuries and disorders, microsurgery, flaps and wound repair. She later worked in a respected North Carolina dermatology practice focused on skin care, medical and surgical dermatology and skin cancer treatment.</p></div>
-    <div class="pmain"><p style="margin-top:0">Dzi keeps current through continuing education in plastic and reconstructive surgery, dermatologic surgery and cosmetic medicine. She is enthusiastic about the options available to people of all ages and skin types, and helps you achieve and maintain the best outcomes for your skin and decide what is right for you.</p>
-      <p>Her experience in hand surgery and dermatology complements the care offered in our practice. As a mother of four, she has particular insight into the modern woman’s balance of personal and professional life.</p></div></div>
-  </div>
-</section>
-
 <section class="section on-sand" id="team" aria-labelledby="tmT">
   <div class="wrap">
-    <div class="head head--split"><div><p class="eyebrow">Our team</p><h2 id="tmT" class="h2" style="margin-top:14px">People with a <em>heart for patient care.</em></h2></div>
-    <p class="lead" style="max-width:24em">Each has a strong medical background and shares our commitment to your having the best possible experience.</p></div>
-    <ul class="team">${TEAM.map(([n, r]) => `<li><span class="mono" aria-hidden="true">${initials(n)}</span><div><b>${esc(n)}</b><span>${esc(r)}</span></div></li>`).join('')}</ul>
-    <p class="note" style="margin-top:26px">Sample content for the design review. Team photos will be added in Admin. Biography text needs Dr. Newman’s review before launch.</p>
+    <div class="head"><p class="eyebrow">Our team</p><h2 id="tmT" class="h2" style="margin-top:14px">The people you will <em>meet.</em></h2><p class="lead" style="margin-top:14px">${esc(NPS.team.intro)}</p></div>
+    <div class="tgrid">${teamCards(true)}</div>
+    <p style="margin-top:30px"><a class="btn btn--ink" href="../our-team/">Meet everyone <svg><use href="#i-arrow"/></svg></a></p>
   </div>
 </section>`;
-  return shell({ title: 'Meet Dr. Newman', desc: 'Meet Charles Newman, Jr., M.D., a board certified Orlando plastic and reconstructive surgeon, and the Newman Plastic Surgery team.', dir: 'meet-dr-newman', body,
+  return shell({ title: 'Meet Dr. Newman and Dzi Newman', desc: 'Meet Charles Newman, Jr., M.D., a board certified Orlando plastic and reconstructive surgeon, his wife and partner Dzi Newman, PA-C, and the Newman Plastic Surgery team.', dir: 'meet-dr-newman', body,
     ld: { '@context': 'https://schema.org', '@type': 'Physician', name: 'Charles E. Newman, Jr., MD', medicalSpecialty: 'PlasticSurgery', url: SITE_URL + 'meet-dr-newman/', worksFor: { '@type': 'MedicalBusiness', name: 'Newman Plastic Surgery', address: { '@type': 'PostalAddress', streetAddress: '444 North Mills Avenue', addressLocality: 'Orlando', addressRegion: 'FL', postalCode: '32803' } } } });
 }
 
@@ -583,6 +636,6 @@ P.forEach(p => {
 });
 fs.mkdirSync(path.join(OUT, 'your-visit'), { recursive: true });
 fs.writeFileSync(path.join(OUT, 'your-visit', 'index.html'), buildVisit());
-[['meet-dr-newman', buildMeet], ['results', buildResults], ['insurance-financing', buildInsurance], ['location', buildLocation]].forEach(([d, fn]) => { fs.mkdirSync(path.join(OUT, d), { recursive: true }); fs.writeFileSync(path.join(OUT, d, 'index.html'), fn()); });
+[['meet-dr-newman', buildMeet], ['our-team', buildTeam], ['results', buildResults], ['insurance-financing', buildInsurance], ['location', buildLocation]].forEach(([d, fn]) => { fs.mkdirSync(path.join(OUT, d), { recursive: true }); fs.writeFileSync(path.join(OUT, d, 'index.html'), fn()); });
 console.log('built', n, 'procedure pages + your-visit + meet-dr-newman + results');
 if (OUT !== ROOT) fs.writeFileSync(path.join(OUT, '_removed.json'), JSON.stringify(baseIds.filter(id => !byId[id])));

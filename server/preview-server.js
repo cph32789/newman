@@ -41,7 +41,7 @@ const PORT = +process.env.PORT || 8080;
 fs.mkdirSync(DATA, { recursive: true });
 
 /* ------------------------------------------------------------------ saved state */
-const PUB_KEYS = ['nps.gallery2', 'nps.imageSettings', 'nps.customImages', 'nps.procEdits', 'nps.siteEdits', 'nps.categories'];
+const PUB_KEYS = ['nps.gallery2', 'nps.imageSettings', 'nps.customImages', 'nps.procEdits', 'nps.siteEdits', 'nps.categories', 'nps.team'];
 const SHARED_KEYS = ['nps.inbox', 'nps.users', 'nps.sendTo', 'nps.activity', 'nps.pubSnap'];
 const ALL_KEYS = PUB_KEYS.concat(SHARED_KEYS);
 const STATE_FILE = path.join(DATA, 'state.json');
@@ -98,6 +98,14 @@ function body(req, limit) {
     req.on('error', reject);
   });
 }
+function bodyBuf(req, limit) {
+  return new Promise((resolve, reject) => {
+    const chunks = []; let n = 0;
+    req.on('data', c => { n += c.length; if (n > limit) { reject(Object.assign(new Error('too large'), { code: 413 })); req.destroy(); } else chunks.push(c); });
+    req.on('end', () => resolve(Buffer.concat(chunks)));
+    req.on('error', reject);
+  });
+}
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 /* ------------------------------------------------------------------ gate page */
@@ -118,6 +126,7 @@ try { const c = { console }; c.window = c; vm.createContext(c); vm.runInContext(
 
 /* ------------------------------------------------------------------ publish / rebuild */
 const BUILD = path.join(DATA, 'build');
+const UPLOADS = path.join(DATA, 'uploads'); fs.mkdirSync(UPLOADS, { recursive: true });
 let removed = []; const loadRemoved = () => { try { removed = JSON.parse(fs.readFileSync(path.join(BUILD, '_removed.json'), 'utf8')); } catch (e) { removed = []; } };
 loadRemoved();
 let building = null;
@@ -206,6 +215,7 @@ async function notify(m) {
 /* ------------------------------------------------------------------ static files */
 function findFile(urlPath) {
   let p; try { p = decodeURIComponent(urlPath); } catch (e) { return null; }
+  const um = p.match(/^\/uploads\/([a-f0-9]{20}\.(?:jpg|png|webp))$/); if (um) { const f = path.join(UPLOADS, um[1]); return fs.existsSync(f) ? f : null; }
   if (p.includes('\0')) return null;
   const rel = path.normalize(p).replace(/^([/\\])+/, '');
   if (rel.startsWith('..')) return null;
@@ -264,6 +274,14 @@ const server = http.createServer(async (req, res) => {
         if (req.method === 'PUT') { store[k] = await body(req, 40 * 1024 * 1024); save(); return json(res, 200, { ok: true }); }
         if (req.method === 'DELETE') { delete store[k]; save(); return json(res, 200, { ok: true }); }
       }
+      if (p === '/api/upload' && req.method === 'POST') {          // photos from the Admin (already resized in the browser)
+        const buf = await bodyBuf(req, 8 * 1024 * 1024);
+        const ext = buf.slice(0, 3).equals(Buffer.from([0xff, 0xd8, 0xff])) ? '.jpg' : buf.slice(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])) ? '.png' : (buf.slice(0, 4).toString() === 'RIFF' && buf.slice(8, 12).toString() === 'WEBP') ? '.webp' : '';
+        if (!ext) return json(res, 400, { ok: false, error: 'Please choose a JPG, PNG or WebP picture.' });
+        const name = crypto.createHash('sha256').update(buf).digest('hex').slice(0, 20) + ext;
+        fs.writeFileSync(path.join(UPLOADS, name), buf);
+        return json(res, 200, { ok: true, url: '/uploads/' + name });
+      }
       if (p === '/api/publish' && req.method === 'POST') {
         PUB_KEYS.forEach(k => { if (k in state.draft) state.published[k] = state.draft[k]; else delete state.published[k]; });
         save(); const host = req.headers['x-forwarded-host'] || req.headers.host, r = await rebuild((isSecure(req) ? 'https://' : 'http://') + host);
@@ -287,7 +305,7 @@ const server = http.createServer(async (req, res) => {
       return send(res, 200, req.method === 'HEAD' ? '' : html, { 'Content-Type': MIME['.html'], 'Cache-Control': 'no-store' });
     }
     const st = fs.statSync(file), etag = '"' + st.size.toString(36) + '-' + Math.round(st.mtimeMs).toString(36) + '"';
-    const cache = /\/(sync|overrides|admin-shell)\.js$/.test(file) ? 'no-cache' : /\.(webp|jpe?g|png|svg|woff2?)$/.test(ext) ? 'public, max-age=86400' : 'public, max-age=300';
+    const cache = file.startsWith(UPLOADS) ? 'public, max-age=31536000, immutable' : /\/(sync|overrides|admin-shell)\.js$/.test(file) ? 'no-cache' : /\.(webp|jpe?g|png|svg|woff2?)$/.test(ext) ? 'public, max-age=86400' : 'public, max-age=300';
     if (req.headers['if-none-match'] === etag) return send(res, 304, '', { ETag: etag, 'Cache-Control': cache });
     res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream', 'Content-Length': st.size, ETag: etag, 'Cache-Control': cache, 'X-Robots-Tag': 'noindex, nofollow', 'X-Content-Type-Options': 'nosniff' });
     if (req.method === 'HEAD') return res.end();
