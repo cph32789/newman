@@ -811,3 +811,15 @@ html.pp{scroll-padding-top:calc(var(--hdr) + 76px)}
 a.tcard:hover .tpic{box-shadow:var(--shadow)}
 .surgeon.dzihero{border-top:1px solid rgba(255,251,244,.12)}
 @media(min-width:900px){.surgeon.dzihero .grid{grid-template-columns:1.1fr .9fr}.surgeon.dzihero .grid>.portrait{order:2}.surgeon.dzihero .grid>.copy{order:1}}
+
+/* Home: Dr. Newman and Dzi side by side */
+.docs .dgrid{display:grid;gap:56px;margin-top:44px}
+@media(min-width:900px){.docs .dgrid{grid-template-columns:repeat(2,1fr);gap:clamp(40px,6vw,96px)}}
+.docs .doc{display:flex;flex-direction:column;align-items:flex-start}
+.docs .doc .portrait{width:min(100%,280px);margin:0 0 34px 14px}
+.docs .dname{font:400 clamp(30px,3.4vw,44px)/1.05 var(--sans);letter-spacing:-.035em;margin:12px 0 14px}
+.docs .dname em{font-family:var(--serif);color:var(--champagne);font-weight:400}
+.docs .doc p:not(.eyebrow):not(.dmeta){color:rgba(255,251,244,.82);max-width:30em}
+.docs .dmeta{font:500 14px/1.4 var(--sans);letter-spacing:.06em;color:var(--champagne);margin-top:6px}
+.docs .doc .actions{margin-top:22px}
+#newman,#dzi{scroll-margin-top:calc(var(--hdr,72px) + 8px)}
