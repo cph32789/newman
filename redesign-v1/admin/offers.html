@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Offers | Admin preview | Newman Plastic Surgery</title>
+<link rel="icon" href="../assets/img/favicon.png">
+<link rel="stylesheet" href="../assets/css/fonts.css?v=20261127j">
+<link rel="stylesheet" href="../assets/css/styles.css?v=20261127j">
+<link rel="stylesheet" href="../assets/css/admin.css?v=20261127j">
+</head>
+<body class="adm">
+<header id="ah"></header>
+<main class="wrap" style="padding-bottom:70px">
+<nav class="side" id="an" aria-label="Admin sections"></nav>
+<h1>Special <em>offers.</em></h1>
+<p class="intro">The specials and events on the <b>Special offers</b> page. Give an offer a start and end date and it appears and disappears by itself, so nothing expired is ever shown.</p>
+<div class="panel" style="margin-top:18px"><div class="two-col"><label class="field-a">Introduction<textarea id="intro" style="min-height:80px"></textarea></label><label class="field-a">Message when there are no current offers<textarea id="empty" style="min-height:80px"></textarea></label></div></div>
+<h2 style="margin-top:26px;font:400 28px var(--sans);letter-spacing:-.03em">Offers</h2>
+<div id="list"></div>
+<div class="tip">Changes you save are drafts. They go live when you press <b>Publish</b>, the gold button at the top of the page (it stays in view as you scroll).</div>
+<div class="bar"><div class="wrap"><button class="btn btn--ink btn--sm" id="save" type="button">Save changes</button><button class="btn btn--line btn--sm" id="discard" type="button">Discard</button><span class="st" id="st" role="status"></span></div></div>
+</main>
+<script src="../assets/js/admin-shell.js?v=20261127j" data-active="offers"></script>
+<script src="../data/site.js?v=20261127j"></script>
+<script>window.NPS_BASE='../';</script>
+<script src="../data/offers.js?v=20261127j"></script>
+<script src="../assets/js/admin-list.js?v=20261127j"></script>
+<script>
+(function(){
+  var NPS=window.NPS, A=window.ADMIN, $=function(s){return document.querySelector(s);}, base=NPS.offers;
+  var ed=JSON.parse(JSON.stringify(A.ls.get('nps.offers',{})||{})), dirty=false;
+  function mark(){dirty=true;$('#st').textContent='Unsaved changes';}
+  function fill(){ $('#intro').value=ed.intro||base.intro; $('#empty').value=ed.empty||base.empty; } fill();
+  $('#intro').addEventListener('input',function(){ ed.intro=this.value; mark(); });
+  $('#empty').addEventListener('input',function(){ ed.empty=this.value; mark(); });
+  function status(m){ var t=new Date().toISOString().slice(0,10); if(m.hidden) return 'Hidden'; if(m.start&&m.start>t) return 'Starts '+m.start; if(m.end&&m.end<t) return 'Ended '+m.end; return m.end?'Running until '+m.end:'Running'; }
+  var L=ADMINLIST.mount({ el:$('#list'), noun:'offer', addPrompt:'Name of the offer?',
+    getBase:function(){return base.items;}, getSaved:function(){return ed;}, setSaved:function(s){ed.order=s.order;ed.items=s.items;}, onChange:mark,
+    title:function(m){return m.title;}, sub:status, thumb:function(m){return m.image;},
+    newItem:function(n){return {title:n,text:''};},
+    fields:[{k:'title',label:'Offer title',wide:true},{k:'text',label:'Details',type:'textarea',wide:true,hint:'blank line between paragraphs'},
+      {k:'start',label:'Starts on',type:'date',hint:'optional'},{k:'end',label:'Ends on',type:'date',hint:'optional; the last day it shows'},
+      {k:'fine',label:'Small print',hint:'optional, e.g. “New patients only”',wide:true},
+      {k:'image',label:'Picture',type:'image',hint:'optional',wide:true},
+      {k:'ctaLabel',label:'Button text',hint:'default: Request a consultation'},{k:'ctaLink',label:'Button link',hint:'default: the consultation form',ph:'https://'}] });
+  $('#save').addEventListener('click',function(){ var o={order:ed.order||[],items:ed.items||{}}; if(ed.intro&&ed.intro.trim()&&ed.intro.trim()!==base.intro) o.intro=ed.intro.trim(); if(ed.empty&&ed.empty.trim()&&ed.empty.trim()!==base.empty) o.empty=ed.empty.trim(); if(A.ls.set('nps.offers',o)){ dirty=false; A.log('Saved offers'); A.refresh(); $('#st').textContent='Saved. Press Publish to show it on the site.'; } else $('#st').textContent='Could not save.'; });
+  $('#discard').addEventListener('click',function(){ ed=JSON.parse(JSON.stringify(A.ls.get('nps.offers',{})||{})); fill(); dirty=false; L.refresh(); $('#st').textContent='Unsaved changes were discarded.'; });
+  window.addEventListener('beforeunload',function(e){ if(dirty){ e.preventDefault(); e.returnValue=''; } });
+})();
+</script>
+</body>
+</html>

@@ -28,6 +28,8 @@ NPS.images = {
   'cat-face': { src:A+'cat-face.webp',  w:720,  h:951, alt:'Illustrative model with softly lit, naturally rested skin' },
   'cat-breast':{src:A+'cat-breast.webp',w:720,  h:1080,alt:'Illustrative model in an ivory silk camisole' },
   'cat-body': { src:A+'cat-body.webp',  w:720,  h:1080,alt:'Illustrative model standing in an ivory swimsuit and linen wrap' },
+  'chest':    { src:A+'chest.webp',    w:575,  h:613, alt:'Illustrative model’s collarbones and chest in an ivory silk camisole' },
+  'torso':    { src:A+'torso.webp',    w:575,  h:670, alt:'Illustrative model’s full torso, from shoulders to hips, in an ivory swimsuit' },
   'cat-skin': { src:A+'cat-skin.webp',  w:720,  h:1080,alt:'Illustrative model with glowing skin resting her hand on her cheek' },
   'f-eyes':   { src:A+'f-eyes.webp',    w:640,  h:511, alt:'Close portrait of a woman’s eyes and cheek in soft light' },
   'f-eyes2':  { src:A+'f-eyes2.webp',   w:640,  h:468, alt:'Illustrative model looking to the side, lit in teal and amber' },
@@ -45,11 +47,11 @@ NPS.images = {
 NPS.slotDefaults = {
   'hero':            { image:'hero-1600', fx:70, fy:22, zoom:1, fit:'cover', m:{ image:'hero-m', fx:50, fy:18, zoom:1 } },
   'cat.face':        { image:'cat-face',   fx:50, fy:35, zoom:1, fit:'cover' },
-  'cat.breast':      { image:'cat-breast', fx:50, fy:40, zoom:1, fit:'cover' },
-  'cat.body':        { image:'cat-body',   fx:50, fy:30, zoom:1, fit:'cover' },
+  'cat.breast':      { image:'chest', fx:50, fy:45, zoom:1, fit:'cover' },
+  'cat.body':        { image:'torso',    fx:50, fy:50, zoom:1, fit:'cover' },
   'cat.skin':        { image:'cat-skin',   fx:50, fy:30, zoom:1, fit:'cover' },
-  'surgeon':         { image:'dr-newman',  fx:50, fy:50, zoom:1, fit:'contain' },
-  'dzi':             { image:'dzi-newman', fx:50, fy:50, zoom:1, fit:'contain' },
+  'surgeon':         { image:'dr-newman',  fx:50, fy:50, zoom:1.4, fit:'cover' },
+  'dzi':             { image:'dzi-newman', fx:50, fy:50, zoom:1.4, fit:'cover' },
   'visit':           { image:'practice',   fx:50, fy:50, zoom:1, fit:'cover' }
 };
 NPS.imageSettings = NPS.imageSettings || {};   /* Admin writes here (saved per slot) */

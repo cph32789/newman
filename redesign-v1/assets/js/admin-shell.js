@@ -6,7 +6,7 @@
   var ADMIN = window.ADMIN = {};
   var ls = { get: function (k, d) { try { var v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }, set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } } };
   ADMIN.ls = ls;
-  var KEYS = [['nps.gallery2', 'Gallery'], ['nps.imageSettings', 'Images'], ['nps.customImages', 'Images'], ['nps.procEdits', 'Procedures'], ['nps.siteEdits', 'Settings'], ['nps.categories', 'Categories'], ['nps.team', 'Team'], ['nps.reviews', 'Reviews'], ['nps.media', 'Media'], ['nps.pages', 'Pages']];
+  var KEYS = [['nps.gallery2', 'Gallery'], ['nps.imageSettings', 'Images'], ['nps.customImages', 'Images'], ['nps.procEdits', 'Procedures'], ['nps.siteEdits', 'Settings'], ['nps.categories', 'Categories'], ['nps.team', 'Team'], ['nps.reviews', 'Reviews'], ['nps.media', 'Media'], ['nps.pages', 'Pages'], ['nps.products', 'Skin care'], ['nps.offers', 'Offers']];
   function hash(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return h; }
   function raw(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
   ADMIN.pending = function () {
@@ -19,7 +19,7 @@
   ADMIN.ago = function (t) { var s = (Date.now() - t) / 1000; if (s < 60) return 'just now'; if (s < 3600) return Math.round(s / 60) + ' min ago'; if (s < 86400) return Math.round(s / 3600) + ' hr ago'; return Math.round(s / 86400) + ' days ago'; };
   ADMIN.esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
 
-  var NAV = [['index.html', 'dashboard', 'Dashboard'], ['pages.html', 'pages', 'Pages & images'], ['procedures.html', 'procedures', 'Procedures'], ['gallery.html', 'gallery', 'Gallery'], ['team.html', 'team', 'Team'], ['reviews.html', 'reviews', 'Reviews'], ['media.html', 'media', 'Media'], ['inbox.html', 'inbox', 'Inbox'], ['settings.html', 'settings', 'Settings']];
+  var NAV = [['index.html', 'dashboard', 'Dashboard'], ['pages.html', 'pages', 'Pages & images'], ['procedures.html', 'procedures', 'Procedures'], ['gallery.html', 'gallery', 'Gallery'], ['team.html', 'team', 'Team'], ['reviews.html', 'reviews', 'Reviews'], ['media.html', 'media', 'Media'], ['skincare.html', 'skincare', 'Skin care'], ['offers.html', 'offers', 'Offers'], ['inbox.html', 'inbox', 'Inbox'], ['settings.html', 'settings', 'Settings']];
   var active = (document.currentScript && document.currentScript.getAttribute('data-active')) || '';
   var inbox = ADMIN.ls.get('nps.inbox', null);
   var newCount = inbox ? inbox.filter(function (m) { return m.status === 'new'; }).length : 3;

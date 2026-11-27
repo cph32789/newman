@@ -43,6 +43,16 @@
     var ms = read('nps.media');
     if (ms) { NPS.media.articles = mergeList(NPS.media.articles, ms.articles); NPS.media.videos = mergeList(NPS.media.videos, ms.videos); if (ms.intro) NPS.media.intro = ms.intro; }
   }
+  if (NPS.products && NPS.products.brands) {
+    NPS.productsBase = JSON.parse(JSON.stringify(NPS.products));
+    var ps = read('nps.products');
+    if (ps) { NPS.products.brands = mergeList(NPS.products.brands, ps); if (ps.intro) NPS.products.intro = ps.intro; if (ps.shop) NPS.products.shop = Object.assign({}, NPS.products.shop, ps.shop); }
+  }
+  if (NPS.offers && NPS.offers.items) {
+    NPS.offersBase = JSON.parse(JSON.stringify(NPS.offers));
+    var os = read('nps.offers');
+    if (os) { NPS.offers.items = mergeList(NPS.offers.items, os); if (os.intro) NPS.offers.intro = os.intro; if (os.empty) NPS.offers.empty = os.empty; }
+  }
   var ed = read('nps.procEdits') || {}, ids = Object.keys(ed); if (!ids.length) return;
   var P = NPS.procedures, byId = {}; P.forEach(function (p) { byId[p.id] = p; });
   var BASE = ['title', 'cat', 'kind', 'blurb', 'detail', 'aka', 'concerns', 'img', 'related'];

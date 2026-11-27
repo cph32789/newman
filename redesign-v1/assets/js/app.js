@@ -77,9 +77,9 @@
     { label: 'Midlife refresh', sub: 'Where to begin', q: 'menopause', image: 'cat-skin', fy: 30 },
     { label: 'Face', sub: 'Lifts, eyes, nose', explore: 'Face', image: 'cat-face', fy: 35 },
     { label: 'After pregnancy', sub: 'Mommy makeover', q: 'after baby', image: 'f-poise', fy: 35 },
-    { label: 'Breast', sub: 'Lift, augment, reduce', explore: 'Breast', image: 'cat-breast', fy: 40 },
+    { label: 'Breast', sub: 'Lift, augment, reduce', explore: 'Breast', image: 'chest', fy: 45 },
     { label: 'Glow', sub: 'Skin renewal', q: 'glow', image: 'f-glow', fy: 40 },
-    { label: 'Body', sub: 'Contour and confidence', explore: 'Body', image: 'cat-body', fy: 30 }
+    { label: 'Body', sub: 'Contour and confidence', explore: 'Body', image: 'torso', fy: 50 }
   ];
   var recent = [];
   try { recent = JSON.parse(localStorage.getItem('nps.recent') || '[]').filter(function (r) { return r.k === 'q' || byId[r.v]; }); } catch (e) { recent = []; }

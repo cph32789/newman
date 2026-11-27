@@ -19,8 +19,8 @@ window.NPS = window.NPS || {};
 NPS.team = {
   intro: 'We are proud to introduce the people you will meet at Newman Plastic Surgery. Each has a strong background in the medical field and shares our commitment to your having the best possible experience. Each of them has a heart for patient care.',
   principals: [
-    { id: 'dr-newman', name: 'Charles E. Newman, Jr., MD', role: 'Plastic & reconstructive surgeon', href: 'meet-dr-newman/#newman', photo: 'assets/img/dr-newman.png', w: 341, h: 341, fx: 50, fy: 46, zoom: 1.16 },
-    { id: 'dzi-newman', name: 'Dzi-Long Newman, MPAS, PA-C', role: 'Physician assistant', href: 'meet-dr-newman/#dzi', photo: 'assets/img/dzi-newman.png', w: 341, h: 341, fx: 50, fy: 46, zoom: 1.16 }
+    { id: 'dr-newman', name: 'Charles E. Newman, Jr., MD', role: 'Plastic & reconstructive surgeon', href: 'meet-dr-newman/#newman', photo: 'assets/img/dr-newman.png', w: 341, h: 341, fx: 50, fy: 50, zoom: 1.4 },
+    { id: 'dzi-newman', name: 'Dzi-Long Newman, MPAS, PA-C', role: 'Physician assistant', href: 'meet-dr-newman/#dzi', photo: 'assets/img/dzi-newman.png', w: 341, h: 341, fx: 50, fy: 50, zoom: 1.4 }
   ],
   members: [
     { id: 'joanne-dyl',     name: 'Joanne Dyl',      role: 'Financial Administrator',            photo: 'assets/img/team/joanne-dyl.jpg',     w: 200, h: 300, fx: 50, fy: 30, zoom: 1 },

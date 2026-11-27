@@ -24,7 +24,7 @@ const ctx = { console }; ctx.window = ctx; vm.createContext(ctx);
    localStorage keys the browser uses). assets/js/overrides.js applies them exactly as the browser does. */
 const STATE = process.env.NPS_STATE ? JSON.parse(fs.readFileSync(process.env.NPS_STATE, 'utf8')) : {};
 ctx.localStorage = { getItem: k => (k in STATE ? STATE[k] : null), setItem() {}, removeItem() {} };
-['data/site.js', 'data/procedures.js', 'data/images.js', 'data/library.js', 'data/feed.js', 'data/procedure-content.js', 'data/team.js', 'data/reviews.js', 'data/media.js'].forEach(f => vm.runInContext(fs.readFileSync(path.join(ROOT, f), 'utf8'), ctx));
+['data/site.js', 'data/procedures.js', 'data/images.js', 'data/library.js', 'data/feed.js', 'data/procedure-content.js', 'data/team.js', 'data/reviews.js', 'data/media.js', 'data/products.js', 'data/offers.js'].forEach(f => vm.runInContext(fs.readFileSync(path.join(ROOT, f), 'utf8'), ctx));
 const baseIds = ctx.NPS.procedures.map(p => p.id);
 vm.runInContext(fs.readFileSync(path.join(ROOT, 'assets/js/overrides.js'), 'utf8'), ctx);
 const NPS = ctx.NPS, P = NPS.procedures, byId = Object.fromEntries(P.map(p => [p.id, p]));
@@ -43,7 +43,7 @@ const rebase = (h, up) => h
   .replace(/href="#visit"/g, 'href="' + up + 'your-visit/"')
   .replace(/href="#surgeon"/g, 'href="' + up + 'meet-dr-newman/"')
   .replace(/href="#results"/g, 'href="' + up + 'results/"')
-  .replace(/href="(your-visit|meet-dr-newman|results|insurance-financing|location|our-team|reviews|media)\//g, 'href="' + up + '$1/')
+  .replace(/href="(your-visit|meet-dr-newman|results|insurance-financing|location|our-team|reviews|media|skin-care|special-offers)\//g, 'href="' + up + '$1/')
   .replace(/href="#discover"/g, 'href="' + up + '#discover"')
   .replace(/(src|href)="assets\//g, '$1="' + up + 'assets/');
 const toBase = h => rebase(h, '../../');
@@ -487,6 +487,55 @@ ${M.videos.length ? `<section class="section" id="videos" aria-labelledby="vidT"
     ld: { '@context': 'https://schema.org', '@type': 'MedicalBusiness', name: 'Newman Plastic Surgery', url: SITE_URL + 'media/' } });
 }
 
+/* ---------------- Skin care and Special offers ---------------- */
+const longDate = d => new Date(d + 'T12:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+const paras = t => String(t || '').split(/\n\s*\n/).map(x => x.trim()).filter(Boolean).map(x => `<p>${esc(x)}</p>`).join('');
+function buildSkinCare() {
+  const PR = NPS.products, sh = PR.shop || {};
+  const brands = PR.brands.map(b => `<article class="pbrand"><div class="pbimg">${b.image ? `<img src="${esc(webPath(b.image))}" alt="${esc(b.name)}" ${b.w && b.h ? `width="${+b.w}" height="${+b.h}" ` : ''}loading="lazy">` : `<span class="mono" aria-hidden="true">${esc(b.name[0] || '')}</span>`}</div><div class="btxt"><h3>${esc(b.name)}</h3>${paras(b.text)}${b.link ? `<p><a class="link" href="${esc(b.link)}" target="_blank" rel="noopener">Learn more</a></p>` : ''}</div></article>`).join('');
+  const body = `
+<section class="vhero wrap" aria-labelledby="skT">
+  <p class="eyebrow">Skin care</p>
+  <h1 id="skT" class="display" style="margin-top:14px">Skin care <em>products.</em></h1>
+  <p class="dblurb">${esc(PR.intro)}</p>
+  <div class="acts"><a class="btn btn--ink" href="#consult">Book a skin consultation</a>${sh.link ? `<a class="btn btn--line" href="${esc(sh.link)}" target="_blank" rel="noopener">${esc(sh.label || 'Shop online')}</a>` : ''}</div>
+</section>
+${sh.title || sh.text ? `<section class="section on-sand" aria-labelledby="shT"><div class="wrap pgrid" style="align-items:center">
+  <div class="pmain"><p class="eyebrow">Online ordering</p><h2 id="shT" class="h2">${esc(sh.title || 'Order online')}</h2><p>${esc(sh.text || '')}</p>${sh.link ? `<p style="margin-top:20px"><a class="btn btn--ink" href="${esc(sh.link)}" target="_blank" rel="noopener">${esc(sh.label || 'Shop online')} <svg><use href="#i-arrow"/></svg></a></p>` : ''}</div>
+  ${sh.image ? `<div class="shopimg"><img src="${esc(webPath(sh.image))}" alt="" ${sh.w && sh.h ? `width="${+sh.w}" height="${+sh.h}" ` : ''}loading="lazy"></div>` : ''}
+</div></section>` : ''}
+<section class="section" aria-labelledby="brT">
+  <div class="wrap">
+    <div class="head"><p class="eyebrow">Our brands</p><h2 id="brT" class="h2" style="margin-top:14px">Lines we <em>trust.</em></h2></div>
+    <div class="brands">${brands || '<p class="lead">Products are coming soon.</p>'}</div>
+    <p class="note" style="margin-top:30px">Skin care is personal. Our aesthetician will help you choose a regimen for your skin during a visit.</p>
+  </div>
+</section>`;
+  return shell({ title: 'Skin care products', desc: 'Skin care products and services at Newman Plastic Surgery in Orlando, Florida, including SkinMedica and EltaMD, with a licensed aesthetician.', dir: 'skin-care', body,
+    ld: { '@context': 'https://schema.org', '@type': 'MedicalBusiness', name: 'Newman Plastic Surgery', url: SITE_URL + 'skin-care/' } });
+}
+function buildOffers() {
+  const O = NPS.offers;
+  const cards = O.items.map(o => `<article class="ofc" data-start="${esc(o.start || '')}" data-end="${esc(o.end || '')}">${o.image ? `<div class="ofi frame"><img class="fit" src="${esc(webPath(o.image))}" alt="" ${o.w && o.h ? `width="${+o.w}" height="${+o.h}" ` : ''}loading="lazy" style="--fit:cover"></div>` : ''}<div class="oft"><h3>${esc(o.title)}</h3>${o.end ? `<p class="odate">Through ${esc(longDate(o.end))}</p>` : ''}${paras(o.text)}${o.fine ? `<p class="fine">${esc(o.fine)}</p>` : ''}<p><a class="btn btn--ink btn--sm" href="${esc(o.ctaLink || '#consult')}">${esc(o.ctaLabel || 'Request a consultation')}</a></p></div></article>`).join('');
+  const body = `
+<section class="vhero wrap" aria-labelledby="ofT">
+  <p class="eyebrow">Special offers</p>
+  <h1 id="ofT" class="display" style="margin-top:14px">Special offers <em>and events.</em></h1>
+  <p class="dblurb">${esc(O.intro)}</p>
+</section>
+<section class="section on-sand" aria-labelledby="ofl">
+  <div class="wrap">
+    <h2 id="ofl" class="h2" style="margin:0 0 6px">What’s <em>happening.</em></h2>
+    <div class="offers" id="offers">${cards}</div>
+    <div class="ofempty" id="ofempty"${O.items.length ? ' hidden' : ''}><p>${esc(O.empty)}</p><p style="margin-top:14px"><a class="btn btn--ink" href="#consult">Request a consultation</a></p></div>
+    <p class="note" style="margin-top:30px">Offers cannot be combined unless stated. Individual results vary.</p>
+  </div>
+</section>
+<script src="../assets/js/offers.js?v=${VERSION}"></script>`;
+  return shell({ title: 'Special offers', desc: 'Current specials and events at Newman Plastic Surgery in Orlando, Florida.', dir: 'special-offers', body,
+    ld: { '@context': 'https://schema.org', '@type': 'MedicalBusiness', name: 'Newman Plastic Surgery', url: SITE_URL + 'special-offers/' } });
+}
+
 function buildMeet() {
   const body = `
 <section class="surgeon section on-dark" id="newman" aria-labelledby="mT" style="padding-top:clamp(48px,7vw,110px)">
@@ -704,6 +753,6 @@ P.forEach(p => {
 });
 fs.mkdirSync(path.join(OUT, 'your-visit'), { recursive: true });
 fs.writeFileSync(path.join(OUT, 'your-visit', 'index.html'), buildVisit());
-[['meet-dr-newman', buildMeet], ['our-team', buildTeam], ['reviews', buildReviews], ['media', buildMedia], ['results', buildResults], ['insurance-financing', buildInsurance], ['location', buildLocation]].forEach(([d, fn]) => { fs.mkdirSync(path.join(OUT, d), { recursive: true }); fs.writeFileSync(path.join(OUT, d, 'index.html'), fn()); });
+[['meet-dr-newman', buildMeet], ['our-team', buildTeam], ['reviews', buildReviews], ['media', buildMedia], ['skin-care', buildSkinCare], ['special-offers', buildOffers], ['results', buildResults], ['insurance-financing', buildInsurance], ['location', buildLocation]].forEach(([d, fn]) => { fs.mkdirSync(path.join(OUT, d), { recursive: true }); fs.writeFileSync(path.join(OUT, d, 'index.html'), fn()); });
 console.log('built', n, 'procedure pages + your-visit + meet-dr-newman + results');
 if (OUT !== ROOT) fs.writeFileSync(path.join(OUT, '_removed.json'), JSON.stringify(baseIds.filter(id => !byId[id])));

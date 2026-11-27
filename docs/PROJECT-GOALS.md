@@ -131,3 +131,8 @@ The two principals (Dr. Newman and Dzi Newman) are shown first and use the portr
 (magazine features + video library) are managed in Admin > **Reviews** and **Media** (`assets/js/admin-list.js`).
 `reviews/` and `media/` are built when Publish runs. Videos are YouTube/Vimeo links (loaded only on play) or the
 three small files in `assets/video/`. Publication names were not recorded on the old site: add them in Admin.
+
+## Skin care and Special offers
+`data/products.js` (brands + online-ordering box) and `data/offers.js` (offers with optional start/end dates) are managed in
+Admin > **Skin care** and **Offers**. `assets/js/offers.js` shows an offer only between its dates, so an expired offer
+disappears without a republish. Both pages can be switched off in Admin > Pages & images.

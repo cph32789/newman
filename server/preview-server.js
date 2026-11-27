@@ -41,7 +41,7 @@ const PORT = +process.env.PORT || 8080;
 fs.mkdirSync(DATA, { recursive: true });
 
 /* ------------------------------------------------------------------ saved state */
-const PUB_KEYS = ['nps.gallery2', 'nps.imageSettings', 'nps.customImages', 'nps.procEdits', 'nps.siteEdits', 'nps.categories', 'nps.team', 'nps.reviews', 'nps.media', 'nps.pages'];
+const PUB_KEYS = ['nps.gallery2', 'nps.imageSettings', 'nps.customImages', 'nps.procEdits', 'nps.siteEdits', 'nps.categories', 'nps.team', 'nps.reviews', 'nps.media', 'nps.pages', 'nps.products', 'nps.offers'];
 const SHARED_KEYS = ['nps.inbox', 'nps.users', 'nps.sendTo', 'nps.activity', 'nps.pubSnap'];
 const ALL_KEYS = PUB_KEYS.concat(SHARED_KEYS);
 const STATE_FILE = path.join(DATA, 'state.json');
@@ -148,7 +148,7 @@ function rebuild(origin) {
 }
 
 /* ------------------------------------------------------------------ pages switched off in Admin > Pages & images */
-const OPTIONAL_PAGES = { 'our-team': 'our-team', reviews: 'reviews', media: 'media', 'insurance-financing': 'insurance-financing', location: 'location' };
+const OPTIONAL_PAGES = { 'our-team': 'our-team', reviews: 'reviews', media: 'media', 'skin-care': 'skin-care', 'special-offers': 'special-offers', 'insurance-financing': 'insurance-financing', location: 'location' };
 function hiddenPages() {                      // visitors only; the Admin always sees every page
   let c; try { c = JSON.parse(state.published['nps.pages'] || '{}'); } catch (e) { c = {}; }
   return Object.keys((c && c.hidden) || {}).filter(id => c.hidden[id] && OPTIONAL_PAGES[id]).map(id => OPTIONAL_PAGES[id]);

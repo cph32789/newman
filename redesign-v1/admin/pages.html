@@ -86,6 +86,8 @@
     {id:'results',n:'Results',path:'results/',slots:[],edit:['gallery.html','Gallery'],note:'Before-and-after galleries. Photos, order and 18+ settings are in Gallery.'},
     {id:'reviews',n:'Reviews',path:'reviews/',slots:[],optional:true,edit:['reviews.html','Reviews'],note:'Patient reviews. Add, edit and hide them in Reviews.'},
     {id:'media',n:'Media & videos',path:'media/',slots:[],optional:true,edit:['media.html','Media'],note:'Magazine features and the video library.'},
+    {id:'skin-care',n:'Skin care products',path:'skin-care/',slots:[],optional:true,edit:['skincare.html','Skin care'],note:'Skin care brands and online ordering.'},
+    {id:'special-offers',n:'Special offers',path:'special-offers/',slots:[],optional:true,edit:['offers.html','Offers'],note:'Current specials and events. Each offer ends by itself on its end date.'},
     {id:'your-visit',n:'Your visit',path:'your-visit/',slots:[],note:'What happens at a consultation, and common questions. The wording is edited by the web team for now.'},
     {id:'insurance-financing',n:'Insurance & financing',path:'insurance-financing/',slots:[],optional:true,edit:['settings.html','Settings (practice details)'],note:'Cost and coverage answers.'},
     {id:'location',n:'Location',path:'location/',slots:[],optional:true,edit:['settings.html','Settings (practice details)'],note:'Address, phone, map and directions. The address and phone come from Settings.'}
@@ -112,7 +114,7 @@
     });
     $('#pl').className='pl'; $('#pl').innerHTML=h;
   }
-  function frameHtml(w,asp,s,arch){ var im=NPS.images[s.image]; if(!im) return ''; var rad=arch?'border-radius:50%;':'border-radius:18px;';
+  function frameHtml(w,asp,s,arch){ var im=NPS.images[s.image]; if(!im) return ''; var rad='border-radius:18px;';
     return '<div class="frame" data-fr style="width:'+w+';aspect-ratio:'+asp+';'+rad+'"><img class="fit" src="'+im.src+'" alt="" width="'+im.w+'" height="'+im.h+'" style="'+NPS.fitStyle(s)+'"><span class="dot" style="left:'+s.fx+'%;top:'+s.fy+'%"></span></div>'; }
   function pagePanel(){
     var pg=pageById(curPage), hid=!!pagesCfg.hidden[pg.id];

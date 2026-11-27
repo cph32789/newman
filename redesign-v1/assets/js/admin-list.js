@@ -56,6 +56,7 @@
       if (f.type === 'select') return '<label class="field-a"' + wide + '>' + esc(f.label) + hint + '<select data-f="' + f.k + '">' + f.opts.map(function (o) { return '<option value="' + o[0] + '"' + (v === o[0] ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join('') + '</select></label>';
       if (f.type === 'check') return '<label class="chk1"' + wide + '><input type="checkbox" data-f="' + f.k + '"' + (v ? ' checked' : '') + '> ' + esc(f.label) + hint + '</label>';
       if (f.type === 'image') return '<div class="field-a imgf"' + wide + '><span>' + esc(f.label) + hint + '</span><div class="imgrow">' + (v ? '<img alt="" src="' + esc(src(v)) + '">' : '<div class="noimg">No picture</div>') + '<div><label class="btn btn--ink btn--sm" style="cursor:pointer">' + (v ? 'Replace' : 'Add') + ' picture<input type="file" accept="image/jpeg,image/png,image/webp" data-img="' + f.k + '" hidden></label>' + (v ? ' <button class="btn btn--line btn--sm" data-noimg="' + f.k + '" type="button">Remove</button>' : '') + '<p class="pv" data-st="' + f.k + '" role="status"></p></div></div></div>';
+      if (f.type === 'date') return '<label class="field-a"' + wide + '>' + esc(f.label) + hint + '<input type="date" data-f="' + f.k + '" value="' + esc(v || '') + '"></label>';
       return '<label class="field-a"' + wide + '>' + esc(f.label) + hint + '<input type="text" data-f="' + f.k + '" value="' + esc(v || '') + '"' + (f.ph ? ' placeholder="' + esc(f.ph) + '"' : '') + (f.readonly ? ' readonly' : '') + '></label>';
     }
     function renderEd() {
