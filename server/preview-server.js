@@ -41,7 +41,7 @@ const PORT = +process.env.PORT || 8080;
 fs.mkdirSync(DATA, { recursive: true });
 
 /* ------------------------------------------------------------------ saved state */
-const PUB_KEYS = ['nps.gallery2', 'nps.imageSettings', 'nps.customImages', 'nps.procEdits', 'nps.siteEdits', 'nps.categories', 'nps.team'];
+const PUB_KEYS = ['nps.gallery2', 'nps.imageSettings', 'nps.customImages', 'nps.procEdits', 'nps.siteEdits', 'nps.categories', 'nps.team', 'nps.reviews', 'nps.media'];
 const SHARED_KEYS = ['nps.inbox', 'nps.users', 'nps.sendTo', 'nps.activity', 'nps.pubSnap'];
 const ALL_KEYS = PUB_KEYS.concat(SHARED_KEYS);
 const STATE_FILE = path.join(DATA, 'state.json');

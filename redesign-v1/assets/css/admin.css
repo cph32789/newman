@@ -140,3 +140,19 @@ dialog.dlg2::backdrop{background:rgba(10,42,47,.55)}
 dialog.dlg2 h2{font:500 24px/1.2 var(--sans);margin:0 0 6px}
 .toast-a{position:fixed;left:50%;bottom:92px;transform:translate(-50%,20px);opacity:0;background:var(--teal-950);color:var(--paper);padding:14px 20px;border-radius:14px;z-index:99;transition:all .3s;max-width:90vw;text-align:center;pointer-events:none}
 .toast-a.on{opacity:1;transform:translate(-50%,0)}
+
+/* List editor (Reviews, Media) */
+.alwrap{display:grid;gap:24px;margin-top:16px}@media(min-width:960px){.alwrap{grid-template-columns:330px 1fr;align-items:start}}
+.alwrap .pl{max-height:62vh;overflow:auto;padding-right:4px}
+.alwrap .row{display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:14px;background:var(--paper);margin-bottom:6px;min-height:62px}
+.alwrap .row.nothumb{grid-template-columns:1fr auto}
+.alwrap .row[aria-current=true]{border-color:var(--clay);box-shadow:0 0 0 2px rgba(154,91,60,.18)}
+.alwrap .row .th{width:52px;height:64px;border-radius:8px;background:var(--sand-2);overflow:hidden}
+.alwrap .row .th img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+.alwrap .row button.pick{all:unset;cursor:pointer;display:flex;flex-direction:column;gap:2px;min-width:0}
+.alwrap .row b{font:600 15px/1.25 var(--sans)}.alwrap .row small{color:var(--muted);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.alwrap .row .mv{display:flex;gap:4px}.alwrap .row .mv button{width:36px;height:36px;border:1px solid var(--line);border-radius:10px;background:var(--paper);font:600 16px var(--sans)}
+.alwrap .tg{font:700 10px/1 var(--sans);letter-spacing:.08em;padding:3px 5px;border-radius:5px;background:#CDC3B3;color:#3a3128;margin-left:6px}
+.alwrap .imgrow{display:flex;gap:16px;align-items:flex-start;margin-top:8px}
+.alwrap .imgrow img{width:110px;border-radius:10px;border:1px solid var(--line);display:block}.alwrap .noimg{width:110px;height:140px;border-radius:10px;background:var(--sand-2);display:grid;place-items:center;color:var(--muted);font-size:13px}
+.chk1{display:flex;gap:10px;align-items:center;font:500 16px var(--sans)}.chk1 input{width:22px;height:22px}

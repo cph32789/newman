@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Media | Admin preview | Newman Plastic Surgery</title>
+<link rel="icon" href="../assets/img/favicon.png">
+<link rel="stylesheet" href="../assets/css/fonts.css?v=20261127j">
+<link rel="stylesheet" href="../assets/css/styles.css?v=20261127j">
+<link rel="stylesheet" href="../assets/css/admin.css?v=20261127j">
+</head>
+<body class="adm">
+<header id="ah"></header>
+<main class="wrap" style="padding-bottom:70px">
+<nav class="side" id="an" aria-label="Admin sections"></nav>
+<h1>Media <em>&amp; videos.</em></h1>
+<p class="intro">Magazine features and the video library shown on the <b>Media</b> page. For videos, paste a YouTube or Vimeo link: the video stays on their site, and visitors only load it when they press play.</p>
+<div class="panel" style="margin-top:18px"><label class="field-a">Introduction <span class="hint">(shown at the top of the Media page)</span><textarea id="intro" style="min-height:90px"></textarea></label></div>
+<div class="seg" style="margin-top:22px" role="group"><button type="button" data-tab="a" aria-pressed="true">Magazine features</button><button type="button" data-tab="v" aria-pressed="false">Videos</button></div>
+<div id="tabA"><div id="listA"></div><p class="pv">Add a picture of the page or article. A second picture can be added for a two-page feature. The publication name was not recorded on the old website, so please add it.</p></div>
+<div id="tabV" hidden><div id="listV"></div><p class="pv">Videos that live on this site (Halo, Kybella, Microneedling) can be hidden or reordered here. New videos should be YouTube or Vimeo links.</p></div>
+<div class="tip">Changes go live when you press <b>Publish</b>.</div>
+<div class="bar"><div class="wrap"><button class="btn btn--ink btn--sm" id="save" type="button">Save changes</button><button class="btn btn--line btn--sm" id="discard" type="button">Discard</button><span class="st" id="st" role="status"></span></div></div>
+</main>
+<script src="../assets/js/admin-shell.js?v=20261127j" data-active="media"></script>
+<script src="../data/site.js?v=20261127j"></script>
+<script>window.NPS_BASE='../';</script>
+<script src="../data/media.js?v=20261127j"></script>
+<script src="../assets/js/admin-list.js?v=20261127j"></script>
+<script>
+(function(){
+  var NPS=window.NPS, A=window.ADMIN, $=function(s){return document.querySelector(s);}, base=NPS.media;
+  var ed=JSON.parse(JSON.stringify(A.ls.get('nps.media',{})||{})), dirty=false;
+  ed.articles=ed.articles||{order:[],items:{}}; ed.videos=ed.videos||{order:[],items:{}};
+  function mark(){dirty=true;$('#st').textContent='Unsaved changes';}
+  $('#intro').value=ed.intro||base.intro;
+  $('#intro').addEventListener('input',function(){ ed.intro=this.value; mark(); });
+  function ytId(v){ var m=String(v).match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{11})/); return m?m[1]:v.trim(); }
+  function vmId(v){ var m=String(v).match(/vimeo\.com\/(?:video\/)?(\d+)/); return m?m[1]:v.trim(); }
+  var LA=ADMINLIST.mount({ el:$('#listA'), noun:'feature', addPrompt:'Title of the feature?',
+    getBase:function(){return base.articles;}, getSaved:function(){return ed.articles;}, setSaved:function(s){ed.articles=s;}, onChange:mark,
+    title:function(m){return m.title;}, sub:function(m){return m.publication||'Publication not added yet';}, thumb:function(m){return m.image;},
+    newItem:function(n){return {title:n,publication:'',image:''};},
+    fields:[{k:'title',label:'Title',wide:true},{k:'publication',label:'Magazine or publication',hint:'e.g. Orlando Magazine'},{k:'link',label:'Link to the original',hint:'optional',ph:'https://'},
+      {k:'image',label:'Picture of the page',type:'image',hint:'the cover shown on the page',wide:true},{k:'image2',label:'Second page',type:'image',hint:'optional',wide:true}] });
+  var LV=ADMINLIST.mount({ el:$('#listV'), noun:'video', addPrompt:'Title of the video?',
+    getBase:function(){return base.videos;}, getSaved:function(){return ed.videos;}, setSaved:function(s){ed.videos=s;}, onChange:mark,
+    title:function(m){return m.title;}, sub:function(m){return m.kind==='file'?'Video file on this site':(m.kind==='vimeo'?'Vimeo':'YouTube')+' · '+(m.ref||'');}, thumb:function(m){return m.kind==='file'?m.poster:(m.kind==='youtube'&&m.ref?'https://i.ytimg.com/vi/'+m.ref+'/default.jpg':'');},
+    newItem:function(n){return {title:n,text:'',kind:'youtube',ref:''};},
+    fields:[{k:'title',label:'Title',wide:true},{k:'text',label:'Short description',type:'textarea',wide:true},
+      {k:'kind',label:'Where it is',type:'select',opts:[['youtube','YouTube'],['vimeo','Vimeo'],['file','A file on this site']]},
+      {k:'ref',label:'Video link or ID',hint:'paste the address from the browser',ph:'https://www.youtube.com/watch?v=…',clean:function(v){return v;}}] });
+  document.addEventListener('change',function(e){ var t=e.target; if(t.matches&&t.matches('#listV [data-f=ref]')){ var k=document.querySelector('#listV [data-f=kind]'); var kind=k?k.value:'youtube'; if(kind==='youtube') t.value=ytId(t.value); else if(kind==='vimeo') t.value=vmId(t.value); t.dispatchEvent(new Event('input',{bubbles:true})); } });
+  document.addEventListener('click',function(e){ var t=e.target.closest('[data-tab]'); if(!t) return; var a=t.getAttribute('data-tab')==='a'; $('#tabA').hidden=!a; $('#tabV').hidden=a; document.querySelectorAll('[data-tab]').forEach(function(b){b.setAttribute('aria-pressed',b===t);}); });
+  $('#save').addEventListener('click',function(){ var o={articles:ed.articles,videos:ed.videos}; if(ed.intro&&ed.intro.trim()&&ed.intro.trim()!==base.intro) o.intro=ed.intro.trim(); if(A.ls.set('nps.media',o)){ dirty=false; A.log('Saved media'); A.refresh(); $('#st').textContent='Saved. Press Publish to show it on the site.'; } else $('#st').textContent='Could not save.'; });
+  $('#discard').addEventListener('click',function(){ ed=JSON.parse(JSON.stringify(A.ls.get('nps.media',{})||{})); ed.articles=ed.articles||{order:[],items:{}}; ed.videos=ed.videos||{order:[],items:{}}; $('#intro').value=ed.intro||base.intro; dirty=false; LA.refresh(); LV.refresh(); $('#st').textContent='Unsaved changes were discarded.'; });
+  window.addEventListener('beforeunload',function(e){ if(dirty){ e.preventDefault(); e.returnValue=''; } });
+})();
+</script>
+</body>
+</html>

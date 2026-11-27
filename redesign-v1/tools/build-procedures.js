@@ -24,7 +24,7 @@ const ctx = { console }; ctx.window = ctx; vm.createContext(ctx);
    localStorage keys the browser uses). assets/js/overrides.js applies them exactly as the browser does. */
 const STATE = process.env.NPS_STATE ? JSON.parse(fs.readFileSync(process.env.NPS_STATE, 'utf8')) : {};
 ctx.localStorage = { getItem: k => (k in STATE ? STATE[k] : null), setItem() {}, removeItem() {} };
-['data/site.js', 'data/procedures.js', 'data/images.js', 'data/library.js', 'data/feed.js', 'data/procedure-content.js', 'data/team.js'].forEach(f => vm.runInContext(fs.readFileSync(path.join(ROOT, f), 'utf8'), ctx));
+['data/site.js', 'data/procedures.js', 'data/images.js', 'data/library.js', 'data/feed.js', 'data/procedure-content.js', 'data/team.js', 'data/reviews.js', 'data/media.js'].forEach(f => vm.runInContext(fs.readFileSync(path.join(ROOT, f), 'utf8'), ctx));
 const baseIds = ctx.NPS.procedures.map(p => p.id);
 vm.runInContext(fs.readFileSync(path.join(ROOT, 'assets/js/overrides.js'), 'utf8'), ctx);
 const NPS = ctx.NPS, P = NPS.procedures, byId = Object.fromEntries(P.map(p => [p.id, p]));
@@ -43,7 +43,7 @@ const rebase = (h, up) => h
   .replace(/href="#visit"/g, 'href="' + up + 'your-visit/"')
   .replace(/href="#surgeon"/g, 'href="' + up + 'meet-dr-newman/"')
   .replace(/href="#results"/g, 'href="' + up + 'results/"')
-  .replace(/href="(your-visit|meet-dr-newman|results|insurance-financing|location|our-team)\//g, 'href="' + up + '$1/')
+  .replace(/href="(your-visit|meet-dr-newman|results|insurance-financing|location|our-team|reviews|media)\//g, 'href="' + up + '$1/')
   .replace(/href="#discover"/g, 'href="' + up + '#discover"')
   .replace(/(src|href)="assets\//g, '$1="' + up + 'assets/');
 const toBase = h => rebase(h, '../../');
@@ -419,6 +419,74 @@ function buildTeam() {
     ld: { '@context': 'https://schema.org', '@type': 'MedicalBusiness', name: 'Newman Plastic Surgery', url: SITE_URL + 'our-team/', employee: NPS.team.members.map(m => ({ '@type': 'Person', name: m.name, jobTitle: m.role })) } });
 }
 
+
+/* ---------------- Reviews and Media (data/reviews.js, data/media.js + Admin edits) ---------------- */
+const webPath = p => (/^(\/|data:|https?:)/.test(p) ? p : '../' + p);
+function buildReviews() {
+  const R = NPS.reviews, items = R.items;
+  const cards = items.map(r => `<figure class="rvc"><div class="stars" aria-label="Five stars">${'<svg><use href="#i-star"/></svg>'.repeat(5)}</div>${r.title ? `<h3>${esc(r.title)}</h3>` : ''}<blockquote>${esc(r.text)}</blockquote><figcaption><b>${esc(r.who || 'Patient review')}</b>${[r.procedure, r.source].filter(Boolean).length ? `<span>${esc([r.procedure, r.source].filter(Boolean).join(' · '))}</span>` : ''}${r.link ? `<a class="link" href="${esc(r.link)}" target="_blank" rel="noopener">Read the original</a>` : ''}</figcaption></figure>`).join('');
+  const body = `
+<section class="vhero wrap" aria-labelledby="rT">
+  <p class="eyebrow">Patient reviews</p>
+  <h1 id="rT" class="display" style="margin-top:14px">In their <em>own words.</em></h1>
+  <p class="dblurb">${esc(R.intro)}</p>
+  <div class="acts"><a class="btn btn--ink" href="#consult">Request a consultation</a><a class="btn btn--line" href="../results/">See results</a></div>
+</section>
+<section class="section on-sand" aria-labelledby="rlT">
+  <div class="wrap">
+    <h2 id="rlT" class="h2" style="margin:0 0 6px">What patients <em>say.</em></h2>
+    ${items.length ? `<div class="rvgrid">${cards}</div>` : '<p class="lead">Reviews are coming soon.</p>'}
+    <p class="note" style="margin-top:30px">Reviews are shared with each patient’s permission. Individual results vary.</p>
+  </div>
+</section>
+<section class="section" aria-labelledby="rvT">
+  <div class="wrap pgrid" style="align-items:center">
+    <div class="pmain"><p class="eyebrow">Hear it from them</p><h2 id="rvT" class="h2">Patient videos <em>and stories.</em></h2>
+      <p>Watch patients and Dr. Newman talk about what to expect, in our video library.</p></div>
+    <div><a class="btn btn--ink" href="../media/#videos">Watch the videos <svg><use href="#i-arrow"/></svg></a></div>
+  </div>
+</section>`;
+  return shell({ title: 'Patient reviews', desc: 'Patient reviews and testimonials for Newman Plastic Surgery in Orlando, Florida, shared with permission.', dir: 'reviews', body,
+    ld: { '@context': 'https://schema.org', '@type': 'MedicalBusiness', name: 'Newman Plastic Surgery', url: SITE_URL + 'reviews/' } });
+}
+function videoCard(v) {
+  const poster = v.kind === 'youtube' ? `https://i.ytimg.com/vi/${esc(v.ref)}/hqdefault.jpg` : v.kind === 'file' ? (v.poster ? esc(webPath(v.poster)) : '') : '';
+  const ref = v.kind === 'file' ? webPath(v.ref) : v.ref;
+  return `<article class="vcard"><button class="vplay" type="button" data-kind="${esc(v.kind)}" data-ref="${esc(ref)}" data-title="${esc(v.title)}" aria-label="Play: ${esc(v.title)}">${poster ? `<img src="${poster}" alt="" loading="lazy">` : ''}<span class="pbtn" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span></button><h3>${esc(v.title)}</h3><p>${esc(v.text || '')}</p></article>`;
+}
+function buildMedia() {
+  const M = NPS.media;
+  const arts = M.articles.map((a, i) => `<article class="acard"><button class="acover" type="button" data-art="${i}" aria-label="Read: ${esc(a.title)}"><span class="frame"><img class="fit" src="${esc(webPath(a.image))}" alt="" ${a.w && a.h ? `width="${+a.w}" height="${+a.h}" ` : ''}loading="lazy" style="--fit:cover;--fy:0%"></span></button><h3>${esc(a.title)}</h3>${a.publication ? `<p class="pub">${esc(a.publication)}</p>` : ''}</article>`).join('');
+  const data = JSON.stringify(M.articles.map(a => ({ t: a.title, p: a.publication || '', i: [a.image, a.image2].filter(Boolean).map(webPath), l: a.link || '' }))).replace(/</g, '\\u003c');
+  const body = `
+<section class="vhero wrap" aria-labelledby="mdT">
+  <p class="eyebrow">Media</p>
+  <h1 id="mdT" class="display" style="margin-top:14px">In the media <em>and on video.</em></h1>
+  <p class="dblurb">${esc(M.intro)}</p>
+  <div class="acts"><a class="btn btn--ink" href="#videos">Watch videos</a><a class="btn btn--line" href="#press">Read the features</a></div>
+</section>
+${M.articles.length ? `<section class="section on-sand" id="press" aria-labelledby="prsT">
+  <div class="wrap">
+    <div class="head"><p class="eyebrow">In print</p><h2 id="prsT" class="h2" style="margin-top:14px">Magazine <em>features.</em></h2></div>
+    <div class="agrid">${arts}</div>
+  </div>
+</section>` : ''}
+${M.videos.length ? `<section class="section" id="videos" aria-labelledby="vidT">
+  <div class="wrap">
+    <div class="head"><p class="eyebrow">Video library</p><h2 id="vidT" class="h2" style="margin-top:14px">See what to <em>expect.</em></h2></div>
+    <div class="vgrid">${M.videos.map(videoCard).join('')}</div>
+  </div>
+</section>` : ''}
+<dialog class="sheet full artview" id="artview" aria-labelledby="avT">
+  <span class="grab"></span>
+  <div class="top"><h2 id="avT">Feature</h2><button class="close" data-close aria-label="Close"><svg><use href="#i-close"/></svg></button></div>
+  <div class="scroll"><div id="avBody"></div></div>
+</dialog>
+<script>window.NPS_ARTICLES=${data};</script>`;
+  return shell({ title: 'Media and videos', desc: 'Magazine features about Dr. Newman and the practice, and the Newman Plastic Surgery video library.', dir: 'media', body, extraScripts: ['media.js'],
+    ld: { '@context': 'https://schema.org', '@type': 'MedicalBusiness', name: 'Newman Plastic Surgery', url: SITE_URL + 'media/' } });
+}
+
 function buildMeet() {
   const body = `
 <section class="surgeon section on-dark" id="newman" aria-labelledby="mT" style="padding-top:clamp(48px,7vw,110px)">
@@ -502,7 +570,7 @@ function buildMeet() {
 <section class="section on-sand" id="team" aria-labelledby="tmT">
   <div class="wrap">
     <div class="head"><p class="eyebrow">Our team</p><h2 id="tmT" class="h2" style="margin-top:14px">The people you will <em>meet.</em></h2><p class="lead" style="margin-top:14px">${esc(NPS.team.intro)}</p></div>
-    <div class="tgrid">${teamCards(true)}</div>
+    <div class="tgrid">${teamCards(false)}</div>
     <p style="margin-top:30px"><a class="btn btn--ink" href="../our-team/">Meet everyone <svg><use href="#i-arrow"/></svg></a></p>
   </div>
 </section>`;
@@ -635,6 +703,6 @@ P.forEach(p => {
 });
 fs.mkdirSync(path.join(OUT, 'your-visit'), { recursive: true });
 fs.writeFileSync(path.join(OUT, 'your-visit', 'index.html'), buildVisit());
-[['meet-dr-newman', buildMeet], ['our-team', buildTeam], ['results', buildResults], ['insurance-financing', buildInsurance], ['location', buildLocation]].forEach(([d, fn]) => { fs.mkdirSync(path.join(OUT, d), { recursive: true }); fs.writeFileSync(path.join(OUT, d, 'index.html'), fn()); });
+[['meet-dr-newman', buildMeet], ['our-team', buildTeam], ['reviews', buildReviews], ['media', buildMedia], ['results', buildResults], ['insurance-financing', buildInsurance], ['location', buildLocation]].forEach(([d, fn]) => { fs.mkdirSync(path.join(OUT, d), { recursive: true }); fs.writeFileSync(path.join(OUT, d, 'index.html'), fn()); });
 console.log('built', n, 'procedure pages + your-visit + meet-dr-newman + results');
 if (OUT !== ROOT) fs.writeFileSync(path.join(OUT, '_removed.json'), JSON.stringify(baseIds.filter(id => !byId[id])));

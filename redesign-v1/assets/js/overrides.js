@@ -22,6 +22,26 @@
       if (te.intro != null && te.intro !== '') NPS.team.intro = te.intro;
     }
   }
+  /* Reviews and Media: Admin saves { order:[ids], items:{ id:{...fields, hidden, deleted, custom} }, intro } (media has one per list) */
+  function mergeList(base, saved) {
+    var items = (saved && saved.items) || {};
+    var list = base.map(function (b) { return Object.assign({}, b, items[b.id] || {}); });
+    Object.keys(items).forEach(function (id) { var e = items[id]; if (e && e.custom && !base.some(function (b) { return b.id === id; })) list.push(Object.assign({ id: id }, e)); });
+    var ord = (saved && saved.order) || [], pos = function (id) { var i = ord.indexOf(id); return i < 0 ? 1e6 : i; };
+    return list.map(function (m, i) { m.__i = i; return m; }).sort(function (a, b) { return pos(a.id) - pos(b.id) || a.__i - b.__i; }).filter(function (m) { return !m.hidden && !m.deleted; });
+  }
+  NPS.mergeList = mergeList;
+  if (NPS.reviews && NPS.reviews.items) {
+    NPS.reviewsBase = JSON.parse(JSON.stringify(NPS.reviews));
+    var rs = read('nps.reviews');
+    if (rs) { NPS.reviews.items = mergeList(NPS.reviews.items, rs); if (rs.intro) NPS.reviews.intro = rs.intro; }
+    NPS.voices = NPS.reviews.items.filter(function (r) { return r.home; }).map(function (r) { return { text: r.text, who: r.who || 'Patient review' }; });
+  }
+  if (NPS.media && NPS.media.articles) {
+    NPS.mediaBase = JSON.parse(JSON.stringify(NPS.media));
+    var ms = read('nps.media');
+    if (ms) { NPS.media.articles = mergeList(NPS.media.articles, ms.articles); NPS.media.videos = mergeList(NPS.media.videos, ms.videos); if (ms.intro) NPS.media.intro = ms.intro; }
+  }
   var ed = read('nps.procEdits') || {}, ids = Object.keys(ed); if (!ids.length) return;
   var P = NPS.procedures, byId = {}; P.forEach(function (p) { byId[p.id] = p; });
   var BASE = ['title', 'cat', 'kind', 'blurb', 'detail', 'aka', 'concerns', 'img', 'related'];

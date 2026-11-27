@@ -125,3 +125,9 @@ Not on GitHub Pages: there the Admin stays a one-browser demo (sync.js and the s
 hides and deletes people and replaces photos (resized in the browser, stored on the server at `/uploads/`).
 The two principals (Dr. Newman and Dzi Newman) are shown first and use the portrait slots in Pages & images.
 `our-team/` and the "Our team" strip on Meet Dr. Newman are built from the saved edits when Publish runs.
+
+## Reviews and Media
+`data/reviews.js` (patient reviews; the ones marked "home" feed the Patient voices strip) and `data/media.js`
+(magazine features + video library) are managed in Admin > **Reviews** and **Media** (`assets/js/admin-list.js`).
+`reviews/` and `media/` are built when Publish runs. Videos are YouTube/Vimeo links (loaded only on play) or the
+three small files in `assets/video/`. Publication names were not recorded on the old site: add them in Admin.
