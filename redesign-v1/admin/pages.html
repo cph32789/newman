@@ -74,14 +74,14 @@
   var FR={ // aspect ratios of the real frames: [desktop, phone], shape
     'hero':{d:'16/9',m:'4/5',n:'Home · big picture at the top'},
     'cat.face':{d:'4/3.5',m:'3/4.6',n:'Home · Face card'},'cat.breast':{d:'4/3.5',m:'3/4.6',n:'Home · Breast card'},'cat.body':{d:'4/3.5',m:'3/4.6',n:'Home · Body card'},'cat.skin':{d:'4/3.5',m:'3/4.6',n:'Home · Skin card'},
-    'surgeon':{d:'1',m:'1',n:'Home and Our doctors · portrait',arch:1},
-    'dzi':{d:'1',m:'1',n:'Our doctors · Dzi Newman portrait',arch:1}
+    'surgeon':{d:'1',m:'1',n:'Home and Our providers · portrait',arch:1},
+    'dzi':{d:'1',m:'1',n:'Our providers · Dzi Newman portrait',arch:1}
   };
   var PN={'hero':'Top picture','cat.face':'Face card','cat.breast':'Breast card','cat.body':'Body card','cat.skin':'Skin card','surgeon':'Dr. Newman portrait','dzi':'Dzi Newman portrait'};
   /* every page of the site. optional = can be switched off. edit = where its content is edited. */
   var PAGES=[
     {id:'home',n:'Home',path:'',slots:['hero','cat.face','cat.breast','cat.body','cat.skin','surgeon'],edit:['discover.html','Discover feed'],note:'The first page visitors see. The procedure cards, Discover feed and patient voices come from Procedures, Reviews and the Discover feed.'},
-    {id:'doctors',n:'Our doctors',path:'meet-dr-newman/',slots:['surgeon','dzi'],team:true,edit:['team.html','Team (staff photos and names)'],note:'Dr. Newman and Dzi, with their biographies and the team strip.'},
+    {id:'doctors',n:'Our providers',path:'meet-dr-newman/',slots:['surgeon','dzi'],team:true,edit:['team.html','Team (staff photos and names)'],note:'Dr. Newman and Dzi, with their biographies and the team strip.'},
     {id:'our-team',n:'Our team',path:'our-team/',slots:[],team:true,optional:true,edit:['team.html','Team'],note:'The staff page. Photos, names and order are set in Team.'},
     {id:'procedures',n:'Procedure pages',path:'procedures/',slots:[],edit:['procedures.html','Procedures'],note:'One page for every procedure and treatment.'},
     {id:'results',n:'Results',path:'results/',slots:[],edit:['gallery.html','Gallery'],note:'Before-and-after galleries. Photos, order and 18+ settings are in Gallery.'},
@@ -118,7 +118,7 @@
   function tmBtn(m){ return '<button data-tm="'+esc(m.id)+'"'+(m.id===curTm?' aria-current="true"':'')+'><span class="tn">'+(m.photo?'<img src="'+esc(tmSrc(m.photo))+'" alt="" style="object-position:'+(+m.fx||50)+'% '+(+m.fy||30)+'%">':'<span style="display:grid;place-items:center;height:100%;font:italic 17px var(--serif)">'+esc(tmInit(m.name))+'</span>')+'</span><span>'+esc(m.name.replace(/,.*$/,''))+'<small>'+(m.photo?'Photo':'No photo')+'</small></span></button>'; }
   function tmPanel(){
     var m=tmGet(curTm); if(!m) return '';
-    return '<div class="panel" style="margin-top:14px"><h2>'+esc(m.name)+' · photo</h2><p class="intro" style="margin:0">'+esc(m.role||'')+'. The photo is a square on the Our team page'+(m.principal?'.':' and the team strip on Our doctors.')+'</p>'+
+    return '<div class="panel" style="margin-top:14px"><h2>'+esc(m.name)+' · photo</h2><p class="intro" style="margin:0">'+esc(m.role||'')+'. The photo is a square on the Our team page'+(m.principal?'.':' and the team strip on Our providers.')+'</p>'+
       '<div class="pv2"><div class="box"><small>How it shows</small><div class="frame" id="tmf" style="width:min(100%,300px);aspect-ratio:1;border-radius:18px;cursor:crosshair">'+(m.photo?'<img class="fit" src="'+esc(tmSrc(m.photo))+'" alt="" style="--fx:'+(+m.fx||50)+'%;--fy:'+(+m.fy||30)+'%;--zoom:'+(+m.zoom||1)+';--fit:cover"><span class="dot" style="left:'+(+m.fx||50)+'%;top:'+(+m.fy||30)+'%"></span>':'<span style="display:grid;place-items:center;height:100%;font:italic 64px var(--serif);color:var(--clay-ink)">'+esc(tmInit(m.name))+'</span>')+'</div><p class="fine2">'+(m.photo?'Click the photo to set the focus point.':'No photo yet. Their initials show until you add one.')+'</p></div>'+
       '<div><div class="pbtn" style="margin:0"><label class="btn btn--ink btn--sm" style="cursor:pointer">'+(m.photo?'Replace photo':'Add photo')+'<input type="file" id="tmup" accept="image/jpeg,image/png,image/webp" hidden></label>'+(m.photo?'<button class="btn btn--line btn--sm" data-tmno type="button">Remove photo</button>':'')+'</div>'+
       (m.photo?'<div class="sl"><label>Zoom<input type="range" id="tmz" min="1" max="2.5" step="0.05" value="'+(+m.zoom||1)+'"><output>'+(+m.zoom||1).toFixed(2)+'×</output></label></div>'+(m.w&&m.h&&Math.min(m.w,m.h)<500?'<p class="pv" style="color:var(--clay-ink)">This photo is small ('+m.w+' × '+m.h+'). It may look soft on large screens.</p>':''):'')+
@@ -156,7 +156,7 @@
     if(!cur||!inPage){ $('#ed').innerHTML=pagePanel(); return; }
     var f=FR[cur], libIds=Object.keys(NPS.images).filter(function(k){return !/^(facelift|breast|tummy|mommy|lipo|mwl|eyelid|nose|ear|male|inject|new)/.test(k);});
     var sd=eff(false), sm=eff(true), editing=mobile?sm:sd, im=NPS.images[draft.image];
-    var h=pagePanel()+'<div class="panel" style="margin-top:14px"><h2>'+esc(f.n)+'</h2><p class="intro" style="margin:0">Where it shows: '+(cur.indexOf('proc.')===0?'the top of that procedure’s page':'the home page'+(cur==='surgeon'||cur==='dzi'?' and the Our doctors page':''))+'.</p>'+
+    var h=pagePanel()+'<div class="panel" style="margin-top:14px"><h2>'+esc(f.n)+'</h2><p class="intro" style="margin:0">Where it shows: '+(cur.indexOf('proc.')===0?'the top of that procedure’s page':'the home page'+(cur==='surgeon'||cur==='dzi'?' and the Our providers page':''))+'.</p>'+
       '<div class="pv2"><div class="box"><small>Desktop</small>'+frameHtml('min(100%,560px)',f.d,sd,f.arch)+'<p class="fine2">Click the picture to set the focus point.</p></div>'+
       '<div class="box"><small>Phone</small>'+frameHtml('190px',f.m,sm,f.arch)+'</div></div>'+
       '<div class="seg" style="margin-top:18px" role="group" aria-label="Which screen to adjust"><button type="button" data-m="0" aria-pressed="'+!mobile+'">Adjust desktop</button><button type="button" data-m="1" aria-pressed="'+mobile+'">Adjust phone</button></div>'+

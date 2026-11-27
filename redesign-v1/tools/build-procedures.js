@@ -627,7 +627,7 @@ function buildMeet() {
     ${NPS.pagesHidden && NPS.pagesHidden['our-team'] ? '' : `<p style="margin-top:30px"><a class="btn btn--ink" href="../our-team/">Meet everyone <svg><use href="#i-arrow"/></svg></a></p>`}
   </div>
 </section>`;
-  return shell({ title: 'Our doctors', desc: 'Meet Charles Newman, Jr., M.D., a board certified Orlando plastic and reconstructive surgeon, his wife and partner Dzi Newman, PA-C, and the Newman Plastic Surgery team.', dir: 'meet-dr-newman', body,
+  return shell({ title: 'Our providers', desc: 'Meet Charles Newman, Jr., M.D., a board certified Orlando plastic and reconstructive surgeon, his wife and partner Dzi Newman, PA-C, and the Newman Plastic Surgery team.', dir: 'meet-dr-newman', body,
     ld: { '@context': 'https://schema.org', '@type': 'Physician', name: 'Charles E. Newman, Jr., MD', medicalSpecialty: 'PlasticSurgery', url: SITE_URL + 'meet-dr-newman/', worksFor: { '@type': 'MedicalBusiness', name: 'Newman Plastic Surgery', address: { '@type': 'PostalAddress', streetAddress: '444 North Mills Avenue', addressLocality: 'Orlando', addressRegion: 'FL', postalCode: '32803' } } } });
 }
 

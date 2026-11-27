@@ -67,7 +67,7 @@
 (function(){
   var NPS=window.NPS, A=window.ADMIN, PK=window.PAGEKIT, $=function(s){return document.querySelector(s);}, esc=A.esc;
   var q=new URLSearchParams(location.search), KEY=PK.pageKey(q.get('p')||'');
-  var PAGES=[['','Home'],['meet-dr-newman','Our doctors'],['our-team','Our team'],['results','Results'],['reviews','Reviews'],['media','Media & videos'],['skin-care','Skin care products'],['special-offers','Special offers'],['your-visit','Your visit'],['insurance-financing','Insurance & financing'],['location','Location']];
+  var PAGES=[['','Home'],['meet-dr-newman','Our providers'],['our-team','Our team'],['results','Results'],['reviews','Reviews'],['media','Media & videos'],['skin-care','Skin care products'],['special-offers','Special offers'],['your-visit','Your visit'],['insurance-financing','Insurance & financing'],['location','Location']];
   var sel='<optgroup label="Pages">'+PAGES.map(function(p){return '<option value="'+p[0]+'">'+esc(p[1])+'</option>';}).join('')+'</optgroup><optgroup label="Procedure pages">'+NPS.procedures.map(function(p){return '<option value="procedures/'+p.id+'">'+esc(p.title.replace(/\s*\(.*\)/,''))+'</option>';}).join('')+'</optgroup>';
   $('#pg').innerHTML=sel; $('#pg').value=KEY;
   var url='/'+(KEY?KEY+'/':'');

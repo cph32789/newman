@@ -62,7 +62,7 @@ const sizeFor = t => { const n = t.length; return n <= 12 ? 120 : n <= 20 ? 100 
   }
   await shoot('home.jpg', { eyebrow: 'Plastic surgery & aesthetics', title: 'The beauty of feeling <em>like you.</em>', blurb: 'Thoughtfully considered plastic surgery. Deeply personal care.', image: 'assets/img/hero-1600.webp', fx: 72, fy: 24, size: 88 });
   await shoot('landing.jpg', { eyebrow: 'Website redesign preview', title: 'Newman Plastic Surgery <em>redesign.</em>', blurb: 'See the new home page and explore the earlier concepts.', image: 'assets/img/hero-1600.webp', fx: 72, fy: 24, size: 76 });
-  await shoot('meet-dr-newman.jpg', { eyebrow: 'Our doctors', title: 'Dr. Newman <em>and Dzi.</em>', blurb: 'Charles Newman, Jr., M.D., and Dzi Newman, PA-C, in Orlando.', image: 'assets/img/hero-1600.webp', fx: 72, fy: 24, size: 78 });
+  await shoot('meet-dr-newman.jpg', { eyebrow: 'Our providers', title: 'Dr. Newman <em>and Dzi.</em>', blurb: 'Charles Newman, Jr., M.D., and Dzi Newman, PA-C, in Orlando.', image: 'assets/img/hero-1600.webp', fx: 72, fy: 24, size: 78 });
   await shoot('our-team.jpg', { eyebrow: 'Our team', title: 'The people who <em>look after you.</em>', blurb: 'Dr. Newman, Dzi Newman, PA-C, and the Newman Plastic Surgery team.', image: 'assets/img/hero-1600.webp', fx: 72, fy: 24, size: 70 });
   await shoot('reviews.jpg', { eyebrow: 'Patient reviews', title: 'In their <em>own words.</em>', blurb: 'Kind words from the people we care for.', image: 'assets/img/hero-1600.webp', fx: 72, fy: 24, size: 78 });
   await shoot('media.jpg', { eyebrow: 'Media', title: 'In the media <em>and on video.</em>', blurb: 'Magazine features and our video library.', image: 'assets/img/hero-1600.webp', fx: 72, fy: 24, size: 70 });
