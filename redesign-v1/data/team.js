@@ -2,7 +2,7 @@
    The team, in the order shown on "Our team".
    Managed in Admin ("Team"): add, edit, reorder, hide, delete, change photos.
    The two principals (Dr. Newman and Dzi Newman) are shown first and link to
-   "Our providers". Their photos here are for this page and the team strip; the larger
+   "Our doctors". Their photos here are for this page and the team strip; the larger
    portraits on Meet Dr. Newman are set in Admin > Pages & images.
 
    Fields

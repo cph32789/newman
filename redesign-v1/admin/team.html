@@ -32,7 +32,7 @@
 .pbox .dot{position:absolute;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px var(--clay),0 2px 8px rgba(0,0,0,.4);pointer-events:none}
 </style>
 <h1>Our <em>team.</em></h1>
-<p class="intro">The staff shown on the <b>Our team</b> page and at the bottom of <b>Our providers</b>. Add people, change names, titles and photos, put them in the order you want, or hide someone.</p>
+<p class="intro">The staff shown on the <b>Our team</b> page and at the bottom of <b>Our doctors</b>. Add people, change names, titles and photos, put them in the order you want, or hide someone.</p>
 <div class="layout">
   <aside>
     <div class="pbtn" style="margin:0 0 10px"><button class="btn btn--ink btn--sm" id="add" type="button">+ Add team member</button></div>
@@ -84,7 +84,7 @@
       '<div class="pbtn" style="margin:0"><label class="btn btn--ink btn--sm" style="cursor:pointer">'+(m.photo?'Replace photo':'Add photo')+'<input type="file" id="up" accept="image/jpeg,image/png,image/webp" hidden></label>'+(m.photo?'<button class="btn btn--line btn--sm" data-nophoto type="button">Remove photo</button>':'')+'</div>'+
       (m.photo?'<label class="field-a" style="margin-top:14px">Zoom <span class="hint" id="zv">'+(+m.zoom||1).toFixed(2)+'×</span><input type="range" id="zoom" min="1" max="2.5" step="0.05" value="'+(+m.zoom||1)+'"></label>'+(m.w&&m.h&&Math.min(m.w,m.h)<500?'<p class="pv" style="color:var(--clay-ink)">This photo is small ('+m.w+' × '+m.h+'). It may look soft on large screens. A larger photo will look sharper.</p>':''):'')+
       '<p class="pv" id="upst" role="status"></p></div></div>'+
-      (m.principal?'<p class="pv" style="margin-top:16px">This is the photo used on the Our team page and the team strip. The larger portraits on <b>Our providers</b> are set in <a class="link" href="pages.html">Pages &amp; images</a>.</p>':'<div class="pbtn" style="margin-top:18px"><label class="sw" title="Show on the site"><input type="checkbox" data-vis'+(!m.hidden?' checked':'')+' aria-label="Show on the site"><i></i></label><span class="pv" style="margin:0">'+(m.hidden?'Hidden from the site':'Visible on the site')+'</span><button class="btn btn--line btn--sm" data-del type="button" style="margin-left:auto">Delete</button></div>')+'</div>';
+      (m.principal?'<p class="pv" style="margin-top:16px">This is the photo used on the Our team page and the team strip. The larger portraits on <b>Our doctors</b> are set in <a class="link" href="pages.html">Pages &amp; images</a>.</p>':'<div class="pbtn" style="margin-top:18px"><label class="sw" title="Show on the site"><input type="checkbox" data-vis'+(!m.hidden?' checked':'')+' aria-label="Show on the site"><i></i></label><span class="pv" style="margin:0">'+(m.hidden?'Hidden from the site':'Visible on the site')+'</span><button class="btn btn--line btn--sm" data-del type="button" style="margin-left:auto">Delete</button></div>')+'</div>';
   }
   /* resize in the browser, then store on the server (or in the browser when there is no server) */
   function prepare(file){
