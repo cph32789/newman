@@ -511,6 +511,20 @@ function buildMeet() {
   </div>
 </section>
 
+
+<section class="section" id="path" aria-labelledby="pT">
+  <div class="wrap pgrid" style="align-items:start">
+    <div class="pmain"><p class="eyebrow">Training</p><h2 id="pT" class="h2">A path that <em>led home.</em></h2>
+      <p>Dr. Newman trained broadly, in every area of plastic surgery, with leaders in the field.</p></div>
+    <ol class="tline">
+      <li><h3>Undergraduate</h3><p>Davidson College in Davidson, North Carolina, where he majored in Biology.</p></li>
+      <li><h3>Medical school</h3><p>University of South Florida College of Medicine, back home in Florida.</p></li>
+      <li><h3>Residency</h3><p>Wake Forest University Baptist Medical Center in Winston-Salem: general surgery and all aspects of plastic surgery, including reconstructive, cosmetic, pediatric reconstruction, hand surgery, microsurgery and endoscopic techniques.</p></li>
+      <li><h3>Mentors</h3><p>Trained under prominent leaders in plastic surgery, including Dr. Malcolm Marks, Dr. Louis Argenta and Dr. Wayne Meredith.</p></li>
+    </ol>
+  </div>
+</section>
+
 <section class="surgeon section on-dark dzihero" id="dzi" aria-labelledby="dzT" style="padding-top:clamp(40px,6vw,90px)">
   <div class="wrap grid">
     <div class="portrait">
@@ -532,19 +546,6 @@ function buildMeet() {
       </div>
       <div class="actions"><a class="btn btn--champagne" href="#consult">Request a consultation <svg><use href="#i-arrow"/></svg></a><a class="link" href="#team">Meet the team</a></div>
     </div>
-  </div>
-</section>
-
-<section class="section" id="path" aria-labelledby="pT">
-  <div class="wrap pgrid" style="align-items:start">
-    <div class="pmain"><p class="eyebrow">Training</p><h2 id="pT" class="h2">A path that <em>led home.</em></h2>
-      <p>Dr. Newman trained broadly, in every area of plastic surgery, with leaders in the field.</p></div>
-    <ol class="tline">
-      <li><h3>Undergraduate</h3><p>Davidson College in Davidson, North Carolina, where he majored in Biology.</p></li>
-      <li><h3>Medical school</h3><p>University of South Florida College of Medicine, back home in Florida.</p></li>
-      <li><h3>Residency</h3><p>Wake Forest University Baptist Medical Center in Winston-Salem: general surgery and all aspects of plastic surgery, including reconstructive, cosmetic, pediatric reconstruction, hand surgery, microsurgery and endoscopic techniques.</p></li>
-      <li><h3>Mentors</h3><p>Trained under prominent leaders in plastic surgery, including Dr. Malcolm Marks, Dr. Louis Argenta and Dr. Wayne Meredith.</p></li>
-    </ol>
   </div>
 </section>
 
