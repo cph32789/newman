@@ -693,6 +693,7 @@ window.NPS = window.NPS || {};
       var o = st.cases[c.id]; if (!o) return;
       Object.keys(o).forEach(function (k) { if (k === 'show') c.show = Object.assign({}, c.show, o.show); else if (o[k] === '' || o[k] == null) delete c[k]; else c[k] = o[k]; });
     });
+    out.forEach(function (c) { if (st.cases[c.id] && st.cases[c.id].views) c.views.forEach(function (v) { ['before', 'after'].forEach(function (k) { var p = v[k]; if (p && p.src) NPS.images[p.image] = { src: p.src, w: p.w, h: p.h, alt: p.alt || '' }; }); }); });
     return out.concat(JSON.parse(JSON.stringify(st.added)));
   };
   L.gated = function (c, defs) {

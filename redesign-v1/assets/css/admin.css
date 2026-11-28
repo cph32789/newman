@@ -44,7 +44,7 @@
 .ed{display:none;padding:6px 18px 22px;border-top:1px solid var(--line);background:var(--ivory)}
 .cs.open .ed{display:block}
 .ed .big{display:grid;gap:18px;margin-top:16px}
-@media(min-width:900px){.ed .big{grid-template-columns:260px 1fr}}
+@media(min-width:900px){.ed .big{grid-template-columns:340px 1fr}}
 .ed .pics{display:grid;grid-template-columns:1fr 1fr;gap:4px;align-content:start}
 .ed .pics img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:8px}
 .ed .pics small{grid-column:1/-1;color:var(--muted);font-size:13px}
@@ -160,3 +160,20 @@ dialog.dlg2 h2{font:500 24px/1.2 var(--sans);margin:0 0 6px}
 .alwrap .pl{padding-top:4px}
 @media(max-width:640px){.adm header .wrap{min-height:60px;padding-block:8px;gap:10px}.adm header .tag{display:none}.adm header img{height:28px}}
 .mchk{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:8px}.mchk label{display:flex;gap:8px;align-items:center;font:500 15px var(--sans)}.mchk input{width:20px;height:20px}
+/* gallery: photos of a case */
+.ed .vws{display:grid;gap:16px;align-content:start}
+.ed .vw{display:grid;gap:8px}
+.ed .vw .ph{display:grid;gap:6px;align-content:start}
+.ed .vw .rp{cursor:pointer;text-align:center;justify-content:center}
+.ed .vh{display:flex;gap:8px;align-items:center}
+.ed .vh input{flex:1;min-width:0}
+.ed .addv{border-top:1px dashed var(--line);padding-top:14px}
+.ed .addv .up{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ed .vws,.ed .vw,.ed .pics,.ed .ph{min-width:0}
+.ed .vw .ph img{width:100%;height:auto;min-width:0}
+.ed .vw .rp{font-size:12px;padding:8px 6px}
+.ed .vh input{height:40px;padding:0 10px;border:1px solid var(--line);border-radius:10px;background:#fff;font:400 14px var(--sans)}
+.ed .vh .ib{white-space:nowrap;font-size:12px}
+.ed .addv .drop img{max-height:90px}
+.ed .vh{flex-wrap:wrap}
+.ed .vh input{flex:1 1 120px}
